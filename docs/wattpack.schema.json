@@ -1,0 +1,1091 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "watt-wallet"
+        },
+        "version": {
+          "type": "number",
+          "const": 1
+        },
+        "kind": {
+          "type": "string",
+          "const": "library"
+        },
+        "definitions": {
+          "minItems": 1,
+          "maxItems": 2000,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "brand": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "reference": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "Chauffage",
+                  "Eau chaude",
+                  "Électroménager",
+                  "Informatique & TV",
+                  "Cuisson",
+                  "Éclairage & autres"
+                ]
+              },
+              "nominalW": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
+              "energy": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "power"
+                      },
+                      "activeW": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "standbyW": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "activeW",
+                      "standbyW"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "cycle"
+                      },
+                      "kwhPerCycle": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "standbyW": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "kwhPerCycle",
+                      "standbyW"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "const": "annual"
+                      },
+                      "kwhPerYear": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      }
+                    },
+                    "required": [
+                      "method",
+                      "kwhPerYear"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "defaultUsage": {
+                "type": "object",
+                "properties": {
+                  "hoursPerDay": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 24
+                  },
+                  "daysPerYear": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 365
+                  },
+                  "cyclesPerWeek": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  },
+                  "cycleHours": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 8760
+                  },
+                  "offPeakPercent": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "hoursPerDay",
+                  "daysPerYear",
+                  "cyclesPerWeek",
+                  "cycleHours",
+                  "offPeakPercent"
+                ],
+                "additionalProperties": false
+              },
+              "visual": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "builtin"
+                      },
+                      "id": {
+                        "type": "string",
+                        "enum": [
+                          "bulb",
+                          "radiator",
+                          "ac",
+                          "boiler",
+                          "fridge",
+                          "freezer",
+                          "tv",
+                          "pc",
+                          "laptop",
+                          "router",
+                          "washer",
+                          "dishwasher",
+                          "oven",
+                          "hob"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "glb"
+                      },
+                      "assetId": {
+                        "type": "string",
+                        "pattern": "^[a-zA-Z0-9_-]{1,100}$"
+                      },
+                      "fallback": {
+                        "type": "string",
+                        "enum": [
+                          "bulb",
+                          "radiator",
+                          "ac",
+                          "boiler",
+                          "fridge",
+                          "freezer",
+                          "tv",
+                          "pc",
+                          "laptop",
+                          "router",
+                          "washer",
+                          "dishwasher",
+                          "oven",
+                          "hob"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "assetId",
+                      "fallback"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "brand",
+              "reference",
+              "category",
+              "nominalW",
+              "energy",
+              "defaultUsage",
+              "visual",
+              "notes"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "format",
+        "version",
+        "kind",
+        "definitions"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "watt-wallet"
+        },
+        "version": {
+          "type": "number",
+          "const": 1
+        },
+        "kind": {
+          "type": "string",
+          "const": "home"
+        },
+        "home": {
+          "type": "object",
+          "properties": {
+            "tariff": {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "base",
+                    "hp-hc"
+                  ]
+                },
+                "basePrice": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000
+                },
+                "peakPrice": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000
+                },
+                "offPeakPrice": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000
+                },
+                "subscription": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000
+                }
+              },
+              "required": [
+                "mode",
+                "basePrice",
+                "peakPrice",
+                "offPeakPrice",
+                "subscription"
+              ],
+              "additionalProperties": false
+            },
+            "devices": {
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "definition": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "brand": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "reference": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "category": {
+                        "type": "string",
+                        "enum": [
+                          "Chauffage",
+                          "Eau chaude",
+                          "Électroménager",
+                          "Informatique & TV",
+                          "Cuisson",
+                          "Éclairage & autres"
+                        ]
+                      },
+                      "nominalW": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "energy": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "method": {
+                                "type": "string",
+                                "const": "power"
+                              },
+                              "activeW": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1000000000
+                              },
+                              "standbyW": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1000000000
+                              }
+                            },
+                            "required": [
+                              "method",
+                              "activeW",
+                              "standbyW"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "method": {
+                                "type": "string",
+                                "const": "cycle"
+                              },
+                              "kwhPerCycle": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1000000000
+                              },
+                              "standbyW": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1000000000
+                              }
+                            },
+                            "required": [
+                              "method",
+                              "kwhPerCycle",
+                              "standbyW"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "method": {
+                                "type": "string",
+                                "const": "annual"
+                              },
+                              "kwhPerYear": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 1000000000
+                              }
+                            },
+                            "required": [
+                              "method",
+                              "kwhPerYear"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "defaultUsage": {
+                        "type": "object",
+                        "properties": {
+                          "hoursPerDay": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 24
+                          },
+                          "daysPerYear": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 365
+                          },
+                          "cyclesPerWeek": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000000000
+                          },
+                          "cycleHours": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 8760
+                          },
+                          "offPeakPercent": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 100
+                          }
+                        },
+                        "required": [
+                          "hoursPerDay",
+                          "daysPerYear",
+                          "cyclesPerWeek",
+                          "cycleHours",
+                          "offPeakPercent"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "visual": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "builtin"
+                              },
+                              "id": {
+                                "type": "string",
+                                "enum": [
+                                  "bulb",
+                                  "radiator",
+                                  "ac",
+                                  "boiler",
+                                  "fridge",
+                                  "freezer",
+                                  "tv",
+                                  "pc",
+                                  "laptop",
+                                  "router",
+                                  "washer",
+                                  "dishwasher",
+                                  "oven",
+                                  "hob"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "id"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "kind": {
+                                "type": "string",
+                                "const": "glb"
+                              },
+                              "assetId": {
+                                "type": "string",
+                                "pattern": "^[a-zA-Z0-9_-]{1,100}$"
+                              },
+                              "fallback": {
+                                "type": "string",
+                                "enum": [
+                                  "bulb",
+                                  "radiator",
+                                  "ac",
+                                  "boiler",
+                                  "fridge",
+                                  "freezer",
+                                  "tv",
+                                  "pc",
+                                  "laptop",
+                                  "router",
+                                  "washer",
+                                  "dishwasher",
+                                  "oven",
+                                  "hob"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "assetId",
+                              "fallback"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "notes": {
+                        "type": "string",
+                        "maxLength": 2000
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "brand",
+                      "reference",
+                      "category",
+                      "nominalW",
+                      "energy",
+                      "defaultUsage",
+                      "visual",
+                      "notes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "usage": {
+                    "type": "object",
+                    "properties": {
+                      "hoursPerDay": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 24
+                      },
+                      "daysPerYear": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 365
+                      },
+                      "cyclesPerWeek": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "cycleHours": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 8760
+                      },
+                      "offPeakPercent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "hoursPerDay",
+                      "daysPerYear",
+                      "cyclesPerWeek",
+                      "cycleHours",
+                      "offPeakPercent"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  "position": {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "minimum": -10,
+                        "maximum": 10
+                      },
+                      "z": {
+                        "type": "number",
+                        "minimum": -8,
+                        "maximum": 8
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "z"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "definition",
+                  "usage",
+                  "quantity",
+                  "position"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "scenarios": {
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "tariff": {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "enum": [
+                          "base",
+                          "hp-hc"
+                        ]
+                      },
+                      "basePrice": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "peakPrice": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "offPeakPrice": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "subscription": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "basePrice",
+                      "peakPrice",
+                      "offPeakPrice",
+                      "subscription"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "devices": {
+                    "maxItems": 500,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 120
+                        },
+                        "definition": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 120
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 100
+                            },
+                            "brand": {
+                              "type": "string",
+                              "maxLength": 100
+                            },
+                            "reference": {
+                              "type": "string",
+                              "maxLength": 100
+                            },
+                            "category": {
+                              "type": "string",
+                              "enum": [
+                                "Chauffage",
+                                "Eau chaude",
+                                "Électroménager",
+                                "Informatique & TV",
+                                "Cuisson",
+                                "Éclairage & autres"
+                              ]
+                            },
+                            "nominalW": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1000000000
+                            },
+                            "energy": {
+                              "oneOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "method": {
+                                      "type": "string",
+                                      "const": "power"
+                                    },
+                                    "activeW": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "maximum": 1000000000
+                                    },
+                                    "standbyW": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "maximum": 1000000000
+                                    }
+                                  },
+                                  "required": [
+                                    "method",
+                                    "activeW",
+                                    "standbyW"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "method": {
+                                      "type": "string",
+                                      "const": "cycle"
+                                    },
+                                    "kwhPerCycle": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "maximum": 1000000000
+                                    },
+                                    "standbyW": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "maximum": 1000000000
+                                    }
+                                  },
+                                  "required": [
+                                    "method",
+                                    "kwhPerCycle",
+                                    "standbyW"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "method": {
+                                      "type": "string",
+                                      "const": "annual"
+                                    },
+                                    "kwhPerYear": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "maximum": 1000000000
+                                    }
+                                  },
+                                  "required": [
+                                    "method",
+                                    "kwhPerYear"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              ]
+                            },
+                            "defaultUsage": {
+                              "type": "object",
+                              "properties": {
+                                "hoursPerDay": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 24
+                                },
+                                "daysPerYear": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 365
+                                },
+                                "cyclesPerWeek": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1000000000
+                                },
+                                "cycleHours": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 8760
+                                },
+                                "offPeakPercent": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 100
+                                }
+                              },
+                              "required": [
+                                "hoursPerDay",
+                                "daysPerYear",
+                                "cyclesPerWeek",
+                                "cycleHours",
+                                "offPeakPercent"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "visual": {
+                              "oneOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "const": "builtin"
+                                    },
+                                    "id": {
+                                      "type": "string",
+                                      "enum": [
+                                        "bulb",
+                                        "radiator",
+                                        "ac",
+                                        "boiler",
+                                        "fridge",
+                                        "freezer",
+                                        "tv",
+                                        "pc",
+                                        "laptop",
+                                        "router",
+                                        "washer",
+                                        "dishwasher",
+                                        "oven",
+                                        "hob"
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "kind",
+                                    "id"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "kind": {
+                                      "type": "string",
+                                      "const": "glb"
+                                    },
+                                    "assetId": {
+                                      "type": "string",
+                                      "pattern": "^[a-zA-Z0-9_-]{1,100}$"
+                                    },
+                                    "fallback": {
+                                      "type": "string",
+                                      "enum": [
+                                        "bulb",
+                                        "radiator",
+                                        "ac",
+                                        "boiler",
+                                        "fridge",
+                                        "freezer",
+                                        "tv",
+                                        "pc",
+                                        "laptop",
+                                        "router",
+                                        "washer",
+                                        "dishwasher",
+                                        "oven",
+                                        "hob"
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "kind",
+                                    "assetId",
+                                    "fallback"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              ]
+                            },
+                            "notes": {
+                              "type": "string",
+                              "maxLength": 2000
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "brand",
+                            "reference",
+                            "category",
+                            "nominalW",
+                            "energy",
+                            "defaultUsage",
+                            "visual",
+                            "notes"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "usage": {
+                          "type": "object",
+                          "properties": {
+                            "hoursPerDay": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 24
+                            },
+                            "daysPerYear": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 365
+                            },
+                            "cyclesPerWeek": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1000000000
+                            },
+                            "cycleHours": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 8760
+                            },
+                            "offPeakPercent": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100
+                            }
+                          },
+                          "required": [
+                            "hoursPerDay",
+                            "daysPerYear",
+                            "cyclesPerWeek",
+                            "cycleHours",
+                            "offPeakPercent"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 10000
+                        },
+                        "position": {
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": -10,
+                              "maximum": 10
+                            },
+                            "z": {
+                              "type": "number",
+                              "minimum": -8,
+                              "maximum": 8
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "z"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "definition",
+                        "usage",
+                        "quantity",
+                        "position"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "initialCost": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000000
+                  }
+                },
+                "required": [
+                  "tariff",
+                  "devices",
+                  "id",
+                  "name",
+                  "initialCost"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "tariff",
+            "devices",
+            "id",
+            "name",
+            "scenarios"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "format",
+        "version",
+        "kind",
+        "home"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "title": "Watt Wallet exchange manifest v1",
+  "$id": "urn:watt-wallet:wattpack:1"
+}

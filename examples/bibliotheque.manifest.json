@@ -1,0 +1,354 @@
+{
+  "format": "watt-wallet",
+  "version": 1,
+  "kind": "library",
+  "definitions": [
+    {
+      "id": "builtin-radiator",
+      "name": "Radiateur électrique",
+      "category": "Chauffage",
+      "nominalW": 1500,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "power",
+        "activeW": 1500,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 5,
+        "daysPerYear": 150,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "radiator"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-boiler",
+      "name": "Ballon d’eau chaude",
+      "category": "Eau chaude",
+      "nominalW": 2200,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "annual",
+        "kwhPerYear": 1300
+      },
+      "defaultUsage": {
+        "hoursPerDay": 0,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "boiler"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-fridge",
+      "name": "Réfrigérateur",
+      "category": "Électroménager",
+      "nominalW": 150,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "annual",
+        "kwhPerYear": 210
+      },
+      "defaultUsage": {
+        "hoursPerDay": 0,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "fridge"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-washer",
+      "name": "Lave-linge",
+      "category": "Électroménager",
+      "nominalW": 2000,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "cycle",
+        "kwhPerCycle": 0.8,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 0,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "washer"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-tv",
+      "name": "Télévision",
+      "category": "Informatique & TV",
+      "nominalW": 100,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "power",
+        "activeW": 85,
+        "standbyW": 0.5
+      },
+      "defaultUsage": {
+        "hoursPerDay": 4,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "tv"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-bulb",
+      "name": "Ampoule LED",
+      "category": "Éclairage & autres",
+      "nominalW": 9,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "power",
+        "activeW": 9,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 5,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "bulb"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-ac",
+      "name": "Climatiseur",
+      "category": "Chauffage",
+      "nominalW": 1200,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "power",
+        "activeW": 800,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 5,
+        "daysPerYear": 60,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "ac"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-freezer",
+      "name": "Congélateur",
+      "category": "Électroménager",
+      "nominalW": 150,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "annual",
+        "kwhPerYear": 230
+      },
+      "defaultUsage": {
+        "hoursPerDay": 0,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "freezer"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-pc",
+      "name": "Ordinateur fixe",
+      "category": "Informatique & TV",
+      "nominalW": 500,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "power",
+        "activeW": 180,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 6,
+        "daysPerYear": 300,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "pc"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-laptop",
+      "name": "Ordinateur portable",
+      "category": "Informatique & TV",
+      "nominalW": 65,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "power",
+        "activeW": 35,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 7,
+        "daysPerYear": 250,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "laptop"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-router",
+      "name": "Box Internet",
+      "category": "Informatique & TV",
+      "nominalW": 12,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "power",
+        "activeW": 12,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 24,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "router"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-dishwasher",
+      "name": "Lave-vaisselle",
+      "category": "Électroménager",
+      "nominalW": 2000,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "cycle",
+        "kwhPerCycle": 0.85,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 0,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "dishwasher"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-oven",
+      "name": "Four électrique",
+      "category": "Cuisson",
+      "nominalW": 2500,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "cycle",
+        "kwhPerCycle": 0.9,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 0,
+        "daysPerYear": 365,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "oven"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    },
+    {
+      "id": "builtin-hob",
+      "name": "Plaques de cuisson",
+      "category": "Cuisson",
+      "nominalW": 6000,
+      "brand": "",
+      "reference": "",
+      "energy": {
+        "method": "power",
+        "activeW": 1800,
+        "standbyW": 0
+      },
+      "defaultUsage": {
+        "hoursPerDay": 0.5,
+        "daysPerYear": 330,
+        "cyclesPerWeek": 3,
+        "cycleHours": 2,
+        "offPeakPercent": 0
+      },
+      "visual": {
+        "kind": "builtin",
+        "id": "hob"
+      },
+      "notes": "Exemple indicatif, à adapter à votre appareil. Ce ne sont pas des mesures constructeur."
+    }
+  ]
+}

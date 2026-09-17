@@ -1,0 +1,575 @@
+<header class="app-header">
+  <a class="brand" href="/" aria-label="Watt Wallet, accueil"
+    ><span class="brand-mark"><ww-icon name="bolt" /></span
+    ><span>watt<span class="brand-light">wallet</span><small>VOTRE ÉNERGIE, EN CLAIR</small></span></a
+  >
+  <nav aria-label="Navigation principale">
+    <button [class.active]="tab() === 'home'" (click)="chooseTab('home')">
+      <ww-icon name="home" />Mon logement</button
+    ><button [class.active]="tab() === 'scenarios'" (click)="chooseTab('scenarios')">
+      <ww-icon name="compare" />Mes scénarios</button
+    ><button [class.active]="tab() === 'library'" (click)="chooseTab('library')">
+      <ww-icon name="box" />Bibliothèque
+    </button>
+  </nav>
+  <div class="header-status">
+    <span class="status-dot"></span>100 % local<span class="version">BÊTA 0.1</span>
+  </div>
+</header>
+@if (store.loadError()) {
+<main class="load-state">
+  <ww-icon name="info" />
+  <h1>Vos données n’ont pas pu être ouvertes</h1>
+  <p>{{store.loadError()}}</p>
+  <p>La sauvegarde existante n’a pas été remplacée.</p>
+  <button class="btn primary" (click)="store.initialize()">Réessayer</button>
+</main>
+} @else if (!store.workspace()) {
+<main class="load-state">
+  <span class="brand-mark"><ww-icon name="bolt" /></span>
+  <h1>Préparons votre petit chez-vous…</h1>
+</main>
+} @else {
+<main class="workspace">
+  <aside class="library-panel">
+    <div class="library-title">
+      <div>
+        <span class="eyebrow">À CHAQUE APPAREIL</span>
+        <h2>Sa place chez vous.</h2>
+      </div>
+      <span class="count-pill">{{store.workspace()!.library.length}}</span>
+    </div>
+    <p class="subtle library-description">
+      Glissez un appareil sur le plateau<br />ou cliquez sur + pour l’ajouter.
+    </p>
+    <label class="search-box"
+      ><ww-icon name="search" /><input
+        aria-label="Rechercher un appareil"
+        placeholder="Rechercher un appareil…"
+        [value]="search()"
+        (input)="search.set(inputValue($event))"
+      /><kbd>⌕</kbd></label
+    >
+    <div class="category-filter">
+      <select
+        aria-label="Filtrer par catégorie"
+        [value]="category()"
+        (change)="category.set(inputValue($event))"
+      >
+        <option>Tous</option>
+        @for(c of categories; track c){
+        <option>{{c}}</option>
+        }</select
+      ><span>{{filteredLibrary().length}} fiches</span>
+    </div>
+    <div class="library-items">
+      @for(d of filteredLibrary(); track d.id) {
+      <div class="library-item" draggable="true" (dragstart)="drag($event, d)">
+        <span class="device-icon" [style.--device-color]="colors[d.category]"
+          ><ww-icon [name]="visualId(d)" /></span
+        ><button class="library-item-info" (click)="editDefinition(d)">
+          <strong>{{d.name}}</strong><span>{{energyLabel(d)}}</span></button
+        ><button class="add-device" [attr.aria-label]="'Ajouter ' + d.name" (click)="add(d)">
+          <ww-icon name="plus" />
+        </button>
+      </div>
+      } @empty {
+      <p class="empty-small">Aucun appareil trouvé.<br />Créez votre propre fiche.</p>
+      }
+    </div>
+    <div class="library-bottom">
+      <button class="btn secondary full" (click)="newDefinition()">
+        <ww-icon name="plus" />Créer un appareil
+      </button>
+      <div class="library-file-actions">
+        <button class="text-button" (click)="openImport()" [disabled]="busy()">
+          <ww-icon name="upload" />Importer</button
+        ><button
+          class="text-button"
+          (click)="exportPack(undefined, true)"
+          [disabled]="busy() || !store.workspace()!.library.length"
+        >
+          <ww-icon name="download" />Exporter
+        </button>
+      </div>
+      <div class="local-note">
+        <ww-icon name="leaf" /><span>Vos données restent chez vous.<br />Aucun compte. Aucun cloud.</span>
+      </div>
+    </div>
+  </aside>
+
+  <section class="main-panel">
+    <div class="page-heading">
+      <div>
+        <div class="breadcrumb">
+          <ww-icon name="home" /><select
+            aria-label="Choisir un logement"
+            [value]="store.home()!.id"
+            (change)="store.switchHome(inputValue($event))"
+          >
+            @for(h of store.workspace()!.homes; track h.id){
+            <option [value]="h.id">{{h.name}}</option>
+            }</select
+          ><button
+            class="icon-button tiny"
+            aria-label="Créer un logement"
+            title="Créer un logement"
+            (click)="openName('new-home')"
+          >
+            <ww-icon name="plus" />
+          </button>
+        </div>
+        <h1>
+          {{tab() === 'library' ? 'Votre bibliothèque d’appareils' : tab() === 'scenarios' ? 'Et si on
+          changeait les choses ?' : 'Un petit monde. Une énergie plus claire.'}}
+        </h1>
+        <p>
+          {{tab() === 'library' ? 'Des fiches à personnaliser, à garder et à partager.' : 'Composez votre
+          logement. Comprenez ce qui compte vraiment.'}}
+        </p>
+      </div>
+      <div class="heading-actions">
+        <button class="btn secondary" (click)="openImport()" [disabled]="busy()">
+          <ww-icon name="upload" />Importer</button
+        ><button class="btn primary" (click)="exportPack()" [disabled]="busy()">
+          <ww-icon name="download" />Partager le logement
+        </button>
+      </div>
+    </div>
+
+    @if(tab() === 'library') {
+    <div class="catalog-heading">
+      <span>{{filteredLibrary().length}} fiches · estimations modifiables</span
+      ><button class="btn primary" (click)="newDefinition()"><ww-icon name="plus" />Nouvelle fiche</button>
+    </div>
+    <div class="catalog-grid">
+      @for(d of filteredLibrary(); track d.id){
+      <article class="catalog-card">
+        <div class="catalog-illustration" [style.--device-color]="colors[d.category]">
+          <ww-icon [name]="visualId(d)" />
+        </div>
+        <span class="eyebrow">{{d.category}}</span>
+        <h2>{{d.name}}</h2>
+        <p>{{d.brand || 'Appareil générique'}} {{d.reference}}</p>
+        <strong>{{energyLabel(d)}}</strong>
+        <p class="field-hint">
+          {{d.visual.kind === 'glb' ? 'Modèle 3D personnalisé' : 'Silhouette intégrée'}}
+        </p>
+        <div class="catalog-actions">
+          <button class="btn secondary small" (click)="editDefinition(d)">Modifier</button
+          ><button
+            class="icon-button"
+            [attr.aria-label]="'Exporter ' + d.name"
+            (click)="exportPack(d)"
+            [disabled]="busy()"
+          >
+            <ww-icon name="download" /></button
+          ><button
+            class="icon-button"
+            [attr.aria-label]="'Supprimer la fiche ' + d.name"
+            (click)="deleteDefinition(d)"
+          >
+            <ww-icon name="trash" /></button
+          ><button
+            class="icon-button add-device"
+            [attr.aria-label]="'Ajouter ' + d.name + ' au logement'"
+            (click)="add(d)"
+          >
+            <ww-icon name="plus" />
+          </button>
+        </div>
+      </article>
+      }
+    </div>
+    } @else {
+    <section class="metrics" aria-label="Estimation annuelle">
+      <article class="metric">
+        <div class="metric-label">
+          <span class="metric-symbol peach"><ww-icon name="bolt" /></span>Consommation estimée<span
+            class="estimate-tag"
+            >ANNUELLE</span
+          >
+        </div>
+        <div class="metric-value">
+          {{number(store.result().kwh)}} <span>kWh<span class="metric-suffix"> / an</span></span>
+        </div>
+        <p>{{count()}} appareils, un seul regard sur votre énergie.</p>
+      </article>
+      <article class="metric">
+        <div class="metric-label">
+          <span class="metric-symbol sage"><ww-icon name="chart" /></span>Budget électricité
+        </div>
+        <div class="metric-value">
+          {{money(store.result().totalCost)}}<span class="metric-suffix"> / an</span>
+        </div>
+        <p>Dont {{money(store.result().subscription)}} d’abonnement.</p>
+      </article>
+      <article class="metric metric-monthly">
+        <div class="metric-label">
+          <span class="metric-symbol cream"><ww-icon name="leaf" /></span>Chaque mois, en moyenne
+        </div>
+        <div class="metric-value">
+          {{money(store.result().monthlyCost)}}<span class="metric-suffix"> / mois</span>
+        </div>
+        <p>Une estimation, pas une facture.</p>
+      </article>
+    </section>
+
+    @if(tab() === 'scenarios' || store.scenario()) {
+    <section class="scenario-section">
+      <div class="section-title">
+        <div>
+          <h2>Vos futurs possibles</h2>
+          <p>Modifiez une copie et comparez-la à votre logement de référence.</p>
+        </div>
+        <button class="btn secondary small" (click)="openName('new-scenario')">
+          <ww-icon name="plus" />Créer un scénario
+        </button>
+      </div>
+      <div class="scenario-tabs">
+        <button [class.active]="!store.scenarioId()" (click)="selectScenario(null)">
+          <ww-icon name="home" />Référence</button
+        >@for(s of store.home()!.scenarios; track s.id){<button
+          [class.active]="store.scenarioId() === s.id"
+          (click)="selectScenario(s.id)"
+        >
+          <ww-icon name="compare" />{{s.name}}</button
+        >}
+      </div>
+      @if(store.comparison(); as comparison){
+      <div class="comparison-grid">
+        <div>
+          <span>Énergie économisée / an</span
+          ><strong>{{number(comparison.kwhSaving, 1)}} <small>kWh</small></strong>
+        </div>
+        <div>
+          <span>Économie estimée / an</span
+          ><strong [class.negative]="comparison.annualSaving < 0"
+            >{{money(comparison.annualSaving, 2)}}</strong
+          >
+        </div>
+        <div>
+          <span>Retour sur le surcoût</span
+          ><strong
+            >{{comparison.paybackYears === null ? 'Non amorti' : store.scenario()!.initialCost === 0 ? 'Sans
+            surcoût' : number(comparison.paybackYears, 1) + ' ans'}}</strong
+          >
+        </div>
+      </div>
+      <form [formGroup]="costForm" (ngSubmit)="saveCost()" class="scenario-cost">
+        <label
+          >Surcoût initial (€)<input
+            formControlName="initialCost"
+            aria-label="Surcoût initial en euros"
+            type="number"
+            min="0"
+            step="any" /></label
+        ><button class="btn secondary small">Enregistrer</button
+        ><button type="button" class="text-button danger" (click)="store.removeScenario()">
+          Supprimer ce scénario
+        </button>
+      </form>
+      <details class="category-comparison">
+        <summary>Voir les économies par catégorie</summary>
+        @for(c of comparison.categories; track c.name){
+        <div>
+          <span>{{c.name}}</span><span>{{number(c.kwhSaving, 1)}} kWh · {{money(c.costSaving, 2)}} / an</span>
+        </div>
+        }
+      </details>
+      } @else if(!store.home()!.scenarios.length){
+      <p class="scenario-empty">
+        Un PC éteint la nuit ? Un appareil plus économe ? Créez votre premier scénario pour voir la
+        différence.
+      </p>
+      }
+    </section>
+    }
+
+    <div class="content-columns">
+      <div class="main-content">
+        <section class="diorama-card">
+          <header class="diorama-header">
+            <div>
+              <span class="eyebrow">VOTRE LOGEMENT, EN MINIATURE</span>
+              <h2>
+                {{store.scenario()?.name ?? store.home()!.name}}<button
+                  class="icon-button tiny"
+                  aria-label="Renommer le logement"
+                  (click)="openName('rename-home')"
+                >
+                  <ww-icon name="edit" />
+                </button>
+              </h2>
+            </div>
+            <span class="device-count"><span class="status-dot"></span>{{count()}} appareils</span>
+          </header>
+          <div class="scene-toolbar">
+            <div class="segmented" aria-label="Mode de visualisation">
+              <button [class.active]="mode() === 'consumption'" (click)="mode.set('consumption')">
+                <ww-icon name="chart" />Consommation</button
+              ><button [class.active]="mode() === 'placement'" (click)="mode.set('placement')">
+                <ww-icon name="box" />Placement
+              </button>
+            </div>
+            <span class="scene-tip"
+              ><ww-icon name="info" />{{mode() === 'consumption' ? 'Plus ça consomme, plus c’est grand.' :
+              'Des tailles uniformes pour placer vos appareils.'}}</span
+            >
+          </div>
+          <div class="stage">
+            <ww-diorama
+              [devices]="store.devices()"
+              [results]="store.result().devices"
+              [mode]="mode()"
+              [selectedId]="store.selectedId()"
+              (selected)="store.selectedId.set($event)"
+              (moved)="store.moveDevice($event.id, $event.position)"
+              (added)="drop($event)"
+            />@if(!store.devices().length){
+            <div class="empty-stage">
+              <h3>Tout commence par un appareil.</h3>
+              <p>Ajoutez-le depuis la bibliothèque à gauche.</p>
+            </div>
+            }
+          </div>
+          <footer class="scene-footer">
+            <span
+              ><ww-icon name="move" />Glisser le décor pour orbiter · Clic droit pour déplacer · Molette pour
+              zoomer</span
+            ><span class="isometric-tag">VUE ISOMÉTRIQUE</span>
+          </footer>
+        </section>
+        <section class="device-list">
+          <div class="section-title">
+            <h2>Les appareils de votre logement <span>{{store.devices().length}}</span></h2>
+            <ww-icon name="list" />
+          </div>
+          <div class="device-table">
+            <div class="table-heading">
+              <span>APPAREIL</span><span>QUANTITÉ</span><span>KWH / AN</span><span>€ / AN</span><span></span>
+            </div>
+            @for(d of store.devices(); track d.id; let i = $index){
+            <div class="device-row" [class.selected]="store.selectedId() === d.id">
+              <button class="table-device" (click)="store.selectedId.set(d.id)">
+                <span class="device-icon small-icon" [style.--device-color]="colors[d.definition.category]"
+                  ><ww-icon [name]="visualId(d.definition)" /></span
+                ><span
+                  ><strong>{{d.definition.name}}</strong><small>{{d.definition.category}}</small></span
+                ></button
+              ><span>× {{d.quantity}}</span><span>{{number(store.result().devices[i].kwh, 1)}}</span
+              ><span>{{money(store.result().devices[i].cost, 1)}}</span
+              ><button
+                class="icon-button"
+                [attr.aria-label]="'Modifier ' + d.definition.name"
+                (click)="store.selectedId.set(d.id)"
+              >
+                <ww-icon name="chevron" />
+              </button>
+            </div>
+            } @empty {
+            <p class="empty-small">Votre logement attend son premier appareil.</p>
+            }
+          </div>
+        </section>
+      </div>
+
+      <aside class="inspector">
+        @if(store.selected(); as selected){
+        <div class="inspector-heading">
+          <span class="eyebrow">DANS VOTRE LOGEMENT</span
+          ><button
+            class="icon-button tiny"
+            aria-label="Fermer les paramètres de l’appareil"
+            (click)="store.selectedId.set(null)"
+          >
+            <ww-icon name="close" />
+          </button>
+        </div>
+        <div class="selected-title">
+          <span class="device-icon" [style.--device-color]="colors[selected.definition.category]"
+            ><ww-icon [name]="visualId(selected.definition)"
+          /></span>
+          <h2>{{selected.definition.name}}</h2>
+        </div>
+        <div class="selected-stats">
+          <strong>{{number(selectedResult()?.kwh ?? 0)}}<small> kWh/an</small></strong
+          ><span>{{number((selectedResult()?.share ?? 0) * 100, 1)}} % du total</span>
+        </div>
+        <div class="inspector-actions">
+          <button class="btn secondary small" (click)="store.duplicateDevice(selected.id)">
+            <ww-icon name="copy" />Dupliquer</button
+          ><button
+            class="icon-button danger"
+            aria-label="Retirer cet appareil du logement"
+            (click)="store.removeDevice(selected.id)"
+          >
+            <ww-icon name="trash" /></button
+          ><button
+            class="icon-button"
+            title="Enregistrer une copie dans la bibliothèque"
+            aria-label="Enregistrer une copie dans la bibliothèque"
+            (click)="saveInstanceAsDefinition()"
+          >
+            <ww-icon name="save" />
+          </button>
+        </div>
+        <ww-device-editor
+          [definition]="selected.definition"
+          [instance]="selected"
+          (committed)="saveDevice($event)"
+        />
+        } @else {
+        <span class="eyebrow">CHAQUE KWH A UNE HISTOIRE</span>
+        <h2>Où va votre énergie ?</h2>
+        <p class="subtle">La répartition de votre consommation annuelle.</p>
+        <div class="donut" [style.background]="donut()">
+          <div>
+            <ww-icon name="bolt" /><strong>{{number(store.result().kwh)}}</strong><span>kWh / an</span>
+          </div>
+        </div>
+        <div class="category-legend">
+          @for(c of store.result().categories; track c.name){
+          <div>
+            <span class="legend-dot" [style.background]="colors[c.name]"></span><span>{{c.name}}</span
+            ><strong>{{number(c.share * 100, 1)}} %</strong>
+          </div>
+          }
+        </div>
+        <div class="insight">
+          <ww-icon name="leaf" />
+          <div>
+            <strong>Les petits gestes comptent.</strong>
+            <p>Testez une nouvelle habitude dans un scénario. Les économies deviennent concrètes.</p>
+            <button class="text-button" (click)="openName('new-scenario')">
+              Explorer un scénario <ww-icon name="chevron" />
+            </button>
+          </div>
+        </div>
+        }
+      </aside>
+    </div>
+    <section class="tariff-strip">
+      <span class="tariff-icon"><ww-icon name="settings" /></span>
+      <div>
+        <strong>Votre tarif d’électricité</strong
+        ><span
+          >{{store.snapshot()!.tariff.mode === 'base' ? 'Option Base · ' +
+          money(store.snapshot()!.tariff.basePrice, 4) + ' / kWh' : 'HP ' +
+          money(store.snapshot()!.tariff.peakPrice, 4) + ' · HC ' +
+          money(store.snapshot()!.tariff.offPeakPrice, 4) + ' / kWh'}} · Abonnement
+          {{money(store.snapshot()!.tariff.subscription)}} / an</span
+        >
+      </div>
+      <button class="btn secondary small" (click)="openTariff()">
+        Ajuster mon tarif <ww-icon name="chevron" />
+      </button>
+    </section>
+    <footer class="workspace-footer">
+      <span
+        ><span class="status-dot"></span>{{store.saveStatus()}}@if(store.saveStatus() === 'Échec de la
+        sauvegarde'){<button class="text-button" (click)="store.retrySave()">Réessayer</button>}</span
+      ><span>Des estimations pour mieux décider. À ajuster avec vos usages réels.</span>
+    </footer>
+    }
+  </section>
+</main>
+} @if(store.error()){
+<div class="error-banner" role="alert">
+  <ww-icon name="info" /><span>{{store.error()}}</span
+  ><button class="icon-button" aria-label="Fermer le message d’erreur" (click)="store.error.set('')">
+    <ww-icon name="close" />
+  </button>
+</div>
+} @if(toast()){
+<div class="toast" role="status"><ww-icon name="check" />{{toast()}}</div>
+} @if(busy() && !modal()){
+<div class="busy-status" role="status">Traitement du fichier…</div>
+} @if(modal()) {
+<dialog #modalDialog class="modal" [class.wide-modal]="modal() === 'device'" (cancel)="cancelModal($event)">
+  <div class="modal-header">
+    <span class="eyebrow">WATT WALLET</span
+    ><button class="icon-button" aria-label="Fermer la fenêtre" (click)="closeModal()" [disabled]="busy()">
+      <ww-icon name="close" />
+    </button>
+  </div>
+  @if(modal() === 'new-home' || modal() === 'new-scenario' || modal() === 'rename-home') {
+  <h2>
+    {{modal() === 'new-home' ? 'Un nouveau chez-vous' : modal() === 'new-scenario' ? 'Imaginez une autre façon
+    de vivre' : 'Le nom de votre logement'}}
+  </h2>
+  <p class="subtle">
+    {{modal() === 'new-scenario' ? 'Une copie complète de la configuration actuelle. Votre référence reste
+    intacte.' : 'Un nom pour retrouver facilement votre logement.'}}
+  </p>
+  <form [formGroup]="nameForm" (ngSubmit)="saveName()">
+    <label
+      >Nom<input
+        formControlName="name"
+        autofocus
+        maxlength="100"
+        placeholder="Ex. Appartement à Lyon" /></label
+    >@if(modalError()){
+    <p class="inline-error">{{modalError()}}</p>
+    }<button class="btn primary full" type="submit">
+      {{modal() === 'rename-home' ? 'Enregistrer' : 'Créer'}}
+    </button>
+  </form>
+  } @if(modal() === 'tariff') {
+  <h2>Votre électricité, votre tarif.</h2>
+  <p class="subtle">Recopiez les prix TTC de votre contrat. Les valeurs proposées sont des exemples.</p>
+  <form [formGroup]="tariffForm" (ngSubmit)="saveTariff()">
+    <label
+      >Option tarifaire<select formControlName="mode">
+        <option value="base">Base — un prix unique</option>
+        <option value="hp-hc">Heures pleines / heures creuses</option>
+      </select></label
+    >@if(tariffForm.controls.mode.value === 'base'){<label
+      >Prix du kWh TTC (€)<input formControlName="basePrice" type="number" min="0" step="any" /></label
+    >} @else {
+    <div class="form-row">
+      <label
+        >Heures pleines (€/kWh)<input formControlName="peakPrice" type="number" min="0" step="any" /></label
+      ><label
+        >Heures creuses (€/kWh)<input formControlName="offPeakPrice" type="number" min="0" step="any"
+      /></label>
+    </div>
+    <p class="field-hint">
+      Réglez la part en heures creuses dans chaque appareil. Aucune plage horaire n’est supposée
+      automatiquement.
+    </p>
+    }<label
+      >Abonnement annuel TTC (€)<input formControlName="subscription" type="number" min="0" step="any"
+    /></label>
+    <p class="field-hint">L’abonnement est affiché séparément de la consommation des appareils.</p>
+    @if(modalError()){
+    <p role="alert" class="inline-error">{{modalError()}}</p>
+    }<button class="btn primary full" type="submit">Enregistrer mon tarif</button>
+  </form>
+  } @if(modal() === 'device' && editingDefinition(); as definition){
+  <h2>{{definition.name || 'Un nouvel appareil, à votre façon.'}}</h2>
+  <p class="subtle">
+    Une fiche réutilisable dans tous vos logements. Les appareils déjà installés conservent leurs
+    caractéristiques.
+  </p>
+  <ww-device-editor [definition]="definition" (committed)="saveDefinition($event)" />} @if(modal() ===
+  'import' && prepared(); as p){
+  <h2>Un petit aperçu avant l’import.</h2>
+  <p class="subtle">
+    {{p.manifest.kind === 'home' ? 'Un logement complet, avec ses scénarios et ses paramètres.' : 'De
+    nouvelles fiches pour votre bibliothèque.'}}
+  </p>
+  <div class="import-summary">
+    <span>{{importCount()}} fiches d’appareils</span
+    ><span>{{assetCount()}} modèles 3D personnalisés</span>@if(p.manifest.kind === 'home'){<strong
+      >{{p.manifest.home.name}}</strong
+    ><span>{{p.manifest.home.scenarios.length}} scénarios</span>}
+  </div>
+  <p class="field-hint">Les éléments seront ajoutés comme nouvelles copies. Rien ne sera écrasé.</p>
+  @if(modalError()){
+  <p role="alert" class="inline-error">{{modalError()}}</p>
+  }<button class="btn primary full" (click)="confirmImport()" [disabled]="busy()">
+    {{busy() ? 'Import en cours…' : 'Importer ces données'}}</button
+  >}
+</dialog>
+}

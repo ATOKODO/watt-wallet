@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Watt Wallet",
+  "version": "0.1.0",
+  "identifier": "app.wattwallet.desktop",
+  "build": {
+    "beforeDevCommand": "npm start",
+    "devUrl": "http://127.0.0.1:4200",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist/watt-wallet/browser"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Watt Wallet — Votre énergie, en clair",
+        "width": 1480,
+        "height": 1000,
+        "minWidth": 800,
+        "minHeight": 640,
+        "dragDropEnabled": false,
+        "backgroundColor": "#f7f8f3"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src ipc: http://ipc.localhost 'self'; font-src 'self'; object-src 'none'; base-uri 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "shortDescription": "Votre logement, ses appareils et son énergie, en clair.",
+    "windows": {
+      "nsis": { "languages": ["French"], "displayLanguageSelector": false, "installMode": "currentUser" },
+      "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true }
+    }
+  }
+}

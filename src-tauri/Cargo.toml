@@ -1,0 +1,20 @@
+[package]
+name = "watt-wallet"
+version = "0.1.0"
+description = "Votre énergie, en clair"
+authors = ["Watt Wallet"]
+edition = "2021"
+
+[lib]
+name = "watt_wallet_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+serde_json = "1"
+tempfile = "3"

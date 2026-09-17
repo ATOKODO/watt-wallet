@@ -1,0 +1,10 @@
+node_modules
+.cache
+.angular
+dist
+src-tauri/target
+src-tauri/gen
+test-results
+package-lock.json
+docs/wattpack.schema.json
+examples

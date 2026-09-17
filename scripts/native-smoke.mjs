@@ -1,0 +1,118 @@
+import { chromium, expect } from '@playwright/test';
+import { spawn } from 'node:child_process';
+import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
+import path from 'node:path';
+const exe = path.resolve(process.argv[2] ?? 'src-tauri/target/release/watt-wallet.exe');
+await mkdir('.cache', { recursive: true });
+const root = await mkdtemp(path.resolve('.cache/native-smoke-'));
+await mkdir('test-results', { recursive: true });
+const port = 9227;
+async function launch() {
+  const child = spawn(exe, ['--smoke-test'], {
+    windowsHide: true,
+    stdio: 'pipe',
+    env: {
+      ...process.env,
+      WATT_WALLET_SMOKE_DIR: root,
+      WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${port}`,
+    },
+  });
+  child.stderr.on('data', (d) => process.stderr.write(d));
+  let endpoint;
+  for (let n = 0; n < 100; n++) {
+    if (child.exitCode !== null) throw new Error(`Application fermée: ${child.exitCode}`);
+    try {
+      const r = await fetch(`http://127.0.0.1:${port}/json/version`);
+      endpoint = (await r.json()).webSocketDebuggerUrl;
+      if (endpoint) break;
+    } catch {}
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  if (!endpoint) {
+    child.kill();
+    throw new Error('WebView2 ne répond pas au débogage local.');
+  }
+  const browser = await chromium.connectOverCDP(endpoint);
+  let page;
+  for (let n = 0; n < 100; n++) {
+    page = browser
+      .contexts()
+      .flatMap((c) => c.pages())
+      .find((p) => p.url().includes('tauri'));
+    if (page) break;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  if (!page) {
+    await browser.close();
+    child.kill();
+    throw new Error('Page Tauri introuvable.');
+  }
+  return { child, browser, page };
+}
+let run;
+try {
+  run = await launch();
+  const { page } = run;
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
+  await expect(page.getByRole('heading', { name: 'Un petit monde. Une énergie plus claire.' })).toBeVisible({
+    timeout: 30000,
+  });
+  await expect(page.locator('ww-diorama canvas')).toBeAttached();
+  await expect(page.locator('.app-header')).toHaveCSS('display', 'flex');
+  await expect(page.locator('.brand-mark ww-icon')).toHaveCSS('width', '26px');
+  await expect(page.locator('ww-diorama .scene-canvas')).toHaveCSS('position', 'absolute');
+  const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+  if (pageHeight > 5000) throw new Error(`Mise en page native incorrecte : ${pageHeight}px.`);
+  await expect(page.locator('.object-label').first()).toBeVisible();
+  const scene = page.locator('ww-diorama .scene-canvas');
+  const sceneBox = await scene.boundingBox();
+  if (!sceneBox) throw new Error('La scène 3D native est introuvable.');
+  const labelLeftBeforeOrbit = await page
+    .locator('.object-label')
+    .evaluateAll((labels) => (labels.length ? labels[0].style.left : ''));
+  await page.mouse.move(sceneBox.x + sceneBox.width * 0.82, sceneBox.y + sceneBox.height * 0.2);
+  await page.mouse.down();
+  await page.mouse.move(sceneBox.x + sceneBox.width * 0.62, sceneBox.y + sceneBox.height * 0.34, {
+    steps: 12,
+  });
+  await page.mouse.up();
+  await expect
+    .poll(() =>
+      page.locator('.object-label').evaluateAll((labels) => (labels.length ? labels[0].style.left : '')),
+    )
+    .not.toBe(labelLeftBeforeOrbit);
+  await page
+    .locator('.library-item')
+    .filter({ hasText: 'Réfrigérateur' })
+    .dragTo(page.locator('ww-diorama .scene-canvas'));
+  await expect(page.locator('.device-row')).toHaveCount(7);
+  await page.getByRole('button', { name: 'Ajouter Télévision', exact: true }).click();
+  await page.locator('.inspector').getByLabel('Quantité', { exact: true }).fill('4');
+  await page.getByRole('button', { name: 'Appliquer les modifications' }).click();
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  const saved = JSON.parse(await readFile(path.join(root, 'workspace.json'), 'utf8'));
+  if (saved.homes[0].devices.at(-1).quantity !== 4) throw new Error('Sauvegarde native incorrecte.');
+  await page.getByRole('button', { name: 'Fermer les paramètres de l’appareil' }).click();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: 'test-results/watt-wallet-native.png', fullPage: true });
+  await run.browser.close();
+  run.child.kill();
+  run = undefined;
+  await new Promise((r) => setTimeout(r, 1000));
+  run = await launch();
+  await expect(run.page.locator('.device-row').last()).toContainText('× 4', { timeout: 30000 });
+  await expect(run.page.locator('.error-banner')).toHaveCount(0);
+  if (errors.length) throw new Error(errors.join('\n'));
+  console.log(
+    'WebView2 natif : styles, rendu 3D, orbite, glisser-déposer, modification, sauvegarde et redémarrage OK.',
+  );
+} finally {
+  if (run) {
+    await run.browser.close();
+    run.child.kill();
+  }
+}
