@@ -57,6 +57,16 @@
                 "minimum": 0,
                 "maximum": 1000000000
               },
+              "simulatedRunningW": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
+              "simulatedStandbyW": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000
+              },
               "energy": {
                 "oneOf": [
                   {
@@ -378,6 +388,16 @@
                         "minimum": 0,
                         "maximum": 1000000000
                       },
+                      "simulatedRunningW": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
+                      "simulatedStandbyW": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000
+                      },
                       "energy": {
                         "oneOf": [
                           {
@@ -667,6 +687,11 @@
               "minLength": 1,
               "maxLength": 100
             },
+            "observedAnnualKwh": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
             "scenarios": {
               "maxItems": 50,
               "type": "array",
@@ -757,6 +782,16 @@
                               ]
                             },
                             "nominalW": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1000000000
+                            },
+                            "simulatedRunningW": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1000000000
+                            },
+                            "simulatedStandbyW": {
                               "type": "number",
                               "minimum": 0,
                               "maximum": 1000000000

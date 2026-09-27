@@ -40,6 +40,7 @@ export function seedLibrary(): DeviceDefinition[] {
     name,
     category,
     nominalW,
+    ...(method === 'annual' ? { simulatedRunningW: nominalW } : {}),
     brand: '',
     reference: '',
     energy:

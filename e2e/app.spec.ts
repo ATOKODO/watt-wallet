@@ -8,7 +8,10 @@ test('ajout, déplacement et orbite autour du plateau', async ({ page }) => {
   await page.getByRole('dialog').getByRole('button', { name: 'Créer', exact: true }).click();
   await page.getByRole('button', { name: 'Placement', exact: true }).click();
   const stage = page.locator('ww-diorama .scene-canvas');
-  await page.locator('.library-item').filter({ hasText: 'Réfrigérateur' }).dragTo(stage);
+  await page
+    .locator('.library-item')
+    .filter({ hasText: 'Réfrigérateur' })
+    .dragTo(stage, { sourcePosition: { x: 20, y: 20 } });
   await expect(page.locator('.device-row')).toHaveCount(1);
   await expect(page.locator('.inspector h2')).toHaveText('Réfrigérateur');
   const xInput = page.locator('.inspector').getByLabel('Position X', { exact: true });
@@ -287,4 +290,70 @@ test('theme sombre, preference systeme et persistance locale', async ({ page }) 
   await page.screenshot({ path: 'test-results/watt-wallet-dark-mobile.png', fullPage: true });
   await page.getByRole('dialog').getByRole('tab', { name: 'JSON' }).click();
   await page.screenshot({ path: 'test-results/watt-wallet-dark-json-mobile.png', fullPage: true });
+});
+
+test('puissance simulee, detail annuel et repere de facture partageable', async ({ page, browser }) => {
+  await page.goto('/');
+  const annual = await page.locator('.metric').first().locator('.metric-value').innerText();
+  await expect(page.locator('.power-total')).toContainText('0 W');
+  await page.getByRole('button', { name: 'Tout en marche' }).click();
+  await expect(page.locator('.power-total')).toContainText('7,39 kW');
+  await expect(page.locator('.metric').first().locator('.metric-value')).toHaveText(annual);
+  await page
+    .getByRole('group', { name: 'État simulé de Réfrigérateur' })
+    .getByRole('button', { name: 'Arrêt' })
+    .click();
+  await expect(page.locator('.power-total')).toContainText('7,24 kW');
+  await page
+    .getByRole('group', { name: 'État simulé de Réfrigérateur' })
+    .getByRole('button', { name: 'Veille' })
+    .click();
+  await expect(page.locator('.power-warning')).toContainText('1 appareil(s)');
+  await page
+    .getByRole('group', { name: 'État simulé de Réfrigérateur' })
+    .getByRole('button', { name: 'Arrêt' })
+    .click();
+  await expect(page.locator('.power-warning')).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/watt-wallet-power.png', fullPage: true });
+
+  await page.getByRole('button', { name: 'Mes scénarios', exact: true }).click();
+  await page.getByRole('button', { name: 'Créer un scénario', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('Nom', { exact: true }).fill('Simulation distincte');
+  await page.getByRole('dialog').getByRole('button', { name: 'Créer', exact: true }).click();
+  await expect(page.locator('.power-total')).toContainText('0 W');
+  await page.getByRole('button', { name: 'Référence', exact: true }).click();
+  await expect(page.locator('.power-total')).toContainText('7,24 kW');
+  await page
+    .locator('.device-row')
+    .filter({ hasText: 'Radiateur électrique' })
+    .getByRole('button', { name: 'Modifier Radiateur électrique' })
+    .click();
+  await page.locator('.calculation-detail summary').click();
+  await expect(page.locator('.calculation-detail')).toContainText('3 375 kWh/an');
+  await page.getByRole('button', { name: 'Saisir ma consommation' }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Consommation constatée sur 12 mois').fill('6000');
+  await dialog.getByRole('button', { name: 'Enregistrer le repère' }).click();
+  await expect(page.locator('.bill-reference')).toContainText('6 000 kWh saisis');
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.locator('.power-simulator').screenshot({ path: 'test-results/watt-wallet-power-mobile.png' });
+  await page.reload();
+  await expect(page.locator('.bill-reference')).toContainText('6 000 kWh saisis');
+  await expect(page.locator('.power-total')).toContainText('0 W');
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Partager le logement' }).click();
+  const download = await downloadPromise;
+  const buffer = await readFile((await download.path())!);
+  const context = await browser.newContext();
+  const fresh = await context.newPage();
+  await fresh.goto('http://127.0.0.1:4200/');
+  const chooserPromise = fresh.waitForEvent('filechooser');
+  await fresh.locator('.heading-actions').getByRole('button', { name: 'Importer', exact: true }).click();
+  await (await chooserPromise).setFiles({ name: 'repere.wattpack', mimeType: 'application/zip', buffer });
+  await fresh.getByRole('button', { name: 'Importer ces données' }).click();
+  await expect(fresh.locator('.bill-reference')).toContainText('6 000 kWh saisis');
+  await context.close();
 });

@@ -5,6 +5,8 @@ import { ThemeService } from './ui/theme';
 import { DeviceEditorComponent } from './ui/device-editor';
 import { DioramaComponent } from './scene/diorama';
 import { WalletStore } from './state';
+import { annualBreakdown, calculate } from './domain/energy';
+import { PowerState, powerEstimate, simulatedTotal } from './domain/power';
 import {
   BuiltinId,
   DeviceDefinition,
@@ -45,7 +47,9 @@ export class AppComponent {
   toast = signal('');
   busy = signal(false);
   modalError = signal('');
-  modal = signal<'new-home' | 'new-scenario' | 'rename-home' | 'tariff' | 'device' | 'import' | null>(null);
+  modal = signal<
+    'new-home' | 'new-scenario' | 'rename-home' | 'tariff' | 'bill' | 'device' | 'import' | null
+  >(null);
   editingDefinition = signal<DeviceDefinition | null>(null);
   prepared = signal<PreparedPack | null>(null);
   categories = categories;
@@ -60,6 +64,8 @@ export class AppComponent {
     subscription: 180,
   });
   costForm = this.fb.nonNullable.group({ initialCost: 0 });
+  billForm = this.fb.nonNullable.group({ annualKwh: 0 });
+  powerStates = signal<Record<string, PowerState>>({});
   filteredLibrary = computed(() => {
     const q = this.search().toLocaleLowerCase('fr');
     return (this.store.workspace()?.library ?? []).filter(
@@ -87,6 +93,31 @@ export class AppComponent {
         : '#e8eade';
   });
   selectedResult = computed(() => this.store.result().devices.find((d) => d.id === this.store.selectedId()));
+  powerContext = computed(() => `${this.store.home()?.id ?? ''}:${this.store.scenarioId() ?? 'reference'}`);
+  currentPowerStates = computed(() => {
+    const prefix = this.powerContext();
+    const states = this.powerStates();
+    return Object.fromEntries(
+      this.store.devices().map((device) => [device.id, states[`${prefix}:${device.id}`] ?? 'off']),
+    ) as Record<string, PowerState>;
+  });
+  powerRows = computed(() =>
+    this.store.devices().map((device) => {
+      const state = this.currentPowerStates()[device.id];
+      return { device, state, estimate: powerEstimate(device, state) };
+    }),
+  );
+  powerSummary = computed(() => simulatedTotal(this.store.devices(), this.currentPowerStates()));
+  selectedBreakdown = computed(() => {
+    const selected = this.store.selected();
+    return selected ? annualBreakdown(selected) : null;
+  });
+  billComparison = computed(() => {
+    const home = this.store.home();
+    if (!home || home.observedAnnualKwh === undefined) return null;
+    const estimated = calculate(home).kwh;
+    return { observed: home.observedAnnualKwh, estimated, difference: home.observedAnnualKwh - estimated };
+  });
   @ViewChild('modalDialog') set modalDialog(el: ElementRef<HTMLDialogElement> | undefined) {
     if (el)
       queueMicrotask(() => {
@@ -112,6 +143,48 @@ export class AppComponent {
       : e.method === 'cycle'
         ? `${this.number(e.kwhPerCycle, 2)} kWh/cycle`
         : `${this.number(e.kwhPerYear)} kWh/an`;
+  }
+  powerLabel(watts: number) {
+    return watts >= 1000 ? `${this.number(watts / 1000, 2)} kW` : `${this.number(watts, 1)} W`;
+  }
+  powerBasis(basis: ReturnType<typeof powerEstimate>['basis']) {
+    if (basis === 'entered') return 'Valeur indicative de la fiche';
+    if (basis === 'active-average') return 'Moyenne en marche';
+    if (basis === 'cycle-average') return 'Moyenne du cycle, sans les pointes';
+    if (basis === 'standby') return 'Puissance en veille';
+    if (basis === 'unknown') return 'Puissance à renseigner dans la fiche';
+    return 'Arrêté';
+  }
+  setPowerState(id: string, state: PowerState) {
+    this.powerStates.update((states) => ({ ...states, [`${this.powerContext()}:${id}`]: state }));
+  }
+  setAllPowerStates(state: PowerState) {
+    const prefix = this.powerContext();
+    this.powerStates.update((states) => {
+      const next = { ...states };
+      for (const device of this.store.devices()) next[`${prefix}:${device.id}`] = state;
+      return next;
+    });
+  }
+  openBill() {
+    this.billForm.reset({ annualKwh: this.store.home()?.observedAnnualKwh ?? 0 });
+    this.modalError.set('');
+    this.modal.set('bill');
+  }
+  saveBill() {
+    const value = this.billForm.controls.annualKwh.value;
+    if (!Number.isFinite(value) || value <= 0 || value > 1e9) {
+      this.modalError.set('Indiquez une consommation sur 12 mois supérieure à zéro.');
+      return;
+    }
+    this.store.updateObservedAnnualKwh(value);
+    this.closeModal();
+    this.notify('Repère de facture enregistré');
+  }
+  clearBill() {
+    this.store.updateObservedAnnualKwh(null);
+    this.closeModal();
+    this.notify('Repère de facture retiré');
   }
   inputValue(e: Event) {
     return (e.target as HTMLInputElement).value;

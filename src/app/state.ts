@@ -176,6 +176,13 @@ export class WalletStore {
       this.current(w).tariff = tariff;
     });
   }
+  updateObservedAnnualKwh(value: number | null) {
+    this.mutate((w) => {
+      const home = w.homes.find((h) => h.id === w.activeHomeId)!;
+      if (value === null) delete home.observedAnnualKwh;
+      else home.observedAnnualKwh = value;
+    });
+  }
   addScenario(name: string) {
     const id = uid(),
       current = this.snapshot()!;

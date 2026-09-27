@@ -68,6 +68,8 @@ export const definitionSchema = z
     reference: z.string().max(100),
     category: z.enum(categories),
     nominalW: positive,
+    simulatedRunningW: positive.optional(),
+    simulatedStandbyW: positive.optional(),
     energy: energySchema,
     defaultUsage: usageSchema,
     visual: visualSchema,
@@ -105,7 +107,12 @@ export const scenarioSchema = snapshotSchema
   .strict();
 export type Scenario = z.infer<typeof scenarioSchema>;
 export const homeSchema = snapshotSchema
-  .extend({ id, name: z.string().trim().min(1).max(100), scenarios: z.array(scenarioSchema).max(50) })
+  .extend({
+    id,
+    name: z.string().trim().min(1).max(100),
+    observedAnnualKwh: positive.optional(),
+    scenarios: z.array(scenarioSchema).max(50),
+  })
   .strict();
 export type Home = z.infer<typeof homeSchema>;
 export const workspaceSchema = z

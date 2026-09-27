@@ -74,8 +74,13 @@ try {
   );
   const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
   if (pageHeight > 5000) throw new Error(`Mise en page native incorrecte : ${pageHeight}px.`);
+  const annualKwh = await page.locator('.metric').first().locator('.metric-value').innerText();
+  await page.getByRole('button', { name: 'Tout en marche' }).click();
+  await expect(page.locator('.power-total')).toContainText('7,39 kW');
+  await expect(page.locator('.metric').first().locator('.metric-value')).toHaveText(annualKwh);
   await expect(page.locator('.object-label').first()).toBeVisible();
   const scene = page.locator('ww-diorama .scene-canvas');
+  await scene.scrollIntoViewIfNeeded();
   const sceneBox = await scene.boundingBox();
   if (!sceneBox) throw new Error('La scène 3D native est introuvable.');
   const labelLeftBeforeOrbit = await page
@@ -112,8 +117,14 @@ try {
   await page.locator('.inspector').getByLabel('Quantité', { exact: true }).fill('4');
   await page.getByRole('button', { name: 'Appliquer les modifications' }).click();
   await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  await page.getByRole('button', { name: 'Saisir ma consommation' }).click();
+  const billDialog = page.getByRole('dialog');
+  await billDialog.getByLabel('Consommation constatée sur 12 mois').fill('6000');
+  await billDialog.getByRole('button', { name: 'Enregistrer le repère' }).click();
+  await expect(page.locator('.bill-reference')).toContainText('6 000 kWh saisis');
   const saved = JSON.parse(await readFile(path.join(root, 'workspace.json'), 'utf8'));
   if (saved.homes[0].devices.at(-1).quantity !== 4) throw new Error('Sauvegarde native incorrecte.');
+  if (saved.homes[0].observedAnnualKwh !== 6000) throw new Error('Repère de facture natif non sauvegardé.');
   await page.getByRole('button', { name: 'Fermer les paramètres de l’appareil' }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: 'test-results/watt-wallet-native.png', fullPage: true });
@@ -124,6 +135,8 @@ try {
   run = await launch();
   await expect(run.page.locator('.device-row').last()).toContainText('× 4', { timeout: 30000 });
   await expect(run.page.locator('.error-banner')).toHaveCount(0);
+  await expect(run.page.locator('.bill-reference')).toContainText('6 000 kWh saisis');
+  await expect(run.page.locator('.power-total')).toContainText('0 W');
   await expect(run.page.locator('html')).toHaveAttribute('data-theme', 'dark');
   const nativePage = run.page;
   nativePage.on('pageerror', (error) => errors.push(error.message));
@@ -146,7 +159,7 @@ try {
   await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(
-    'WebView2 natif : mode sombre, scène 3D, grille, JSON, scénario, glisser-déposer, sauvegarde et redémarrage OK.',
+    'WebView2 natif : mode sombre, scène 3D, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde et redémarrage OK.',
   );
 } finally {
   if (run) {

@@ -130,6 +130,21 @@ import { IconComponent } from './icon';
           /></label>
           <p class="field-hint">Veille appliquée aux heures restantes sur l’année.</p>
         }
+        <div class="form-divider">Simulation instantanée</div>
+        <div class="form-row">
+          <label
+            >En marche <span>W · facultatif</span
+            ><input formControlName="simulatedRunningW" type="number" min="0" step="any"
+          /></label>
+          <label
+            >En veille <span>W · facultatif</span
+            ><input formControlName="simulatedStandbyW" type="number" min="0" step="any"
+          /></label>
+        </div>
+        <p class="field-hint">
+          Ces puissances servent uniquement au simulateur. Si elles sont vides, la puissance moyenne en marche
+          ou celle déduite d’un cycle est utilisée quand elle existe.
+        </p>
         <label
           >Consommation en heures creuses <span>%</span
           ><input formControlName="offPeakPercent" type="number" min="0" max="100" step="any"
@@ -288,6 +303,8 @@ export class DeviceEditorComponent {
     reference: '',
     category: 'Électroménager',
     nominalW: 0,
+    simulatedRunningW: this.fb.control<number | null>(null),
+    simulatedStandbyW: this.fb.control<number | null>(null),
     method: 'power',
     activeW: 100,
     standbyW: 0,
@@ -320,6 +337,8 @@ export class DeviceEditorComponent {
           reference: d.reference,
           category: d.category,
           nominalW: d.nominalW,
+          simulatedRunningW: d.simulatedRunningW ?? null,
+          simulatedStandbyW: d.simulatedStandbyW ?? null,
           method: e.method,
           activeW: e.method === 'power' ? e.activeW : 100,
           standbyW: e.method !== 'annual' ? e.standbyW : 0,
@@ -346,6 +365,8 @@ export class DeviceEditorComponent {
             reference: '',
             category: 'Chauffage',
             nominalW: 1500,
+            simulatedRunningW: 900,
+            simulatedStandbyW: 0,
             energy: { method: 'power', activeW: 900, standbyW: 0 },
             defaultUsage: {
               hoursPerDay: 5,
@@ -385,6 +406,8 @@ export class DeviceEditorComponent {
       reference: v.reference,
       category: v.category,
       nominalW: v.nominalW,
+      simulatedRunningW: v.simulatedRunningW ?? undefined,
+      simulatedStandbyW: v.simulatedStandbyW ?? undefined,
       notes: v.notes,
       energy:
         v.method === 'power'
@@ -428,6 +451,8 @@ export class DeviceEditorComponent {
           reference: d.reference,
           category: d.category,
           nominalW: d.nominalW,
+          simulatedRunningW: d.simulatedRunningW ?? null,
+          simulatedStandbyW: d.simulatedStandbyW ?? null,
           method: e.method,
           activeW: e.method === 'power' ? e.activeW : 100,
           standbyW: e.method !== 'annual' ? e.standbyW : 0,
@@ -575,6 +600,8 @@ export class DeviceEditorComponent {
         reference: v.reference,
         category: v.category,
         nominalW: v.nominalW,
+        simulatedRunningW: v.simulatedRunningW ?? undefined,
+        simulatedStandbyW: v.simulatedStandbyW ?? undefined,
         notes: v.notes,
         energy:
           v.method === 'power'

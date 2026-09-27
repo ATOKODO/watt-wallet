@@ -223,6 +223,13 @@
         <p>Une estimation, pas une facture.</p>
       </article>
     </section>
+    <a class="power-preview" href="#power-simulator">
+      <span
+        ><ww-icon name="bolt" /><strong>Puissance simulée</strong> · Choisissez les appareils en marche</span
+      >
+      <b>{{powerLabel(powerSummary().watts)}}</b>
+      <ww-icon name="chevron" />
+    </a>
 
     @if(tab() === 'scenarios' || store.scenario()) {
     <section class="scenario-section">
@@ -340,7 +347,10 @@
             />@if(!store.devices().length){
             <div class="empty-stage">
               <h3>Tout commence par un appareil.</h3>
-              <p>Ajoutez-le depuis la bibliothèque à gauche.</p>
+              <p>
+                Choisissez une fiche, cliquez sur +, puis ajustez les heures ou les cycles dans le panneau de
+                droite.
+              </p>
             </div>
             }
           </div>
@@ -389,9 +399,84 @@
               </div>
             </div>
             } @empty {
-            <p class="empty-small">Votre logement attend son premier appareil.</p>
+            <p class="empty-small">
+              Choisissez une fiche dans la bibliothèque et cliquez sur +. Ajustez ensuite son usage dans le
+              panneau de droite.
+            </p>
             }
           </div>
+        </section>
+        <section id="power-simulator" class="power-simulator" aria-label="Puissance simulée">
+          <div class="section-title power-title">
+            <div>
+              <span class="eyebrow">EXPÉRIENCE INTERACTIVE</span>
+              <h2>Puissance simulée maintenant</h2>
+            </div>
+            <strong class="power-total" aria-live="polite">{{powerLabel(powerSummary().watts)}}</strong>
+          </div>
+          <p class="power-intro">
+            Imaginez les appareils en marche, en veille ou arrêtés. Ce total est une puissance estimée, pas
+            une mesure en direct.
+          </p>
+          <div class="power-actions">
+            <button type="button" class="text-button" (click)="setAllPowerStates('running')">
+              Tout en marche
+            </button>
+            <button type="button" class="text-button" (click)="setAllPowerStates('off')">Tout arrêter</button>
+          </div>
+          <div class="power-list">
+            @for(row of powerRows(); track row.device.id) {
+            <div class="power-row">
+              <div class="power-device">
+                <strong>{{row.device.definition.name}}</strong>
+                <span>× {{row.device.quantity}}</span>
+              </div>
+              <div
+                class="power-state"
+                role="group"
+                [attr.aria-label]="'État simulé de ' + row.device.definition.name"
+              >
+                <button
+                  type="button"
+                  [attr.aria-pressed]="row.state === 'off'"
+                  (click)="setPowerState(row.device.id, 'off')"
+                >
+                  Arrêt
+                </button>
+                <button
+                  type="button"
+                  [attr.aria-pressed]="row.state === 'standby'"
+                  (click)="setPowerState(row.device.id, 'standby')"
+                >
+                  Veille
+                </button>
+                <button
+                  type="button"
+                  [attr.aria-pressed]="row.state === 'running'"
+                  (click)="setPowerState(row.device.id, 'running')"
+                >
+                  En marche
+                </button>
+              </div>
+              <div class="power-watts">
+                <strong>{{row.estimate.watts === null ? '—' : powerLabel(row.estimate.watts)}}</strong>
+                <span>{{powerBasis(row.estimate.basis)}}</span>
+              </div>
+            </div>
+            } @empty {
+            <p class="empty-small">Ajoutez un appareil pour essayer la simulation.</p>
+            }
+          </div>
+          @if(powerSummary().unknown) {
+          <p class="power-warning" role="status">
+            {{powerSummary().unknown}} appareil(s) sans puissance renseignée : le total affiché est partiel.
+            Ouvrez leur fiche pour indiquer une puissance de simulation.
+          </p>
+          }
+          <p class="power-footnote">
+            Ces états sont temporaires et ne modifient ni les kWh/an ni les scénarios. Une puissance moyenne
+            peut masquer les pointes d’un cycle.
+          </p>
         </section>
       </div>
 
@@ -417,6 +502,40 @@
           <strong>{{number(selectedResult()?.kwh ?? 0)}}<small> kWh/an</small></strong
           ><span>{{number((selectedResult()?.share ?? 0) * 100, 1)}} % du total</span>
         </div>
+        @if(selectedBreakdown(); as breakdown) {
+        <details class="calculation-detail">
+          <summary>Comprendre cette estimation</summary>
+          @if(selected.definition.energy.method === 'power') {
+          <p>
+            {{number(selected.definition.energy.activeW, 1)}} W × {{number(selected.usage.hoursPerDay, 1)}}
+            h/j × {{number(selected.usage.daysPerYear)}} j/an × {{selected.quantity}}
+          </p>
+          } @else if(selected.definition.energy.method === 'cycle') {
+          <p>
+            {{number(selected.definition.energy.kwhPerCycle, 2)}} kWh/cycle ×
+            {{number(selected.usage.cyclesPerWeek, 1)}} cycles/semaine × 52 × {{selected.quantity}}
+          </p>
+          } @else {
+          <p>
+            {{number(selected.definition.energy.kwhPerYear, 1)}} kWh/an tout compris × {{selected.quantity}}
+          </p>
+          }
+          <div><span>Fonctionnement</span><strong>{{number(breakdown.activeKwh, 1)}} kWh/an</strong></div>
+          @if(breakdown.activeHours !== null) {
+          <div>
+            <span>Veille sur {{number(8760 - breakdown.activeHours, 1)}} h</span
+            ><strong>{{number(breakdown.standbyKwh, 1)}} kWh/an</strong>
+          </div>
+          }
+          <div><span>Total de ce groupe</span><strong>{{number(breakdown.totalKwh, 1)}} kWh/an</strong></div>
+          <p>
+            Coût énergie : {{money(selectedResult()?.cost ?? 0, 2)}} / an. L’abonnement est compté séparément.
+          </p>
+          @if(selected.definition.notes) {
+          <p class="calculation-source">Hypothèse / source : {{selected.definition.notes}}</p>
+          }
+        </details>
+        }
         <div class="inspector-actions">
           <button class="btn secondary small" (click)="store.duplicateDevice(selected.id)">
             <ww-icon name="copy" />Dupliquer</button
@@ -471,6 +590,30 @@
         }
       </aside>
     </div>
+    <section class="bill-reference">
+      <div>
+        <span class="eyebrow">REPÈRE FACULTATIF</span>
+        <h2>Comparer à votre facture</h2>
+        @if(billComparison(); as bill) {
+        <p>
+          Sur 12 mois : {{number(bill.observed, 1)}} kWh saisis · {{number(bill.estimated, 1)}} kWh estimés
+          pour le logement de référence.
+        </p>
+        <strong
+          >Écart : {{number(bill.difference < 0 ? -bill.difference : bill.difference, 1)}} kWh
+          ({{bill.difference >= 0 ? 'facture supérieure' : 'estimation supérieure'}})</strong
+        >
+        } @else {
+        <p>
+          Saisissez les kWh de 12 mois de factures pour voir l’écart avec votre modèle, sans connexion
+          externe.
+        </p>
+        }
+      </div>
+      <button type="button" class="btn secondary small" (click)="openBill()">
+        {{billComparison() ? 'Modifier le repère' : 'Saisir ma consommation'}}
+      </button>
+    </section>
     <section class="tariff-strip">
       <span class="tariff-icon"><ww-icon name="settings" /></span>
       <div>
@@ -536,6 +679,25 @@
     }<button class="btn primary full" type="submit">
       {{modal() === 'rename-home' ? 'Enregistrer' : 'Créer'}}
     </button>
+  </form>
+  } @if(modal() === 'bill') {
+  <h2>Votre repère de consommation.</h2>
+  <p class="subtle">
+    Recopiez uniquement les kWh consommés sur 12 mois de factures. La comparaison porte sur le logement de
+    référence, jamais sur un scénario.
+  </p>
+  <form [formGroup]="billForm" (ngSubmit)="saveBill()">
+    <label
+      >Consommation constatée sur 12 mois <span>kWh</span>
+      <input formControlName="annualKwh" type="number" min="0" step="any" />
+    </label>
+    @if(modalError()) {
+    <p class="inline-error" role="alert">{{modalError()}}</p>
+    }
+    <button type="submit" class="btn primary full">Enregistrer le repère</button>
+    @if(store.home()?.observedAnnualKwh !== undefined) {
+    <button type="button" class="text-button danger" (click)="clearBill()">Effacer ce repère</button>
+    }
   </form>
   } @if(modal() === 'tariff') {
   <h2>Votre électricité, votre tarif.</h2>

@@ -20,19 +20,37 @@ export function validateUsage(definition: DeviceDefinition, usage: UsageProfile)
   }
 }
 
-export function annualEnergy(device: DeviceInstance): number {
+export interface EnergyBreakdown {
+  activeHours: number | null;
+  activeKwh: number;
+  standbyKwh: number;
+  totalKwh: number;
+}
+
+export function annualBreakdown(device: DeviceInstance): EnergyBreakdown {
   instanceSchema.parse(device);
   const { definition: d, usage: u, quantity } = device;
   validateUsage(d, u);
   const e = d.energy;
-  if (e.method === 'annual') return e.kwhPerYear * quantity;
+  if (e.method === 'annual')
+    return {
+      activeHours: null,
+      activeKwh: e.kwhPerYear * quantity,
+      standbyKwh: 0,
+      totalKwh: e.kwhPerYear * quantity,
+    };
   const activeHours =
     e.method === 'power' ? u.hoursPerDay * u.daysPerYear : u.cycleHours * u.cyclesPerWeek * 52;
-  const active =
-    e.method === 'power' ? (e.activeW * activeHours) / 1000 : e.kwhPerCycle * u.cyclesPerWeek * 52;
-  return (active + (e.standbyW * (8760 - activeHours)) / 1000) * quantity;
+  const activeKwh =
+    (e.method === 'power' ? (e.activeW * activeHours) / 1000 : e.kwhPerCycle * u.cyclesPerWeek * 52) *
+    quantity;
+  const standbyKwh = ((e.standbyW * (8760 - activeHours)) / 1000) * quantity;
+  return { activeHours, activeKwh, standbyKwh, totalKwh: activeKwh + standbyKwh };
 }
 
+export function annualEnergy(device: DeviceInstance): number {
+  return annualBreakdown(device).totalKwh;
+}
 export function calculate(snapshot: { devices: DeviceInstance[]; tariff: Tariff }): CalculationResult {
   const t = tariffSchema.parse(snapshot.tariff);
   const devices = snapshot.devices.map((d) => {

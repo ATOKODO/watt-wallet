@@ -36,11 +36,13 @@ Dans un paquet réel, `definitions` contient au moins une fiche. Une seule fiche
 }
 ```
 
+Le logement peut aussi contenir observedAnnualKwh, repère facultatif recopié depuis 12 mois de factures. Il est comparé aux kWh estimés de la référence et voyage avec le logement exporté. Son absence est acceptée pour les anciens fichiers.
+
 Les scénarios portent `id`, `name`, `initialCost`, `tariff` et `devices`. Ils se comparent à la référence du logement parent, sans graphe de dépendances entre scénarios.
 
 ## Fiches et instances
 
-Une `DeviceDefinition` contient `id`, `name`, `brand`, `reference`, `category`, `nominalW`, `energy`, `defaultUsage`, `visual` et `notes`. Marque, référence et notes peuvent être des chaînes vides. La puissance nominale est indicative ; elle n’entre pas automatiquement dans le calcul.
+Une `DeviceDefinition` contient `id`, `name`, `brand`, `reference`, `category`, `nominalW`, `energy`, `defaultUsage`, `visual` et `notes`. Marque, référence et notes peuvent être des chaînes vides. La puissance nominale est indicative ; elle n’entre pas automatiquement dans le calcul. Les champs facultatifs simulatedRunningW et simulatedStandbyW servent uniquement à la puissance simulée. En leur absence, cette vue utilise la moyenne en marche, la moyenne du cycle si sa durée est connue, ou indique une puissance inconnue. Les fichiers existants sans ces champs restent valides.
 
 `energy` choisit exactement une méthode :
 
@@ -52,7 +54,7 @@ Une `DeviceDefinition` contient `id`, `name`, `brand`, `reference`, `category`, 
 
 Une `DeviceInstance` contient `id`, une copie complète `definition`, `usage`, `quantity` (entier ≥ 1) et `position: { x, z }`. Le schéma limite X à ±10 et Z à ±8 ; le glisser-déposer reste dans le plateau ±8/±6. Les unités du plateau sont abstraites, pas des mètres.
 
-Les résultats ne sont pas stockés : ils sont recalculés. Les montants sont en euros TTC, puissances en watts, énergie en kWh, durées en heures. L’année vaut 365 jours / 8 760 heures et le modèle par cycle utilise 52 semaines.
+Les états temporaires arrêté, veille et en marche du simulateur ne sont pas stockés ni exportés et ne changent pas les résultats annuels. Les résultats ne sont pas stockés : ils sont recalculés. Les montants sont en euros TTC, puissances en watts, énergie en kWh, durées en heures. L’année vaut 365 jours / 8 760 heures et le modèle par cycle utilise 52 semaines.
 
 ## Visuels
 

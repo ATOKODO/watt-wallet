@@ -36,6 +36,8 @@ Le bouton lune/soleil dans l'en-tête active le mode sombre ou clair. Le premier
 - Créer un scénario depuis la référence ou un scénario existant. Il est toujours comparé à la référence actuelle du logement. Son surcoût initial sert au calcul du retour simple, sans financement ni actualisation.
 - Exporter une fiche, la bibliothèque ou le logement avec tous ses scénarios. Importer un `.wattpack` affiche un aperçu avant d’ajouter de nouvelles copies.
 - Importer un GLB dans une fiche pour remplacer sa silhouette. Utiliser un GLB 2 autonome, géométrie et textures PNG/JPEG embarquées, sans Draco/Meshopt/KTX2. L’aperçu est statique.
+- Dans « Puissance simulée maintenant », passez chaque groupe d’appareils entre Arrêt, Veille et En marche. Le total en W/kW est temporaire, sans mesure en direct ni effet sur les kWh/an. Une puissance inconnue est signalée et exclue du total ; renseignez les watts de simulation dans la fiche si nécessaire.
+- Ouvrez « Comprendre cette estimation » dans le panneau de l’appareil pour retrouver fonctionnement, veille, quantité et coût. Vous pouvez aussi saisir les kWh de 12 mois de factures pour comparer votre logement de référence au réel ; ce repère est inclus dans son export.
 
 ## Calculs
 

@@ -33,6 +33,7 @@
       "name": "Ballon d’eau chaude",
       "category": "Eau chaude",
       "nominalW": 2200,
+      "simulatedRunningW": 2200,
       "brand": "",
       "reference": "",
       "energy": {
@@ -57,6 +58,7 @@
       "name": "Réfrigérateur",
       "category": "Électroménager",
       "nominalW": 150,
+      "simulatedRunningW": 150,
       "brand": "",
       "reference": "",
       "energy": {
@@ -181,6 +183,7 @@
       "name": "Congélateur",
       "category": "Électroménager",
       "nominalW": 150,
+      "simulatedRunningW": 150,
       "brand": "",
       "reference": "",
       "energy": {

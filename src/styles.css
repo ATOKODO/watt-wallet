@@ -2600,3 +2600,300 @@ textarea {
     border-color: #425645;
   }
 }
+
+.power-simulator {
+  margin-top: 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fffefa;
+  overflow: hidden;
+}
+.power-title {
+  padding-bottom: 8px;
+}
+.power-title .eyebrow {
+  font-size: 7px;
+}
+.power-title h2 {
+  margin-top: 7px;
+}
+.power-total {
+  color: #315b43;
+  font-size: 25px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.power-intro,
+.power-footnote {
+  color: #84947a;
+  font-size: 10px;
+  line-height: 1.6;
+  padding: 0 20px;
+}
+.power-actions {
+  display: flex;
+  gap: 17px;
+  padding: 13px 20px 12px;
+}
+.power-actions .text-button {
+  font-size: 10px;
+}
+.power-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) auto minmax(125px, 0.65fr);
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-top: 1px solid #edf0e4;
+}
+.power-device,
+.power-watts {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+.power-device strong,
+.power-watts strong {
+  font-size: 11px;
+  font-weight: 600;
+  color: #3b593e;
+}
+.power-device span,
+.power-watts span {
+  font-size: 9px;
+  line-height: 1.45;
+  color: #8d9a82;
+}
+.power-watts {
+  text-align: right;
+}
+.power-state {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #dce5d4;
+  border-radius: 8px;
+  background: #f1f4e9;
+}
+.power-state button {
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #637b59;
+  font-size: 9px;
+  white-space: nowrap;
+}
+.power-state button[aria-pressed='true'] {
+  background: #315b43;
+  color: white;
+  box-shadow: 0 1px 4px #243b2629;
+}
+.power-warning {
+  margin: 11px 20px;
+  padding: 9px 11px;
+  border: 1px solid #ead8bb;
+  border-radius: 7px;
+  background: #fff7e9;
+  color: #8b694e;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.power-footnote {
+  margin: 13px 0 16px;
+}
+.calculation-detail {
+  margin: -4px 0 17px;
+  padding: 11px;
+  border: 1px solid #dce7d4;
+  border-radius: 8px;
+  background: #f8faf3;
+  color: #657a58;
+  font-size: 10px;
+  line-height: 1.55;
+}
+.calculation-detail summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.calculation-detail p {
+  margin: 11px 0;
+  overflow-wrap: anywhere;
+}
+.calculation-detail > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid #e5ebdd;
+}
+.calculation-detail strong {
+  color: #425b43;
+  text-align: right;
+}
+.calculation-source {
+  color: #87967c;
+}
+.bill-reference {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+  padding: 17px 20px;
+  border: 1px solid #dce5d5;
+  border-radius: 10px;
+  background: #f4f8ee;
+}
+.bill-reference h2 {
+  margin: 7px 0;
+  color: #3e5e43;
+  font-size: 15px;
+}
+.bill-reference p {
+  color: #71866b;
+  font-size: 10px;
+  line-height: 1.55;
+}
+.bill-reference strong {
+  display: block;
+  margin-top: 5px;
+  color: #4e754d;
+  font-size: 11px;
+}
+.bill-reference .btn {
+  flex-shrink: 0;
+}
+:root[data-theme='dark'] :is(.power-simulator, .bill-reference) {
+  background: #25332a;
+  border-color: #3a4a3e;
+}
+:root[data-theme='dark'] .power-row,
+:root[data-theme='dark'] .calculation-detail > div {
+  border-color: #405243;
+}
+:root[data-theme='dark'] .power-total,
+:root[data-theme='dark']
+  :is(
+    .power-device strong,
+    .power-watts strong,
+    .calculation-detail strong,
+    .bill-reference h2,
+    .bill-reference strong
+  ) {
+  color: #dceecf;
+}
+:root[data-theme='dark']
+  :is(
+    .power-intro,
+    .power-footnote,
+    .power-device span,
+    .power-watts span,
+    .bill-reference p,
+    .calculation-source
+  ) {
+  color: #b0c3a9;
+}
+:root[data-theme='dark'] :is(.power-state, .calculation-detail) {
+  background: #304135;
+  border-color: #4b614e;
+  color: #c9d9c0;
+}
+:root[data-theme='dark'] .power-state button {
+  color: #c2d2ba;
+}
+:root[data-theme='dark'] .power-state button[aria-pressed='true'] {
+  background: #557e59;
+  color: #fff;
+}
+:root[data-theme='dark'] .power-warning {
+  background: #49382b;
+  border-color: #8d6747;
+  color: #ffe0b6;
+}
+@media (max-width: 760px) {
+  .power-row {
+    grid-template-columns: 1fr auto;
+    padding: 12px 14px;
+  }
+  .power-state {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: fit-content;
+  }
+  .power-watts {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: 135px;
+  }
+  .power-intro,
+  .power-footnote {
+    padding-inline: 14px;
+  }
+  .power-actions {
+    padding-inline: 14px;
+  }
+  .bill-reference {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.power-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 45px;
+  margin: -7px 0 23px;
+  padding: 10px 15px;
+  border: 1px solid #dce5d5;
+  border-radius: 9px;
+  background: #f4f8ee;
+  color: #637b59;
+  font-size: 10px;
+  text-decoration: none;
+}
+.power-preview > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+}
+.power-preview strong {
+  color: #3e5e43;
+}
+.power-preview b {
+  color: #315b43;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.power-preview ww-icon {
+  width: 14px;
+  height: 14px;
+}
+.power-preview:hover {
+  background: #eaf2e3;
+}
+:root[data-theme='dark'] .power-preview {
+  background: #2c4031;
+  border-color: #4b614e;
+  color: #bacfb2;
+}
+:root[data-theme='dark'] .power-preview:hover {
+  background: #39533d;
+}
+:root[data-theme='dark'] :is(.power-preview strong, .power-preview b) {
+  color: #e0efd2;
+}
+@media (max-width: 760px) {
+  .power-preview {
+    margin-top: 0;
+  }
+  .power-preview > span {
+    flex-wrap: wrap;
+  }
+  .power-preview b {
+    font-size: 13px;
+  }
+}
