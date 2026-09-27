@@ -2289,3 +2289,314 @@ textarea {
     scroll-behavior: auto !important;
   }
 }
+
+/* The dark palette keeps the miniature readable without dimming device models. */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-right: 8px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--green);
+}
+.theme-toggle ww-icon {
+  width: 17px;
+  height: 17px;
+}
+.theme-toggle:hover {
+  background: #e9efe3;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  color: #e7eee4;
+  background: #18211c;
+  --green: #4a7957;
+  --deep: #b9d7ae;
+  --muted: #a6b6a2;
+  --border: #3a4a3e;
+  --cream: #18211c;
+}
+:root[data-theme='dark'] .app-header {
+  background: #1e2922;
+}
+:root[data-theme='dark'] .library-panel {
+  background: #1b261f;
+}
+:root[data-theme='dark'] .app-header nav,
+:root[data-theme='dark'] .segmented,
+:root[data-theme='dark'] .definition-tabs {
+  background: #2a392e;
+  border-color: #415345;
+}
+:root[data-theme='dark'] .app-header nav button.active,
+:root[data-theme='dark'] .segmented button.active,
+:root[data-theme='dark'] .definition-tabs button[aria-selected='true'] {
+  background: #435c47;
+  color: #f2f8ed;
+  box-shadow: 0 1px 4px #08100b44;
+}
+:root[data-theme='dark'] .app-header nav button,
+:root[data-theme='dark'] .segmented button,
+:root[data-theme='dark'] .definition-tabs button,
+:root[data-theme='dark'] .header-status,
+:root[data-theme='dark'] .version {
+  color: #b4c6ad;
+}
+:root[data-theme='dark'] .version {
+  border-color: #4a5c4e;
+}
+:root[data-theme='dark'] .theme-toggle {
+  color: #d9e9c5;
+  background: #2b3c30;
+}
+:root[data-theme='dark'] .theme-toggle:hover {
+  background: #405844;
+}
+:root[data-theme='dark'] :is(.metric, .inspector, .device-list, .catalog-card, .modal) {
+  background: #25332a;
+  border-color: var(--border);
+}
+:root[data-theme='dark']
+  :is(
+    .scenario-section,
+    .diorama-card,
+    .tariff-strip,
+    .selected-stats,
+    .insight,
+    .definition-json-preview,
+    .json-example,
+    .import-summary
+  ) {
+  background: #293a2e;
+  border-color: #435947;
+}
+:root[data-theme='dark'] .metric-monthly {
+  background: #334935;
+  border-color: #506849;
+}
+:root[data-theme='dark']
+  :is(.search-box, .add-device, .btn.secondary, .scenario-tabs button, .json-example pre) {
+  background: #304134;
+  border-color: #4a604c;
+}
+:root[data-theme='dark']
+  :is(.library-item:hover, .library-item, .device-row:hover, .device-row.selected, .table-heading) {
+  background: #304135;
+  border-color: #425645;
+}
+:root[data-theme='dark'] .table-heading {
+  border-block-color: #425645;
+}
+:root[data-theme='dark'] .device-row,
+:root[data-theme='dark'] .catalog-actions,
+:root[data-theme='dark'] .category-comparison > div,
+:root[data-theme='dark'] .definition-json-preview dl > div,
+:root[data-theme='dark'] .form-divider,
+:root[data-theme='dark'] .local-note {
+  border-color: #405243;
+}
+:root[data-theme='dark']
+  :is(
+    .count-pill,
+    .device-count,
+    .estimate-tag,
+    .tariff-icon,
+    .section-title h2 span,
+    .peach,
+    .sage,
+    .cream
+  ) {
+  background: #3a4e3b;
+  border-color: #52694d;
+  color: #d3e4be;
+}
+:root[data-theme='dark'] :is(.device-icon, .catalog-illustration) {
+  background: color-mix(in srgb, var(--device-color, #8aa57d) 21%, #2b3b30);
+  color: color-mix(in srgb, var(--device-color, #8aa57d) 70%, #e9f2df);
+}
+:root[data-theme='dark'] .stage {
+  background: radial-gradient(ellipse at 50% 55%, #60806524, transparent 70%);
+}
+:root[data-theme='dark'] .donut > div {
+  background: #25332a;
+}
+:root[data-theme='dark']
+  :is(
+    .page-heading h1,
+    .metric-value,
+    .selected-title h2,
+    .table-device strong,
+    .donut strong,
+    .definition-json-preview h3,
+    .definition-json-preview dd,
+    .modal,
+    .catalog-card h2
+  ) {
+  color: #edf4e9;
+}
+:root[data-theme='dark']
+  :is(
+    .metric-monthly .metric-value,
+    .selected-stats strong,
+    .comparison-grid strong,
+    .catalog-card > strong,
+    .tariff-strip strong,
+    .category-legend strong,
+    .json-estimate strong
+  ) {
+  color: #d5e8be;
+}
+:root[data-theme='dark']
+  :is(
+    .subtle,
+    .eyebrow,
+    .brand small,
+    .page-heading p,
+    .library-item-info span,
+    .metric-label,
+    .metric p,
+    .metric-value > span,
+    .metric-value .metric-suffix,
+    .scene-tip,
+    .scene-footer > span:first-child,
+    .isometric-tag,
+    .table-heading,
+    .device-row,
+    .table-device small,
+    .category-legend > div,
+    .donut span,
+    .tariff-strip div span,
+    .workspace-footer,
+    .field-hint,
+    .catalog-card p,
+    .definition-json-preview > p,
+    .definition-json-preview dt,
+    .json-example,
+    .form-divider,
+    .scenario-section .section-title p,
+    .comparison-grid span,
+    .category-comparison,
+    .empty-small,
+    .load-state p,
+    .import-summary
+  ) {
+  color: #b4c5ae;
+}
+:root[data-theme='dark']
+  :is(
+    .text-button,
+    .btn.secondary,
+    .breadcrumb select,
+    .icon-button,
+    .table-device,
+    .scenario-tabs button,
+    .selected-stats span,
+    .insight strong,
+    .insight .text-button,
+    .tariff-strip strong,
+    .catalog-heading > span,
+    .json-example pre
+  ) {
+  color: #c9dfbb;
+}
+:root[data-theme='dark'] :is(.icon-button:hover, .btn.secondary:hover) {
+  background: #3e5942;
+  color: #f0f8e9;
+}
+:root[data-theme='dark'] .btn.primary:hover {
+  background: #5b8e67;
+}
+:root[data-theme='dark'] .add-device:hover {
+  background: #4a7957;
+  color: #fff;
+}
+:root[data-theme='dark'] .scenario-tabs button.active {
+  background: #425d42;
+  border-color: #77926b;
+  color: #edf6e2;
+}
+:root[data-theme='dark'] .json-estimate {
+  background: #405a42;
+  color: #ecf5e5;
+}
+:root[data-theme='dark'] .json-validation.valid,
+:root[data-theme='dark'] .success-text {
+  color: #a9d3a1;
+}
+:root[data-theme='dark'] :is(.danger, .row-remove, .comparison-grid .negative, .json-validation.invalid) {
+  color: #e9aa97 !important;
+}
+:root[data-theme='dark'] :is(.inline-error, .error-banner) {
+  background: #49332e;
+  border-color: #865b4b;
+  color: #ffd1b8;
+}
+:root[data-theme='dark'] .modal::backdrop {
+  background: #0b130ec9;
+}
+:root[data-theme='dark'] input:not([type='file']),
+:root[data-theme='dark'] select,
+:root[data-theme='dark'] textarea {
+  color: #edf3e9;
+  background: #1e2d24;
+  border-color: #536854;
+}
+:root[data-theme='dark'] :is(input, textarea)::placeholder {
+  color: #a0b19c;
+}
+:root[data-theme='dark'] .search-box input,
+:root[data-theme='dark'] .breadcrumb select,
+:root[data-theme='dark'] .category-filter select {
+  background: transparent;
+  border: 0;
+  color: #e0edda;
+}
+:root[data-theme='dark'] :is(label, .category-filter, .local-note, .definition-json-input label) {
+  color: #c3d4b9;
+}
+:root[data-theme='dark'] .definition-tabs button[aria-selected='true'] {
+  color: #f2f8ed;
+}
+:root[data-theme='dark'] ww-diorama .scene-grid-actions button,
+:root[data-theme='dark'] ww-diorama .scene-navigation,
+:root[data-theme='dark'] ww-diorama .object-label {
+  background: #2a3a30f2;
+  border-color: #4a604d;
+  color: #edf3e8;
+  box-shadow: 0 4px 14px #0c180c55;
+}
+:root[data-theme='dark'] ww-diorama .scene-grid-actions button.active,
+:root[data-theme='dark'] ww-diorama .object-label.selected {
+  background: #456247;
+  border-color: #91bb81;
+  color: #fff;
+}
+:root[data-theme='dark'] ww-diorama .scene-navigation button,
+:root[data-theme='dark'] ww-diorama .object-label strong {
+  color: #d5efc4;
+}
+:root[data-theme='dark'] ww-diorama .scene-navigation button:hover {
+  background: #425a45;
+}
+:root[data-theme='dark'] ww-diorama .scene-navigation span {
+  border-color: #4a604d;
+}
+:root[data-theme='dark'] ww-diorama .object-label b,
+:root[data-theme='dark'] ww-diorama .webgl-fallback {
+  color: #bbccb3;
+}
+:root[data-theme='dark'] ww-diorama .scene-grid-message,
+:root[data-theme='dark'] ww-diorama .scene-warning {
+  background: #49382b;
+  border-color: #8d6747;
+  color: #ffe0b6;
+}
+@media (max-width: 760px) {
+  :root[data-theme='dark'] .library-item {
+    background: #304135;
+    border-color: #425645;
+  }
+}

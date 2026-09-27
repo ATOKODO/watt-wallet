@@ -25,6 +25,8 @@ L’application Windows fonctionne hors connexion. L’installateur télécharge
 
 ## Utilisation
 
+Le bouton lune/soleil dans l'en-tête active le mode sombre ou clair. Le premier affichage suit la préférence du système ; votre choix est ensuite conservé localement.
+
 - Ajouter un appareil par le bouton + ou glisser-déposer. Cliquer sur l’objet, son étiquette ou sa ligne pour ouvrir les paramètres. Le bouton « Retirer » de chaque ligne agit uniquement sur le logement ou le scénario affiché.
 - Passer en **Placement** pour organiser le plateau avec des tailles uniformes. Le mode **Consommation** fait varier le volume de la boîte englobante selon la part des kWh/an. Les pourcentages chiffrés sont exacts ; les appareils à zéro deviennent de petits repères gris.
 - « Ranger en grille » répartit les objets selon leur taille affichée. L’accrochage, activé au départ, place les objets déplacés sur la cellule libre la plus proche ; il peut être désactivé. Si les objets ne tiennent pas sur le plateau, aucune position n’est modifiée et un message l’explique.

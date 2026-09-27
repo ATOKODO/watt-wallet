@@ -17,6 +17,7 @@ import { WalletStore } from '../state';
 import { ModelFactory, disposeObject, loadGlb } from './models';
 import { GridFootprint, GridPosition, arrangeGrid, gridCells, nearestFreeGridCell } from './grid';
 import { IconComponent } from '../ui/icon';
+import { Theme } from '../ui/theme';
 
 interface Label {
   id: string;
@@ -277,6 +278,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   devices = input.required<DeviceInstance[]>();
   results = input.required<DeviceResult[]>();
   mode = input<'consumption' | 'placement'>('consumption');
+  theme = input<Theme>('light');
   selectedId = input<string | null>(null);
   selected = output<string>();
   moved = output<{ id: string; position: { x: number; z: number } }>();
@@ -322,6 +324,10 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       const enabled = this.snap();
       if (this.guides) this.guides.visible = enabled;
       if (this.renderer) this.requestRender();
+    });
+    effect(() => {
+      const theme = this.theme();
+      if (this.renderer && this.stage) this.applySceneTheme(theme);
     });
   }
   ngAfterViewInit() {
@@ -386,6 +392,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       this.selectionRing.rotation.x = -Math.PI / 2;
       this.selectionRing.position.y = 0.03;
       this.scene.add(this.selectionRing);
+      this.applySceneTheme(this.theme());
       const canvas = this.renderer.domElement;
       canvas.addEventListener('pointerdown', this.pointerDown, true);
       canvas.addEventListener('pointermove', this.pointerMove);
@@ -400,6 +407,17 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       this.failed.set(true);
       this.renderer?.dispose();
     }
+  }
+  private applySceneTheme(theme: Theme) {
+    const dark = theme === 'dark';
+    this.factory.material('#d7dcca').color.set(dark ? '#172820' : '#d7dcca');
+    this.factory.material('#f0eddf').color.set(dark ? '#344b3b' : '#f0eddf');
+    this.factory.material('#cfd3c3').color.set(dark ? '#708773' : '#cfd3c3');
+    if (this.guides)
+      (this.guides.material as THREE.MeshBasicMaterial).color.set(dark ? '#a4c493' : '#7fa66e');
+    if (this.selectionRing)
+      (this.selectionRing.material as THREE.MeshBasicMaterial).color.set(dark ? '#a6d394' : '#4e7952');
+    this.requestRender();
   }
   private async rebuild() {
     const generation = ++this.generation;
@@ -501,7 +519,11 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     this.guides = undefined;
     if (!this.slots.length) return;
     const geometry = new THREE.CylinderGeometry(0.045, 0.045, 0.012, 8);
-    const material = new THREE.MeshBasicMaterial({ color: '#7fa66e', transparent: true, opacity: 0.55 });
+    const material = new THREE.MeshBasicMaterial({
+      color: this.theme() === 'dark' ? '#a4c493' : '#7fa66e',
+      transparent: true,
+      opacity: 0.55,
+    });
     const guides = new THREE.InstancedMesh(geometry, material, this.slots.length);
     const dummy = new THREE.Object3D();
     this.slots.forEach((cell, index) => {

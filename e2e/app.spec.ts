@@ -126,6 +126,59 @@ test('mode sans WebGL et interface étroite', async ({ page }) => {
   await page.screenshot({ path: 'test-results/watt-wallet-mobile-fallback.png', fullPage: true });
 });
 
+test('grille, accrochage et éditeur JSON synchronisé', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: /Accrochage activé/ })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByRole('button', { name: 'Ranger en grille' }).click();
+  await expect(page.locator('.scene-grid-message')).toHaveCount(0);
+  await page.getByRole('button', { name: /Accrochage activé/ }).click();
+  await expect(page.getByRole('button', { name: /Accrochage désactivé/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+
+  await page.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('tab', { name: 'JSON' }).click();
+  await dialog.getByText('Voir un exemple JSON complet').click();
+  await dialog.getByRole('button', { name: 'Charger cet exemple' }).click();
+  const editor = dialog.getByLabel('JSON de la fiche');
+  await expect(editor).toHaveValue(/Radiateur du salon/);
+  const example = JSON.parse(await editor.inputValue());
+  await expect(dialog.locator('.json-validation')).toContainText('JSON valide');
+  await expect(dialog.locator('.definition-json-preview')).toContainText('675 kWh/an');
+  await dialog.screenshot({ path: 'test-results/watt-wallet-json.png' });
+
+  await editor.fill('{');
+  await expect(dialog.locator('.json-validation')).toContainText('Syntaxe JSON invalide');
+  await expect(dialog.getByRole('button', { name: 'Enregistrer la fiche' })).toBeDisabled();
+  await editor.fill(JSON.stringify({ id: example.id }));
+  await expect(dialog.locator('.json-validation')).toContainText('Champ requis');
+  await editor.fill(JSON.stringify({ ...example, energy: { method: 'power', activeW: -1, standbyW: 0 } }));
+  await expect(dialog.locator('.json-validation')).toContainText('Valeur invalide');
+
+  await editor.fill(
+    JSON.stringify({
+      ...example,
+      name: 'Mon radiateur JSON',
+      energy: { method: 'power', activeW: 100, standbyW: 0 },
+    }),
+  );
+  await expect(dialog.locator('.json-validation')).toContainText('JSON valide');
+  await expect(dialog.locator('.definition-json-preview')).toContainText('75 kWh/an');
+  await dialog.getByRole('tab', { name: 'Formulaire' }).click();
+  await expect(dialog.getByLabel('Nom de l’appareil')).toHaveValue('Mon radiateur JSON');
+  await dialog.getByLabel('Nom de l’appareil').fill('Nom via formulaire');
+  await dialog.getByRole('tab', { name: 'JSON' }).click();
+  await expect(editor).toHaveValue(/Nom via formulaire/);
+  await dialog.getByRole('button', { name: 'Enregistrer la fiche' }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator('.library-item').filter({ hasText: 'Nom via formulaire' })).toHaveCount(1);
+});
+
 test('GLB personnalisé partagé avec sa fiche et placement sans glisser-déposer', async ({
   page,
   browser,
@@ -180,58 +233,6 @@ test('retirer un appareil d’un scénario conserve la référence', async ({ pa
   await expect(page.locator('.metric-value').first()).toHaveText(referenceKwh!);
 });
 
-test('grille, accrochage et éditeur JSON synchronisé', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByRole('button', { name: /Accrochage activé/ })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
-  await page.getByRole('button', { name: 'Ranger en grille' }).click();
-  await expect(page.locator('.scene-grid-message')).toHaveCount(0);
-  await page.getByRole('button', { name: /Accrochage activé/ }).click();
-  await expect(page.getByRole('button', { name: /Accrochage désactivé/ })).toHaveAttribute(
-    'aria-pressed',
-    'false',
-  );
-
-  await page.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
-  const dialog = page.getByRole('dialog');
-  await dialog.getByRole('tab', { name: 'JSON' }).click();
-  await dialog.getByText('Voir un exemple JSON complet').click();
-  await dialog.getByRole('button', { name: 'Charger cet exemple' }).click();
-  const editor = dialog.getByLabel('JSON de la fiche');
-  const example = JSON.parse(await editor.inputValue());
-  await expect(dialog.locator('.json-validation')).toContainText('JSON valide');
-  await expect(dialog.locator('.definition-json-preview')).toContainText('675 kWh/an');
-  await dialog.screenshot({ path: 'test-results/watt-wallet-json.png' });
-
-  await editor.fill('{');
-  await expect(dialog.locator('.json-validation')).toContainText('Syntaxe JSON invalide');
-  await expect(dialog.getByRole('button', { name: 'Enregistrer la fiche' })).toBeDisabled();
-  await editor.fill(JSON.stringify({ id: example.id }));
-  await expect(dialog.locator('.json-validation')).toContainText('Champ requis');
-  await editor.fill(JSON.stringify({ ...example, energy: { method: 'power', activeW: -1, standbyW: 0 } }));
-  await expect(dialog.locator('.json-validation')).toContainText('Valeur invalide');
-
-  await editor.fill(
-    JSON.stringify({
-      ...example,
-      name: 'Mon radiateur JSON',
-      energy: { method: 'power', activeW: 100, standbyW: 0 },
-    }),
-  );
-  await expect(dialog.locator('.json-validation')).toContainText('JSON valide');
-  await expect(dialog.locator('.definition-json-preview')).toContainText('75 kWh/an');
-  await dialog.getByRole('tab', { name: 'Formulaire' }).click();
-  await expect(dialog.getByLabel('Nom de l’appareil')).toHaveValue('Mon radiateur JSON');
-  await dialog.getByLabel('Nom de l’appareil').fill('Nom via formulaire');
-  await dialog.getByRole('tab', { name: 'JSON' }).click();
-  await expect(editor).toHaveValue(/Nom via formulaire/);
-  await dialog.getByRole('button', { name: 'Enregistrer la fiche' }).click();
-  await expect(dialog).not.toBeVisible();
-  await expect(page.locator('.library-item').filter({ hasText: 'Nom via formulaire' })).toHaveCount(1);
-});
-
 test('éditeur JSON mobile et retrait du scénario au clavier', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
@@ -253,4 +254,37 @@ test('éditeur JSON mobile et retrait du scénario au clavier', async ({ page })
   await expect(page.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Référence', exact: true }).click();
   await expect(page.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
+});
+
+test('theme sombre, preference systeme et persistance locale', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.getByRole('button', { name: 'Activer le mode clair' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  const darkBackground = await page
+    .locator('.app-header')
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  await page.getByRole('button', { name: 'Activer le mode clair' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  const lightBackground = await page
+    .locator('.app-header')
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(lightBackground).not.toBe(darkBackground);
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: 'Activer le mode sombre' }).click();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('ww-diorama canvas')).toBeVisible();
+  await page.screenshot({ path: 'test-results/watt-wallet-dark.png', fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: 'test-results/watt-wallet-dark-mobile.png', fullPage: true });
+  await page.getByRole('dialog').getByRole('tab', { name: 'JSON' }).click();
+  await page.screenshot({ path: 'test-results/watt-wallet-dark-json-mobile.png', fullPage: true });
 });

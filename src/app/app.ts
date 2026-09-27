@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconComponent } from './ui/icon';
+import { ThemeService } from './ui/theme';
 import { DeviceEditorComponent } from './ui/device-editor';
 import { DioramaComponent } from './scene/diorama';
 import { WalletStore } from './state';
@@ -35,6 +36,7 @@ import { validateRenderableGlb } from './scene/models';
 })
 export class AppComponent {
   store = inject(WalletStore);
+  theme = inject(ThemeService);
   private fb = inject(FormBuilder);
   tab = signal<'home' | 'scenarios' | 'library'>('home');
   mode = signal<'consumption' | 'placement'>('consumption');
@@ -78,7 +80,11 @@ export class AppComponent {
         start = end;
         return part;
       });
-    return parts.length ? `conic-gradient(${parts.join(',')})` : '#e8eade';
+    return parts.length
+      ? `conic-gradient(${parts.join(',')})`
+      : this.theme.theme() === 'dark'
+        ? '#485d49'
+        : '#e8eade';
   });
   selectedResult = computed(() => this.store.result().devices.find((d) => d.id === this.store.selectedId()));
   @ViewChild('modalDialog') set modalDialog(el: ElementRef<HTMLDialogElement> | undefined) {

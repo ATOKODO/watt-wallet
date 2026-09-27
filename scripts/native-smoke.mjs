@@ -65,6 +65,13 @@ try {
   await expect(page.locator('.app-header')).toHaveCSS('display', 'flex');
   await expect(page.locator('.brand-mark ww-icon')).toHaveCSS('width', '26px');
   await expect(page.locator('ww-diorama .scene-canvas')).toHaveCSS('position', 'absolute');
+  if ((await page.locator('html').getAttribute('data-theme')) !== 'dark')
+    await page.getByRole('button', { name: 'Activer le mode sombre' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.getByRole('button', { name: 'Activer le mode clair' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
   if (pageHeight > 5000) throw new Error(`Mise en page native incorrecte : ${pageHeight}px.`);
   await expect(page.locator('.object-label').first()).toBeVisible();
@@ -117,6 +124,7 @@ try {
   run = await launch();
   await expect(run.page.locator('.device-row').last()).toContainText('× 4', { timeout: 30000 });
   await expect(run.page.locator('.error-banner')).toHaveCount(0);
+  await expect(run.page.locator('html')).toHaveAttribute('data-theme', 'dark');
   const nativePage = run.page;
   nativePage.on('pageerror', (error) => errors.push(error.message));
   await nativePage.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
@@ -138,7 +146,7 @@ try {
   await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(
-    'WebView2 natif : scène 3D, grille, JSON, scénario, glisser-déposer, sauvegarde et redémarrage OK.',
+    'WebView2 natif : mode sombre, scène 3D, grille, JSON, scénario, glisser-déposer, sauvegarde et redémarrage OK.',
   );
 } finally {
   if (run) {
