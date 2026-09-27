@@ -85,6 +85,17 @@ try {
       page.locator('.object-label').evaluateAll((labels) => (labels.length ? labels[0].style.left : '')),
     )
     .not.toBe(labelLeftBeforeOrbit);
+  await page.getByRole('button', { name: 'Ranger en grille' }).click();
+  await expect(page.locator('.scene-grid-message')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Accrochage activé/ })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByRole('button', { name: /Accrochage activé/ }).click();
+  await expect(page.getByRole('button', { name: /Accrochage désactivé/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
   await page
     .locator('.library-item')
     .filter({ hasText: 'Réfrigérateur' })
@@ -106,9 +117,28 @@ try {
   run = await launch();
   await expect(run.page.locator('.device-row').last()).toContainText('× 4', { timeout: 30000 });
   await expect(run.page.locator('.error-banner')).toHaveCount(0);
+  const nativePage = run.page;
+  nativePage.on('pageerror', (error) => errors.push(error.message));
+  await nativePage.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
+  const dialog = nativePage.getByRole('dialog');
+  await dialog.getByRole('tab', { name: 'JSON' }).click();
+  await dialog.getByText('Voir un exemple JSON complet').click();
+  await dialog.getByRole('button', { name: 'Charger cet exemple' }).click();
+  await expect(dialog.locator('.json-validation')).toContainText('JSON valide');
+  await expect(dialog.locator('.definition-json-preview')).toContainText('675 kWh/an');
+  await dialog.getByRole('button', { name: 'Enregistrer la fiche' }).click();
+  await expect(dialog).not.toBeVisible();
+  await nativePage.getByRole('button', { name: 'Mes scénarios', exact: true }).click();
+  await nativePage.getByRole('button', { name: 'Créer un scénario', exact: true }).click();
+  await dialog.getByLabel('Nom', { exact: true }).fill('Sans radiateur');
+  await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+  await nativePage.getByRole('button', { name: 'Retirer de ce scénario : Radiateur électrique' }).click();
+  await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(0);
+  await nativePage.getByRole('button', { name: 'Référence', exact: true }).click();
+  await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(
-    'WebView2 natif : styles, rendu 3D, orbite, glisser-déposer, modification, sauvegarde et redémarrage OK.',
+    'WebView2 natif : scène 3D, grille, JSON, scénario, glisser-déposer, sauvegarde et redémarrage OK.',
   );
 } finally {
   if (run) {

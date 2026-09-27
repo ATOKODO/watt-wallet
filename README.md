@@ -25,10 +25,11 @@ L’application Windows fonctionne hors connexion. L’installateur télécharge
 
 ## Utilisation
 
-- Ajouter un appareil par `+` ou glisser-déposer. Cliquer sur l’objet, son étiquette ou sa ligne pour ouvrir les paramètres ; appliquer les modifications avec le bouton du formulaire.
+- Ajouter un appareil par le bouton + ou glisser-déposer. Cliquer sur l’objet, son étiquette ou sa ligne pour ouvrir les paramètres. Le bouton « Retirer » de chaque ligne agit uniquement sur le logement ou le scénario affiché.
 - Passer en **Placement** pour organiser le plateau avec des tailles uniformes. Le mode **Consommation** fait varier le volume de la boîte englobante selon la part des kWh/an. Les pourcentages chiffrés sont exacts ; les appareils à zéro deviennent de petits repères gris.
+- « Ranger en grille » répartit les objets selon leur taille affichée. L’accrochage, activé au départ, place les objets déplacés sur la cellule libre la plus proche ; il peut être désactivé. Si les objets ne tiennent pas sur le plateau, aucune position n’est modifiée et un message l’explique.
 - Faire glisser le décor avec le bouton gauche pour orbiter autour du logement, utiliser le bouton droit pour déplacer la vue et la molette pour zoomer. Sur écran tactile, un doigt fait orbiter ; deux doigts déplacent et zooment. Un appareil se déplace en le faisant glisser directement. Les coordonnées X/Z du formulaire permettent aussi un placement au clavier.
-- Créer ou éditer les fiches dans la bibliothèque. Chaque appareil installé conserve sa propre copie de la fiche. Modifier une fiche n’altère pas les logements précédents.
+- Créer ou éditer les fiches de bibliothèque avec le formulaire ou l’onglet JSON synchronisé. L’exemple montre tous les champs attendus, le statut distingue syntaxe et valeurs invalides, et l’aperçu calcule la consommation annuelle. Un JSON incomplet ne peut pas être enregistré. Chaque appareil installé conserve sa copie de la fiche.
 - Ajuster le tarif en bas du logement : Base ou HP/HC, prix TTC et abonnement annuel. En HP/HC, renseigner la part de consommation en heures creuses pour chaque appareil.
 - Créer un scénario depuis la référence ou un scénario existant. Il est toujours comparé à la référence actuelle du logement. Son surcoût initial sert au calcul du retour simple, sans financement ni actualisation.
 - Exporter une fiche, la bibliothèque ou le logement avec tous ses scénarios. Importer un `.wattpack` affiche un aperçu avant d’ajouter de nouvelles copies.

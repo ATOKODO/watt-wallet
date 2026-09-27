@@ -325,6 +325,7 @@
               [selectedId]="store.selectedId()"
               (selected)="store.selectedId.set($event)"
               (moved)="store.moveDevice($event.id, $event.position)"
+              (arranged)="store.moveDevices($event)"
               (added)="drop($event)"
             />@if(!store.devices().length){
             <div class="empty-stage">
@@ -358,14 +359,24 @@
                   ><strong>{{d.definition.name}}</strong><small>{{d.definition.category}}</small></span
                 ></button
               ><span>× {{d.quantity}}</span><span>{{number(store.result().devices[i].kwh, 1)}}</span
-              ><span>{{money(store.result().devices[i].cost, 1)}}</span
-              ><button
-                class="icon-button"
-                [attr.aria-label]="'Modifier ' + d.definition.name"
-                (click)="store.selectedId.set(d.id)"
-              >
-                <ww-icon name="chevron" />
-              </button>
+              ><span>{{money(store.result().devices[i].cost, 1)}}</span>
+              <div class="device-row-actions">
+                <button
+                  class="icon-button"
+                  [attr.aria-label]="'Modifier ' + d.definition.name"
+                  (click)="store.selectedId.set(d.id)"
+                >
+                  <ww-icon name="chevron" />
+                </button>
+                <button
+                  class="row-remove danger"
+                  [attr.aria-label]="(store.scenario() ? 'Retirer de ce scénario : ' : 'Retirer du logement : ') + d.definition.name"
+                  [title]="store.scenario() ? 'Retirer de ce scénario' : 'Retirer du logement'"
+                  (click)="store.removeDevice(d.id)"
+                >
+                  <ww-icon name="trash" /><span>Retirer</span>
+                </button>
+              </div>
             </div>
             } @empty {
             <p class="empty-small">Votre logement attend son premier appareil.</p>
@@ -401,7 +412,8 @@
             <ww-icon name="copy" />Dupliquer</button
           ><button
             class="icon-button danger"
-            aria-label="Retirer cet appareil du logement"
+            [attr.aria-label]="store.scenario() ? 'Retirer cet appareil de ce scénario' : 'Retirer cet appareil du logement'"
+            [title]="store.scenario() ? 'Retirer de ce scénario' : 'Retirer du logement'"
             (click)="store.removeDevice(selected.id)"
           >
             <ww-icon name="trash" /></button

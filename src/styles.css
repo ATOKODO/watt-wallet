@@ -905,7 +905,7 @@ h3 {
 .table-heading,
 .device-row {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) 58px 80px 72px 25px;
+  grid-template-columns: minmax(120px, 1fr) 58px 80px 72px 96px;
   align-items: center;
   gap: 8px;
   padding: 10px 18px;
@@ -930,6 +930,40 @@ h3 {
 }
 .device-row:hover {
   background: #f8faf0;
+}
+.device-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+.device-row-actions .icon-button {
+  width: 26px;
+  height: 26px;
+}
+.device-row-actions .icon-button ww-icon {
+  width: 15px;
+  height: 15px;
+}
+.row-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  background: transparent;
+  color: #aa6b5d;
+  cursor: pointer;
+  padding: 5px 2px;
+  font-size: 9px;
+}
+.row-remove ww-icon {
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 1200px) {
+  .row-remove span {
+    display: none;
+  }
 }
 .table-device {
   display: flex;
@@ -1077,6 +1111,158 @@ h3 {
 }
 .device-form {
   font-size: 11px;
+}
+.definition-tabs {
+  display: flex;
+  width: fit-content;
+  gap: 3px;
+  padding: 3px;
+  margin: 0 0 14px;
+  border-radius: 9px;
+  border: 1px solid #dce3d1;
+  background: #edf1e5;
+}
+.definition-tabs button {
+  padding: 8px 15px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #77886c;
+  font-size: 12px;
+  cursor: pointer;
+}
+.definition-tabs button[aria-selected='true'] {
+  background: #fffef8;
+  color: #315c41;
+  box-shadow: 0 1px 4px #344c351c;
+}
+.modal.wide-modal:has(.definition-json-layout) {
+  width: min(960px, calc(100vw - 30px));
+}
+.definition-json-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
+  gap: 18px;
+  align-items: start;
+}
+.definition-json-input,
+.definition-json-preview {
+  min-width: 0;
+}
+.definition-json-input label {
+  margin: 14px 0 4px;
+}
+.definition-json-input textarea {
+  min-height: 340px;
+  width: 100%;
+  font:
+    12px/1.55 Consolas,
+    'Courier New',
+    monospace;
+  resize: vertical;
+  tab-size: 2;
+}
+.json-example {
+  border: 1px solid #e0e8d6;
+  border-radius: 9px;
+  background: #f7f9f1;
+  padding: 9px 12px;
+  color: #607854;
+  font-size: 11px;
+}
+.json-example summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.json-example pre {
+  overflow: auto;
+  max-height: 230px;
+  padding: 10px;
+  background: #fffefb;
+  border-radius: 6px;
+  font:
+    11px/1.5 Consolas,
+    'Courier New',
+    monospace;
+  color: #4d614c;
+}
+.json-validation {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 9px 0 12px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.json-validation ww-icon {
+  width: 15px;
+  height: 15px;
+}
+.json-validation.valid {
+  color: #3f7851;
+}
+.json-validation.invalid {
+  color: #a15a45;
+}
+.definition-json-preview {
+  padding: 18px;
+  border: 1px solid #dde6d1;
+  border-radius: 11px;
+  background: #f7f9ef;
+  min-height: 265px;
+}
+.definition-json-preview h3 {
+  margin: 13px 0 3px;
+  font:
+    22px/1.2 Georgia,
+    serif;
+  color: #355641;
+}
+.definition-json-preview > p {
+  color: #87977d;
+  font-size: 12px;
+  margin: 0 0 15px;
+}
+.definition-json-preview dl {
+  margin: 14px 0 18px;
+}
+.definition-json-preview dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e6ebdc;
+  font-size: 11px;
+}
+.definition-json-preview dt {
+  color: #829078;
+}
+.definition-json-preview dd {
+  margin: 0;
+  text-align: right;
+  color: #48644b;
+  font-weight: 600;
+}
+.json-estimate {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  background: #e9f2dd;
+  border-radius: 8px;
+  color: #436446;
+  font-size: 11px;
+}
+.json-estimate strong {
+  font-size: 13px;
+}
+@media (max-width: 720px) {
+  .definition-json-layout {
+    grid-template-columns: 1fr;
+  }
+  .definition-json-input textarea {
+    min-height: 250px;
+  }
 }
 label {
   display: block;
@@ -1601,7 +1787,7 @@ textarea {
   }
   .table-heading,
   .device-row {
-    grid-template-columns: minmax(100px, 1fr) 37px 59px 55px 22px;
+    grid-template-columns: minmax(100px, 1fr) 37px 59px 55px 55px;
     padding-inline: 12px;
     gap: 5px;
   }
@@ -1929,7 +2115,7 @@ textarea {
   }
   .table-heading,
   .device-row {
-    grid-template-columns: minmax(110px, 1fr) 35px 60px 56px 20px;
+    grid-template-columns: minmax(110px, 1fr) 35px 60px 56px 55px;
     gap: 4px;
     padding: 11px 13px;
   }

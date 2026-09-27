@@ -164,3 +164,93 @@ test('GLB personnalisé partagé avec sa fiche et placement sans glisser-dépose
   await expect(fresh.locator('.scene-warning')).toHaveCount(0);
   await context.close();
 });
+
+test('retirer un appareil d’un scénario conserve la référence', async ({ page }) => {
+  await page.goto('/');
+  const referenceKwh = await page.locator('.metric-value').first().textContent();
+  await page.getByRole('button', { name: 'Mes scénarios', exact: true }).click();
+  await page.getByRole('button', { name: 'Créer un scénario', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('Nom', { exact: true }).fill('Sans chauffage');
+  await page.getByRole('dialog').getByRole('button', { name: 'Créer', exact: true }).click();
+  await page.getByRole('button', { name: 'Retirer de ce scénario : Radiateur électrique' }).click();
+  await expect(page.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(0);
+  await expect(page.locator('.comparison-grid')).toContainText('3 375');
+  await page.getByRole('button', { name: 'Référence', exact: true }).click();
+  await expect(page.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
+  await expect(page.locator('.metric-value').first()).toHaveText(referenceKwh!);
+});
+
+test('grille, accrochage et éditeur JSON synchronisé', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: /Accrochage activé/ })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByRole('button', { name: 'Ranger en grille' }).click();
+  await expect(page.locator('.scene-grid-message')).toHaveCount(0);
+  await page.getByRole('button', { name: /Accrochage activé/ }).click();
+  await expect(page.getByRole('button', { name: /Accrochage désactivé/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+
+  await page.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('tab', { name: 'JSON' }).click();
+  await dialog.getByText('Voir un exemple JSON complet').click();
+  await dialog.getByRole('button', { name: 'Charger cet exemple' }).click();
+  const editor = dialog.getByLabel('JSON de la fiche');
+  const example = JSON.parse(await editor.inputValue());
+  await expect(dialog.locator('.json-validation')).toContainText('JSON valide');
+  await expect(dialog.locator('.definition-json-preview')).toContainText('675 kWh/an');
+  await dialog.screenshot({ path: 'test-results/watt-wallet-json.png' });
+
+  await editor.fill('{');
+  await expect(dialog.locator('.json-validation')).toContainText('Syntaxe JSON invalide');
+  await expect(dialog.getByRole('button', { name: 'Enregistrer la fiche' })).toBeDisabled();
+  await editor.fill(JSON.stringify({ id: example.id }));
+  await expect(dialog.locator('.json-validation')).toContainText('Champ requis');
+  await editor.fill(JSON.stringify({ ...example, energy: { method: 'power', activeW: -1, standbyW: 0 } }));
+  await expect(dialog.locator('.json-validation')).toContainText('Valeur invalide');
+
+  await editor.fill(
+    JSON.stringify({
+      ...example,
+      name: 'Mon radiateur JSON',
+      energy: { method: 'power', activeW: 100, standbyW: 0 },
+    }),
+  );
+  await expect(dialog.locator('.json-validation')).toContainText('JSON valide');
+  await expect(dialog.locator('.definition-json-preview')).toContainText('75 kWh/an');
+  await dialog.getByRole('tab', { name: 'Formulaire' }).click();
+  await expect(dialog.getByLabel('Nom de l’appareil')).toHaveValue('Mon radiateur JSON');
+  await dialog.getByLabel('Nom de l’appareil').fill('Nom via formulaire');
+  await dialog.getByRole('tab', { name: 'JSON' }).click();
+  await expect(editor).toHaveValue(/Nom via formulaire/);
+  await dialog.getByRole('button', { name: 'Enregistrer la fiche' }).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator('.library-item').filter({ hasText: 'Nom via formulaire' })).toHaveCount(1);
+});
+
+test('éditeur JSON mobile et retrait du scénario au clavier', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('tab', { name: 'JSON' }).click();
+  await expect(dialog.locator('.definition-json-layout')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await dialog.screenshot({ path: 'test-results/watt-wallet-json-mobile.png' });
+  await dialog.getByRole('button', { name: 'Fermer la fenêtre' }).click();
+
+  await page.getByRole('button', { name: 'Mes scénarios', exact: true }).click();
+  await page.getByRole('button', { name: 'Créer un scénario', exact: true }).click();
+  await dialog.getByLabel('Nom', { exact: true }).fill('Sans radiateur au clavier');
+  await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+  const remove = page.getByRole('button', { name: 'Retirer de ce scénario : Radiateur électrique' });
+  await remove.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Référence', exact: true }).click();
+  await expect(page.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
+});

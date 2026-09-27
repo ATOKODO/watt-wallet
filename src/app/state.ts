@@ -133,6 +133,15 @@ export class WalletStore {
       if (d) d.position = position;
     });
   }
+  moveDevices(positions: { id: string; position: { x: number; z: number } }[]) {
+    this.mutate((w) => {
+      const byId = new Map(positions.map(({ id, position }) => [id, position]));
+      for (const device of this.current(w).devices) {
+        const position = byId.get(device.id);
+        if (position) device.position = position;
+      }
+    });
+  }
   duplicateDevice(id: string) {
     const d = this.devices().find((d) => d.id === id);
     if (!d) return;

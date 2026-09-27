@@ -15,6 +15,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { DeviceInstance, DeviceResult } from '../domain/models';
 import { WalletStore } from '../state';
 import { ModelFactory, disposeObject, loadGlb } from './models';
+import { GridFootprint, GridPosition, arrangeGrid, gridCells, nearestFreeGridCell } from './grid';
 import { IconComponent } from '../ui/icon';
 
 interface Label {
@@ -48,6 +49,7 @@ interface Label {
         <button
           class="object-label"
           [class.selected]="label.selected"
+          [title]="label.name + ' · ' + label.percent + ' %'"
           [style.left.px]="label.x"
           [style.top.px]="label.y"
           (pointerdown)="$event.stopPropagation()"
@@ -65,6 +67,23 @@ interface Label {
     @if (warning()) {
       <div class="scene-warning" role="status">{{ warning() }}</div>
     }
+    @if (gridMessage()) {
+      <div class="scene-grid-message" role="status">{{ gridMessage() }}</div>
+    }
+    <div class="scene-grid-actions">
+      <button type="button" (click)="organize()" [disabled]="failed() || !devices().length">
+        <ww-icon name="grid" /> Ranger en grille
+      </button>
+      <button
+        type="button"
+        [attr.aria-pressed]="snap()"
+        [class.active]="snap()"
+        [disabled]="failed()"
+        (click)="snap.set(!snap())"
+      >
+        <ww-icon name="move" /> Accrochage {{ snap() ? 'activé' : 'désactivé' }}
+      </button>
+    </div>
     <div class="scene-navigation">
       <button title="Zoom avant" aria-label="Zoom avant" (click)="zoom(1.2)"><ww-icon name="plus" /></button
       ><button title="Zoom arrière" aria-label="Zoom arrière" (click)="zoom(0.8)">
@@ -98,6 +117,67 @@ interface Label {
       }
       .scene-canvas canvas.orbiting {
         cursor: grabbing;
+      }
+      .scene-grid-actions {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        display: flex;
+        gap: 5px;
+        z-index: 3;
+      }
+      .scene-grid-actions button {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 8px;
+        border: 1px solid #dce3d1;
+        border-radius: 7px;
+        background: #fffdf7ee;
+        color: #667b5e;
+        font-size: 10px;
+        cursor: pointer;
+      }
+      .scene-grid-actions button.active {
+        background: #e9f1db;
+        border-color: #aac394;
+        color: #315c41;
+      }
+      .scene-grid-actions button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .scene-grid-actions ww-icon {
+        width: 13px;
+        height: 13px;
+      }
+      .scene-grid-message {
+        position: absolute;
+        left: 12px;
+        bottom: 64px;
+        right: 100px;
+        z-index: 3;
+        width: fit-content;
+        max-width: calc(100% - 125px);
+        border: 1px solid #e4c3ad;
+        background: #fff8e9;
+        border-radius: 8px;
+        padding: 8px 10px;
+        color: #8d624f;
+        font-size: 11px;
+      }
+      @media (max-width: 580px) {
+        .scene-grid-actions {
+          top: 8px;
+          right: 8px;
+          left: 8px;
+          justify-content: flex-end;
+          flex-wrap: wrap;
+        }
+        .scene-grid-actions button {
+          font-size: 9px;
+          padding: 5px 6px;
+        }
       }
       .scene-navigation {
         position: absolute;
@@ -141,11 +221,14 @@ interface Label {
         border-radius: 9px;
         font: 10px inherit;
         white-space: nowrap;
+        max-width: 210px;
         cursor: pointer;
         box-shadow: 0 4px 14px #283e3610;
       }
       .object-label span {
         font-size: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .object-label strong {
         font-size: 11px;
@@ -197,10 +280,13 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   selectedId = input<string | null>(null);
   selected = output<string>();
   moved = output<{ id: string; position: { x: number; z: number } }>();
+  arranged = output<{ id: string; position: { x: number; z: number } }[]>();
   added = output<{ definitionId: string; position: { x: number; z: number } }>();
   failed = signal(false);
   labels = signal<Label[]>([]);
   warning = signal('');
+  gridMessage = signal('');
+  snap = signal(true);
   private store = inject(WalletStore);
   private renderer?: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
@@ -210,6 +296,8 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   private objects = new Map<string, THREE.Group>();
   private custom = new Map<string, THREE.Group>();
   private activeCustom = new Set<string>();
+  private slots: GridPosition[] = [];
+  private guides?: THREE.InstancedMesh;
   private resizeObserver?: ResizeObserver;
   private ray = new THREE.Raycaster();
   private plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -228,6 +316,11 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     });
     effect(() => {
       this.selectedId();
+      if (this.renderer) this.requestRender();
+    });
+    effect(() => {
+      const enabled = this.snap();
+      if (this.guides) this.guides.visible = enabled;
       if (this.renderer) this.requestRender();
     });
   }
@@ -387,7 +480,65 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
         this.custom.delete(id);
       }
     this.activeCustom = usedAssets;
+    this.updateGrid();
     this.requestRender();
+  }
+  private footprints(): GridFootprint[] {
+    return this.devices().flatMap((device) => {
+      const object = this.objects.get(device.id);
+      if (!object) return [];
+      const size = new THREE.Box3().setFromObject(object).getSize(new THREE.Vector3());
+      return [{ id: device.id, width: size.x, depth: size.z }];
+    });
+  }
+  private updateGrid() {
+    this.slots = gridCells(this.footprints());
+    if (this.guides) {
+      this.scene.remove(this.guides);
+      this.guides.geometry.dispose();
+      (this.guides.material as THREE.Material).dispose();
+    }
+    this.guides = undefined;
+    if (!this.slots.length) return;
+    const geometry = new THREE.CylinderGeometry(0.045, 0.045, 0.012, 8);
+    const material = new THREE.MeshBasicMaterial({ color: '#7fa66e', transparent: true, opacity: 0.55 });
+    const guides = new THREE.InstancedMesh(geometry, material, this.slots.length);
+    const dummy = new THREE.Object3D();
+    this.slots.forEach((cell, index) => {
+      dummy.position.set(cell.x, 0.04, cell.z);
+      dummy.updateMatrix();
+      guides.setMatrixAt(index, dummy.matrix);
+    });
+    guides.instanceMatrix.needsUpdate = true;
+    guides.visible = this.snap();
+    guides.raycast = () => {};
+    this.guides = guides;
+    this.scene.add(guides);
+  }
+  organize() {
+    const positions = arrangeGrid(this.footprints());
+    if (!positions) {
+      this.gridMessage.set('Pas assez de place sur le plateau pour espacer tous les appareils en grille.');
+      return;
+    }
+    this.gridMessage.set('');
+    if (positions.length) this.arranged.emit(positions);
+  }
+  private nearestAvailable(point: GridPosition, movingId?: string): GridPosition | null {
+    const occupied = this.devices()
+      .filter((device) => device.id !== movingId)
+      .flatMap((device) => {
+        const object = this.objects.get(device.id);
+        if (!object || !this.slots.length) return [];
+        const nearest = this.slots.reduce((best, cell) =>
+          (cell.x - object.position.x) ** 2 + (cell.z - object.position.z) ** 2 <
+          (best.x - object.position.x) ** 2 + (best.z - object.position.z) ** 2
+            ? cell
+            : best,
+        );
+        return [nearest];
+      });
+    return nearestFreeGridCell(point, this.slots, occupied);
   }
   private releaseTemporary(objects: Map<string, THREE.Group>) {
     objects.forEach((g) =>
@@ -436,26 +587,71 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     this.renderer.render(this.scene, this.camera);
     const w = this.host.nativeElement.clientWidth,
       h = this.host.nativeElement.clientHeight;
-    const labels: Label[] = [];
+    const candidates: { label: Label; share: number }[] = [];
     for (const d of this.devices()) {
       const object = this.objects.get(d.id);
       if (!object) continue;
       const b = new THREE.Box3().setFromObject(object),
         p = new THREE.Vector3(object.position.x, b.max.y + 0.35, object.position.z).project(this.camera);
       if (Math.abs(p.x) > 1 || Math.abs(p.y) > 1) continue;
-      labels.push({
-        id: d.id,
-        name: d.definition.name,
-        percent: new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(
-          (this.results().find((r) => r.id === d.id)?.share ?? 0) * 100,
-        ),
-        quantity: d.quantity,
-        x: ((p.x + 1) * w) / 2,
-        y: ((1 - p.y) * h) / 2,
-        selected: d.id === this.selectedId(),
+      const share = this.results().find((r) => r.id === d.id)?.share ?? 0;
+      candidates.push({
+        label: {
+          id: d.id,
+          name: d.definition.name,
+          percent: new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(share * 100),
+          quantity: d.quantity,
+          x: ((p.x + 1) * w) / 2,
+          y: ((1 - p.y) * h) / 2,
+          selected: d.id === this.selectedId(),
+        },
+        share,
       });
     }
-    this.labels.set(labels);
+    this.labels.set(this.spaceLabels(candidates, w, h));
+  }
+  private spaceLabels(candidates: { label: Label; share: number }[], width: number, height: number): Label[] {
+    const placed: { x: number; y: number; width: number; height: number }[] = [];
+    const result: Label[] = [];
+    candidates.sort((a, b) => Number(b.label.selected) - Number(a.label.selected) || b.share - a.share);
+    for (const { label } of candidates) {
+      const labelWidth = Math.min(
+        210,
+        Math.max(95, label.name.length * 6.5 + label.percent.length * 7 + (label.quantity > 1 ? 22 : 0) + 34),
+      );
+      const labelHeight = 28;
+      const offsets = [
+        [0, 0],
+        [0, -32],
+        [0, -64],
+        [0, 32],
+        [-labelWidth * 0.65, -18],
+        [labelWidth * 0.65, -18],
+        [-labelWidth * 0.65, -50],
+        [labelWidth * 0.65, -50],
+        [-labelWidth * 0.65, 24],
+        [labelWidth * 0.65, 24],
+      ];
+      for (const [dx, dy] of offsets) {
+        const x = Math.max(labelWidth / 2 + 5, Math.min(width - labelWidth / 2 - 5, label.x + dx));
+        const y = Math.max(labelHeight + 5, Math.min(height - 5, label.y + dy));
+        const rect = { x: x - labelWidth / 2, y: y - labelHeight, width: labelWidth, height: labelHeight };
+        if (
+          placed.some(
+            (other) =>
+              rect.x < other.x + other.width + 4 &&
+              rect.x + rect.width + 4 > other.x &&
+              rect.y < other.y + other.height + 4 &&
+              rect.y + rect.height + 4 > other.y,
+          )
+        )
+          continue;
+        placed.push(rect);
+        result.push({ ...label, x, y });
+        break;
+      }
+    }
+    return result;
   }
   private cast(event: { clientX: number; clientY: number }) {
     const rect = this.host.nativeElement.getBoundingClientRect();
@@ -502,8 +698,18 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       object = this.objects.get(this.drag.id);
     if (!point || !object) return;
     point.sub(this.drag.offset);
-    object.position.x = Math.max(-8, Math.min(8, point.x));
-    object.position.z = Math.max(-6, Math.min(6, point.z));
+    const target = {
+      x: Math.max(-8, Math.min(8, point.x)),
+      z: Math.max(-6, Math.min(6, point.z)),
+    };
+    const snapped = this.snap() ? this.nearestAvailable(target, this.drag.id) : target;
+    if (!snapped) {
+      this.gridMessage.set('Toutes les cellules de la grille sont occupées.');
+      return;
+    }
+    this.gridMessage.set('');
+    object.position.x = snapped.x;
+    object.position.z = snapped.z;
     this.drag.changed = true;
     this.requestRender();
   };
@@ -513,7 +719,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       if (o && this.drag.changed)
         this.moved.emit({
           id: this.drag.id,
-          position: { x: Math.round(o.position.x * 10) / 10, z: Math.round(o.position.z * 10) / 10 },
+          position: { x: Math.round(o.position.x * 100) / 100, z: Math.round(o.position.z * 100) / 100 },
         });
       this.drag = undefined;
     }
@@ -540,9 +746,10 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     const definitionId = e.dataTransfer?.getData('application/x-watt-device');
     if (!definitionId) return;
     const p = this.renderer ? this.ground(e) : null;
+    const position = { x: Math.max(-8, Math.min(8, p?.x ?? 0)), z: Math.max(-6, Math.min(6, p?.z ?? 0)) };
     this.added.emit({
       definitionId,
-      position: { x: Math.max(-8, Math.min(8, p?.x ?? 0)), z: Math.max(-6, Math.min(6, p?.z ?? 0)) },
+      position: (this.snap() ? this.nearestAvailable(position) : null) ?? position,
     });
   }
   zoom(factor: number) {
@@ -576,6 +783,10 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     c?.removeEventListener('webglcontextlost', this.contextLost);
     this.releaseTemporary(this.objects);
     this.custom.forEach(disposeObject);
+    if (this.guides) {
+      this.guides.geometry.dispose();
+      (this.guides.material as THREE.Material).dispose();
+    }
     this.factory.dispose();
     if (this.selectionRing) disposeObject(this.selectionRing);
     this.scene.traverse((o) => {
