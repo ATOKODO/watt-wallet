@@ -2973,15 +2973,23 @@ textarea {
   border-radius: 50%;
   color: white;
 }
+.accent-custom {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
 .accent-custom-field {
   display: flex;
   align-items: center;
+  float: none;
   gap: 12px;
   margin-top: 8px;
+  color: inherit;
 }
 .accent-custom-field input[type='color'] {
   width: 64px;
   height: 44px;
+  margin-top: 0;
   padding: 4px;
   cursor: pointer;
   flex: 0 0 auto;
