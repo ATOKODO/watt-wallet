@@ -3010,3 +3010,29 @@ textarea {
   gap: 14px;
   margin-top: 26px;
 }
+
+.language-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  gap: 5px;
+  padding: 0 8px;
+}
+.language-toggle span {
+  font-size: 10px;
+  font-weight: 700;
+}
+.language-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 24px 0;
+}
+.language-options button {
+  justify-content: space-between;
+}
+.language-options button[aria-pressed='true'] {
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green);
+}

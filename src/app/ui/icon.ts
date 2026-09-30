@@ -1,5 +1,6 @@
 import { Component, input } from '@angular/core';
 const paths: Record<string, string> = {
+  globe: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM3 12h18M12 3c-5 5-5 13 0 18 5-5 5-13 0-18Z',
   bolt: 'm13 2-9 12h7l-1 8 10-12h-7l1-8Z',
   home: 'm3 10 9-7 9 7v10H3V10Z M9 20v-7h6v7',
   plus: 'M12 5v14M5 12h14',

@@ -64,10 +64,14 @@ try {
   await expect(page.locator('.device-row').filter({ hasText: 'Box Internet' })).toHaveCount(1);
   await expect(page.locator('.inspector h2')).toHaveText('Box Internet');
   await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'English', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done', exact: true }).click();
   await context.setOffline(true);
   await page.reload();
   try {
-    await expect(page.locator('.device-row').filter({ hasText: 'Box Internet' })).toHaveCount(1);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.locator('.device-row').filter({ hasText: 'Internet router' })).toHaveCount(1);
   } catch (e) {
     console.log('OFFLINE HTML', await page.locator('body').innerText());
     console.log(
@@ -84,7 +88,7 @@ try {
   await expect(page.locator('.object-label')).toHaveCount(7);
   expect(requests).toEqual([]);
   console.log(
-    'SPA production : cache complet, rechargement hors connexion, persistance et absence de requêtes externes OK.',
+    'SPA production : cache complet, rechargement hors connexion, langue anglaise persistante, persistance et absence de requêtes externes OK.',
   );
 } finally {
   await browser.close();

@@ -1,3 +1,4 @@
+import { LanguageService, TranslatePipe } from './ui/language';
 import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconComponent } from './ui/icon';
@@ -34,10 +35,11 @@ import { validateRenderableGlb } from './scene/models';
 @Component({
   selector: 'ww-app',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, DeviceEditorComponent, DioramaComponent],
+  imports: [ReactiveFormsModule, IconComponent, DeviceEditorComponent, DioramaComponent, TranslatePipe],
   templateUrl: './app.html',
 })
 export class AppComponent {
+  readonly i18n = inject(LanguageService);
   store = inject(WalletStore);
   theme = inject(ThemeService);
   private fb = inject(FormBuilder);
@@ -49,7 +51,16 @@ export class AppComponent {
   busy = signal(false);
   modalError = signal('');
   modal = signal<
-    'new-home' | 'new-scenario' | 'rename-home' | 'tariff' | 'bill' | 'device' | 'import' | 'palette' | null
+    | 'new-home'
+    | 'new-scenario'
+    | 'rename-home'
+    | 'tariff'
+    | 'bill'
+    | 'device'
+    | 'import'
+    | 'palette'
+    | 'language'
+    | null
   >(null);
   editingDefinition = signal<DeviceDefinition | null>(null);
   prepared = signal<PreparedPack | null>(null);
@@ -68,11 +79,11 @@ export class AppComponent {
   billForm = this.fb.nonNullable.group({ annualKwh: 0 });
   powerStates = signal<Record<string, PowerState>>({});
   filteredLibrary = computed(() => {
-    const q = this.search().toLocaleLowerCase('fr');
+    const q = this.search().toLocaleLowerCase(this.i18n.locale());
     return (this.store.workspace()?.library ?? []).filter(
       (d) =>
         (this.category() === 'Tous' || d.category === this.category()) &&
-        `${d.name} ${d.brand} ${d.reference}`.toLocaleLowerCase('fr').includes(q),
+        `${this.i18n.deviceName(d)} ${d.name} ${d.brand} ${d.reference}`.toLocaleLowerCase('fr').includes(q),
     );
   });
   count = computed(() => this.store.devices().reduce((s, d) => s + d.quantity, 0));
@@ -129,10 +140,10 @@ export class AppComponent {
     void this.store.initialize();
   }
   number(value: number, digits = 0) {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: digits }).format(value);
+    return this.i18n.number(value, digits);
   }
   money(value: number, digits = 0) {
-    return `${this.number(value, digits)} €`;
+    return this.i18n.money(value, digits);
   }
   visualId(d: DeviceDefinition): BuiltinId {
     return d.visual.kind === 'builtin' ? d.visual.id : d.visual.fallback;
@@ -198,7 +209,7 @@ export class AppComponent {
   add(d: DeviceDefinition) {
     this.store.addDevice(d);
     this.tab.set('home');
-    this.notify(`${d.name} ajouté au logement`);
+    this.notify(this.i18n.t('{0} ajouté au logement', [this.i18n.deviceName(d)]));
   }
   drag(event: DragEvent, d: DeviceDefinition) {
     event.dataTransfer?.setData('application/x-watt-device', d.id);
@@ -216,7 +227,7 @@ export class AppComponent {
     this.nameForm.reset({
       name:
         type === 'new-scenario'
-          ? `Scénario ${1 + (this.store.home()?.scenarios.length ?? 0)}`
+          ? this.i18n.t('Scénario {0}', [1 + (this.store.home()?.scenarios.length ?? 0)])
           : type === 'rename-home'
             ? this.store.home()!.name
             : '',
@@ -310,7 +321,9 @@ export class AppComponent {
   deleteDefinition(d: DeviceDefinition) {
     if (
       window.confirm(
-        `Supprimer « ${d.name} » de la bibliothèque ? Les appareils déjà installés seront conservés.`,
+        this.i18n.t('Supprimer « {0} » de la bibliothèque ? Les appareils déjà installés seront conservés.', [
+          this.i18n.deviceName(d),
+        ]),
       )
     )
       this.store.removeDefinition(d.id);

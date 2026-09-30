@@ -151,6 +151,12 @@ try {
   await page.getByRole('button', { name: 'Fermer les paramètres de l’appareil' }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: 'test-results/watt-wallet-native.png', fullPage: true });
+  await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'English', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('button', { name: 'My home', exact: true })).toBeVisible();
+  await page.screenshot({ path: 'test-results/watt-wallet-native-english.png', fullPage: true });
   await run.browser.close();
   run.child.kill();
   run = undefined;
@@ -158,6 +164,12 @@ try {
   run = await launch();
   await expect(run.page.locator('.device-row').last()).toContainText('× 4', { timeout: 30000 });
   await expect(run.page.locator('.error-banner')).toHaveCount(0);
+  await expect(run.page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(run.page.locator('.bill-reference')).toContainText('6,000 kWh entered');
+  await run.page.getByRole('button', { name: 'Choose language', exact: true }).click();
+  await run.page.getByRole('dialog').getByRole('button', { name: 'Français', exact: true }).click();
+  await run.page.getByRole('dialog').getByRole('button', { name: 'Terminer', exact: true }).click();
+  await expect(run.page.locator('html')).toHaveAttribute('lang', 'fr');
   await expect(run.page.locator('.bill-reference')).toContainText('6 000 kWh saisis');
   await expect(run.page.locator('.power-total')).toContainText('0 W');
   await expect(run.page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -183,7 +195,7 @@ try {
   await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(
-    'WebView2 natif : mode sombre, palette persistante, scène 3D, plateau adaptatif, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde et redémarrage OK.',
+    'WebView2 natif : français/anglais persistants, mode sombre, palette persistante, scène 3D, plateau adaptatif, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde et redémarrage OK.',
   );
 } finally {
   if (run) {

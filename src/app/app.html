@@ -1,23 +1,26 @@
 <header class="app-header">
-  <a class="brand" href="/" aria-label="Watt Wallet, accueil"
+  <a class="brand" href="/" [attr.aria-label]="'Watt Wallet, accueil' | t"
     ><span class="brand-mark"><ww-icon name="bolt" /></span
-    ><span>watt<span class="brand-light">wallet</span><small>VOTRE ÉNERGIE, EN CLAIR</small></span></a
+    ><span
+      >{{ 'watt' | t }}<span class="brand-light">{{ 'wallet' | t }}</span
+      ><small>{{ 'VOTRE ÉNERGIE, EN CLAIR' | t }}</small></span
+    ></a
   >
-  <nav aria-label="Navigation principale">
+  <nav [attr.aria-label]="'Navigation principale' | t">
     <button [class.active]="tab() === 'home'" (click)="chooseTab('home')">
-      <ww-icon name="home" />Mon logement</button
+      <ww-icon name="home" />{{ 'Mon logement' | t }}</button
     ><button [class.active]="tab() === 'scenarios'" (click)="chooseTab('scenarios')">
-      <ww-icon name="compare" />Mes scénarios</button
+      <ww-icon name="compare" />{{ 'Mes scénarios' | t }}</button
     ><button [class.active]="tab() === 'library'" (click)="chooseTab('library')">
-      <ww-icon name="box" />Bibliothèque
+      <ww-icon name="box" />{{ 'Bibliothèque' | t }}
     </button>
   </nav>
   <div class="header-status">
     <button
       type="button"
       class="theme-toggle"
-      [attr.aria-label]="theme.theme() === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'"
-      [attr.title]="theme.theme() === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'"
+      [attr.aria-label]="(theme.theme() === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre') | t"
+      [attr.title]="(theme.theme() === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre') | t"
       [attr.aria-pressed]="theme.theme() === 'dark'"
       (click)="theme.toggle()"
     >
@@ -25,61 +28,70 @@
     ><button
       type="button"
       class="theme-toggle palette-toggle"
-      aria-label="Choisir la couleur du thème"
-      title="Choisir la couleur du thème"
+      [attr.aria-label]="'Choisir la couleur du thème' | t"
+      [title]="'Choisir la couleur du thème' | t"
       aria-haspopup="dialog"
       (click)="modal.set('palette')"
     >
       <ww-icon name="palette" />
       <span class="palette-indicator" [style.background]="theme.accent()"></span></button
-    ><span class="status-dot"></span>100 % local<span class="version">BÊTA 0.1</span>
+    ><button
+      type="button"
+      class="theme-toggle language-toggle"
+      [attr.aria-label]="'Choisir la langue' | t"
+      [title]="'Choisir la langue' | t"
+      aria-haspopup="dialog"
+      (click)="modal.set('language')"
+    >
+      <ww-icon name="globe" /><span>{{i18n.language().toUpperCase()}}</span></button
+    ><span class="status-dot"></span>{{ '100 % local' | t }}<span class="version">{{ 'BÊTA 0.1' | t }}</span>
   </div>
 </header>
 @if (store.loadError()) {
 <main class="load-state">
   <ww-icon name="info" />
-  <h1>Vos données n’ont pas pu être ouvertes</h1>
-  <p>{{store.loadError()}}</p>
-  <p>La sauvegarde existante n’a pas été remplacée.</p>
-  <button class="btn primary" (click)="store.initialize()">Réessayer</button>
+  <h1>{{ 'Vos données n’ont pas pu être ouvertes' | t }}</h1>
+  <p>{{i18n.error(store.loadError())}}</p>
+  <p>{{ 'La sauvegarde existante n’a pas été remplacée.' | t }}</p>
+  <button class="btn primary" (click)="store.initialize()">{{ 'Réessayer' | t }}</button>
 </main>
 } @else if (!store.workspace()) {
 <main class="load-state">
   <span class="brand-mark"><ww-icon name="bolt" /></span>
-  <h1>Préparons votre petit chez-vous…</h1>
+  <h1>{{ 'Préparons votre petit chez-vous…' | t }}</h1>
 </main>
 } @else {
 <main class="workspace">
   <aside class="library-panel">
     <div class="library-title">
       <div>
-        <span class="eyebrow">À CHAQUE APPAREIL</span>
-        <h2>Sa place chez vous.</h2>
+        <span class="eyebrow">{{ 'À CHAQUE APPAREIL' | t }}</span>
+        <h2>{{ 'Sa place chez vous.' | t }}</h2>
       </div>
-      <span class="count-pill">{{store.workspace()!.library.length}}</span>
+      <span class="count-pill">{{(store.workspace()!.library.length) | t}}</span>
     </div>
     <p class="subtle library-description">
-      Glissez un appareil sur le plateau<br />ou cliquez sur + pour l’ajouter.
+      {{ 'Glissez un appareil sur le plateau' | t }}<br />{{ 'ou cliquez sur + pour l’ajouter.' | t }}
     </p>
     <label class="search-box"
       ><ww-icon name="search" /><input
-        aria-label="Rechercher un appareil"
-        placeholder="Rechercher un appareil…"
+        [attr.aria-label]="'Rechercher un appareil' | t"
+        [placeholder]="'Rechercher un appareil…' | t"
         [value]="search()"
         (input)="search.set(inputValue($event))"
       /><kbd>⌕</kbd></label
     >
     <div class="category-filter">
       <select
-        aria-label="Filtrer par catégorie"
+        [attr.aria-label]="'Filtrer par catégorie' | t"
         [value]="category()"
         (change)="category.set(inputValue($event))"
       >
-        <option>Tous</option>
+        <option value="Tous">{{ 'Tous' | t }}</option>
         @for(c of categories; track c){
-        <option>{{c}}</option>
+        <option [value]="c">{{(c) | t}}</option>
         }</select
-      ><span>{{filteredLibrary().length}} fiches</span>
+      ><span>{{ '{0} fiches' | t:[((filteredLibrary().length) | t)] }}</span>
     </div>
     <div class="library-items">
       @for(d of filteredLibrary(); track d.id) {
@@ -87,32 +99,38 @@
         <span class="device-icon" [style.--device-color]="colors[d.category]"
           ><ww-icon [name]="visualId(d)" /></span
         ><button class="library-item-info" (click)="editDefinition(d)">
-          <strong>{{d.name}}</strong><span>{{energyLabel(d)}}</span></button
-        ><button class="add-device" [attr.aria-label]="'Ajouter ' + d.name" (click)="add(d)">
+          <strong>{{i18n.deviceName(d)}}</strong><span>{{(energyLabel(d)) | t}}</span></button
+        ><button
+          class="add-device"
+          [attr.aria-label]="('Ajouter ' + i18n.deviceName(d)) | t"
+          (click)="add(d)"
+        >
           <ww-icon name="plus" />
         </button>
       </div>
       } @empty {
-      <p class="empty-small">Aucun appareil trouvé.<br />Créez votre propre fiche.</p>
+      <p class="empty-small">{{'Aucun appareil trouvé.' | t}}<br />{{'Créez votre propre fiche.' | t}}</p>
       }
     </div>
     <div class="library-bottom">
       <button class="btn secondary full" (click)="newDefinition()">
-        <ww-icon name="plus" />Créer un appareil
+        <ww-icon name="plus" />{{ 'Créer un appareil' | t }}
       </button>
       <div class="library-file-actions">
         <button class="text-button" (click)="openImport()" [disabled]="busy()">
-          <ww-icon name="upload" />Importer</button
+          <ww-icon name="upload" />{{ 'Importer' | t }}</button
         ><button
           class="text-button"
           (click)="exportPack(undefined, true)"
           [disabled]="busy() || !store.workspace()!.library.length"
         >
-          <ww-icon name="download" />Exporter
+          <ww-icon name="download" />{{ 'Exporter' | t }}
         </button>
       </div>
       <div class="local-note">
-        <ww-icon name="leaf" /><span>Vos données restent chez vous.<br />Aucun compte. Aucun cloud.</span>
+        <ww-icon name="leaf" /><span
+          >{{ 'Vos données restent chez vous.' | t }}<br />{{ 'Aucun compte. Aucun cloud.' | t }}</span
+        >
       </div>
     </div>
   </aside>
@@ -122,7 +140,7 @@
       <div>
         <div class="breadcrumb">
           <ww-icon name="home" /><select
-            aria-label="Choisir un logement"
+            [attr.aria-label]="'Choisir un logement' | t"
             [value]="store.home()!.id"
             (change)="store.switchHome(inputValue($event))"
           >
@@ -131,35 +149,37 @@
             }</select
           ><button
             class="icon-button tiny"
-            aria-label="Créer un logement"
-            title="Créer un logement"
+            [attr.aria-label]="'Créer un logement' | t"
+            [title]="'Créer un logement' | t"
             (click)="openName('new-home')"
           >
             <ww-icon name="plus" />
           </button>
         </div>
         <h1>
-          {{tab() === 'library' ? 'Votre bibliothèque d’appareils' : tab() === 'scenarios' ? 'Et si on
-          changeait les choses ?' : 'Un petit monde. Une énergie plus claire.'}}
+          {{(tab() === 'library' ? 'Votre bibliothèque d’appareils' : tab() === 'scenarios' ? 'Et si on
+          changeait les choses ?' : 'Un petit monde. Une énergie plus claire.') | t}}
         </h1>
         <p>
-          {{tab() === 'library' ? 'Des fiches à personnaliser, à garder et à partager.' : 'Composez votre
-          logement. Comprenez ce qui compte vraiment.'}}
+          {{(tab() === 'library' ? 'Des fiches à personnaliser, à garder et à partager.' : 'Composez votre
+          logement. Comprenez ce qui compte vraiment.') | t}}
         </p>
       </div>
       <div class="heading-actions">
         <button class="btn secondary" (click)="openImport()" [disabled]="busy()">
-          <ww-icon name="upload" />Importer</button
+          <ww-icon name="upload" />{{ 'Importer' | t }}</button
         ><button class="btn primary" (click)="exportPack()" [disabled]="busy()">
-          <ww-icon name="download" />Partager le logement
+          <ww-icon name="download" />{{ 'Partager le logement' | t }}
         </button>
       </div>
     </div>
 
     @if(tab() === 'library') {
     <div class="catalog-heading">
-      <span>{{filteredLibrary().length}} fiches · estimations modifiables</span
-      ><button class="btn primary" (click)="newDefinition()"><ww-icon name="plus" />Nouvelle fiche</button>
+      <span>{{ '{0} fiches · estimations modifiables' | t:[((filteredLibrary().length) | t)] }}</span
+      ><button class="btn primary" (click)="newDefinition()">
+        <ww-icon name="plus" />{{ 'Nouvelle fiche' | t }}
+      </button>
     </div>
     <div class="catalog-grid">
       @for(d of filteredLibrary(); track d.id){
@@ -167,31 +187,31 @@
         <div class="catalog-illustration" [style.--device-color]="colors[d.category]">
           <ww-icon [name]="visualId(d)" />
         </div>
-        <span class="eyebrow">{{d.category}}</span>
-        <h2>{{d.name}}</h2>
-        <p>{{d.brand || 'Appareil générique'}} {{d.reference}}</p>
-        <strong>{{energyLabel(d)}}</strong>
+        <span class="eyebrow">{{(d.category) | t}}</span>
+        <h2>{{i18n.deviceName(d)}}</h2>
+        <p>{{ '{0} {1}' | t:[(d.brand || ('Appareil générique' | t)),(d.reference)] }}</p>
+        <strong>{{(energyLabel(d)) | t}}</strong>
         <p class="field-hint">
-          {{d.visual.kind === 'glb' ? 'Modèle 3D personnalisé' : 'Silhouette intégrée'}}
+          {{(d.visual.kind === 'glb' ? 'Modèle 3D personnalisé' : 'Silhouette intégrée') | t}}
         </p>
         <div class="catalog-actions">
-          <button class="btn secondary small" (click)="editDefinition(d)">Modifier</button
+          <button class="btn secondary small" (click)="editDefinition(d)">{{ 'Modifier' | t }}</button
           ><button
             class="icon-button"
-            [attr.aria-label]="'Exporter ' + d.name"
+            [attr.aria-label]="('Exporter ' + i18n.deviceName(d)) | t"
             (click)="exportPack(d)"
             [disabled]="busy()"
           >
             <ww-icon name="download" /></button
           ><button
             class="icon-button"
-            [attr.aria-label]="'Supprimer la fiche ' + d.name"
+            [attr.aria-label]="('Supprimer la fiche ' + i18n.deviceName(d)) | t"
             (click)="deleteDefinition(d)"
           >
             <ww-icon name="trash" /></button
           ><button
             class="icon-button add-device"
-            [attr.aria-label]="'Ajouter ' + d.name + ' au logement'"
+            [attr.aria-label]="('Ajouter ' + i18n.deviceName(d) + ' au logement') | t"
             (click)="add(d)"
           >
             <ww-icon name="plus" />
@@ -201,43 +221,43 @@
       }
     </div>
     } @else {
-    <section class="metrics" aria-label="Estimation annuelle">
+    <section class="metrics" [attr.aria-label]="'Estimation annuelle' | t">
       <article class="metric">
         <div class="metric-label">
-          <span class="metric-symbol peach"><ww-icon name="bolt" /></span>Consommation estimée<span
-            class="estimate-tag"
-            >ANNUELLE</span
-          >
+          <span class="metric-symbol peach"><ww-icon name="bolt" /></span>{{ 'Consommation estimée' | t
+          }}<span class="estimate-tag">{{ 'ANNUELLE' | t }}</span>
         </div>
         <div class="metric-value">
-          {{number(store.result().kwh)}} <span>kWh<span class="metric-suffix"> / an</span></span>
+          {{(number(store.result().kwh)) | t}}
+          <span>{{ 'kWh' | t }}<span class="metric-suffix"> {{ '/ an' | t }}</span></span>
         </div>
-        <p>{{count()}} appareils, un seul regard sur votre énergie.</p>
+        <p>{{ '{0} appareils, un seul regard sur votre énergie.' | t:[((count()) | t)] }}</p>
       </article>
       <article class="metric">
         <div class="metric-label">
-          <span class="metric-symbol sage"><ww-icon name="chart" /></span>Budget électricité
+          <span class="metric-symbol sage"><ww-icon name="chart" /></span>{{ 'Budget électricité' | t }}
         </div>
         <div class="metric-value">
-          {{money(store.result().totalCost)}}<span class="metric-suffix"> / an</span>
+          {{(money(store.result().totalCost)) | t}}<span class="metric-suffix"> {{ '/ an' | t }}</span>
         </div>
-        <p>Dont {{money(store.result().subscription)}} d’abonnement.</p>
+        <p>{{ 'Dont {0} d’abonnement.' | t:[((money(store.result().subscription)) | t)] }}</p>
       </article>
       <article class="metric metric-monthly">
         <div class="metric-label">
-          <span class="metric-symbol cream"><ww-icon name="leaf" /></span>Chaque mois, en moyenne
+          <span class="metric-symbol cream"><ww-icon name="leaf" /></span>{{ 'Chaque mois, en moyenne' | t }}
         </div>
         <div class="metric-value">
-          {{money(store.result().monthlyCost)}}<span class="metric-suffix"> / mois</span>
+          {{(money(store.result().monthlyCost)) | t}}<span class="metric-suffix"> {{ '/ mois' | t }}</span>
         </div>
-        <p>Une estimation, pas une facture.</p>
+        <p>{{ 'Une estimation, pas une facture.' | t }}</p>
       </article>
     </section>
     <a class="power-preview" href="#power-simulator">
       <span
-        ><ww-icon name="bolt" /><strong>Puissance simulée</strong> · Choisissez les appareils en marche</span
+        ><ww-icon name="bolt" /><strong>{{ 'Puissance simulée' | t }}</strong> {{ '· Choisissez les appareils
+        en marche' | t }}</span
       >
-      <b>{{powerLabel(powerSummary().watts)}}</b>
+      <b>{{(powerLabel(powerSummary().watts)) | t}}</b>
       <ww-icon name="chevron" />
     </a>
 
@@ -245,16 +265,16 @@
     <section class="scenario-section">
       <div class="section-title">
         <div>
-          <h2>Vos futurs possibles</h2>
-          <p>Modifiez une copie et comparez-la à votre logement de référence.</p>
+          <h2>{{ 'Vos futurs possibles' | t }}</h2>
+          <p>{{ 'Modifiez une copie et comparez-la à votre logement de référence.' | t }}</p>
         </div>
         <button class="btn secondary small" (click)="openName('new-scenario')">
-          <ww-icon name="plus" />Créer un scénario
+          <ww-icon name="plus" />{{ 'Créer un scénario' | t }}
         </button>
       </div>
       <div class="scenario-tabs">
         <button [class.active]="!store.scenarioId()" (click)="selectScenario(null)">
-          <ww-icon name="home" />Référence</button
+          <ww-icon name="home" />{{ 'Référence' | t }}</button
         >@for(s of store.home()!.scenarios; track s.id){<button
           [class.active]="store.scenarioId() === s.id"
           (click)="selectScenario(s.id)"
@@ -265,48 +285,52 @@
       @if(store.comparison(); as comparison){
       <div class="comparison-grid">
         <div>
-          <span>Énergie économisée / an</span
-          ><strong>{{number(comparison.kwhSaving, 1)}} <small>kWh</small></strong>
+          <span>{{ 'Énergie économisée / an' | t }}</span
+          ><strong>{{(number(comparison.kwhSaving, 1)) | t}} <small>{{ 'kWh' | t }}</small></strong>
         </div>
         <div>
-          <span>Économie estimée / an</span
+          <span>{{ 'Économie estimée / an' | t }}</span
           ><strong [class.negative]="comparison.annualSaving < 0"
-            >{{money(comparison.annualSaving, 2)}}</strong
+            >{{(money(comparison.annualSaving, 2)) | t}}</strong
           >
         </div>
         <div>
-          <span>Retour sur le surcoût</span
+          <span>{{ 'Retour sur le surcoût' | t }}</span
           ><strong
-            >{{comparison.paybackYears === null ? 'Non amorti' : store.scenario()!.initialCost === 0 ? 'Sans
-            surcoût' : number(comparison.paybackYears, 1) + ' ans'}}</strong
+            >{{(comparison.paybackYears === null ? 'Non amorti' : store.scenario()!.initialCost === 0 ? 'Sans
+            surcoût' : number(comparison.paybackYears, 1) + ' ans') | t}}</strong
           >
         </div>
       </div>
       <form [formGroup]="costForm" (ngSubmit)="saveCost()" class="scenario-cost">
         <label
-          >Surcoût initial (€)<input
+          >{{ 'Surcoût initial (€)' | t }}<input
             formControlName="initialCost"
-            aria-label="Surcoût initial en euros"
+            [attr.aria-label]="'Surcoût initial en euros' | t"
             type="number"
             min="0"
             step="any" /></label
-        ><button class="btn secondary small">Enregistrer</button
+        ><button class="btn secondary small">{{ 'Enregistrer' | t }}</button
         ><button type="button" class="text-button danger" (click)="store.removeScenario()">
-          Supprimer ce scénario
+          {{ 'Supprimer ce scénario' | t }}
         </button>
       </form>
       <details class="category-comparison">
-        <summary>Voir les économies par catégorie</summary>
+        <summary>{{ 'Voir les économies par catégorie' | t }}</summary>
         @for(c of comparison.categories; track c.name){
         <div>
-          <span>{{c.name}}</span><span>{{number(c.kwhSaving, 1)}} kWh · {{money(c.costSaving, 2)}} / an</span>
+          <span>{{(c.name) | t}}</span
+          ><span
+            >{{ '{0} kWh · {1} / an' | t:[((number(c.kwhSaving, 1)) | t),((money(c.costSaving, 2)) | t)]
+            }}</span
+          >
         </div>
         }
       </details>
       } @else if(!store.home()!.scenarios.length){
       <p class="scenario-empty">
-        Un PC éteint la nuit ? Un appareil plus économe ? Créez votre premier scénario pour voir la
-        différence.
+        {{ 'Un PC éteint la nuit ? Un appareil plus économe ? Créez votre premier scénario pour voir la
+        différence.' | t }}
       </p>
       }
     </section>
@@ -317,30 +341,32 @@
         <section class="diorama-card">
           <header class="diorama-header">
             <div>
-              <span class="eyebrow">VOTRE LOGEMENT, EN MINIATURE</span>
+              <span class="eyebrow">{{ 'VOTRE LOGEMENT, EN MINIATURE' | t }}</span>
               <h2>
                 {{store.scenario()?.name ?? store.home()!.name}}<button
                   class="icon-button tiny"
-                  aria-label="Renommer le logement"
+                  [attr.aria-label]="'Renommer le logement' | t"
                   (click)="openName('rename-home')"
                 >
                   <ww-icon name="edit" />
                 </button>
               </h2>
             </div>
-            <span class="device-count"><span class="status-dot"></span>{{count()}} appareils</span>
+            <span class="device-count"
+              ><span class="status-dot"></span>{{ '{0} appareils' | t:[((count()) | t)] }}</span
+            >
           </header>
           <div class="scene-toolbar">
-            <div class="segmented" aria-label="Mode de visualisation">
+            <div class="segmented" [attr.aria-label]="'Mode de visualisation' | t">
               <button [class.active]="mode() === 'consumption'" (click)="mode.set('consumption')">
-                <ww-icon name="chart" />Consommation</button
+                <ww-icon name="chart" />{{ 'Consommation' | t }}</button
               ><button [class.active]="mode() === 'placement'" (click)="mode.set('placement')">
-                <ww-icon name="box" />Placement
+                <ww-icon name="box" />{{ 'Placement' | t }}
               </button>
             </div>
             <span class="scene-tip"
-              ><ww-icon name="info" />{{mode() === 'consumption' ? 'Plus ça consomme, plus c’est grand.' :
-              'Des tailles uniformes pour placer vos appareils.'}}</span
+              ><ww-icon name="info" />{{(mode() === 'consumption' ? 'Plus ça consomme, plus c’est grand.' :
+              'Des tailles uniformes pour placer vos appareils.') | t}}</span
             >
           </div>
           <div class="stage">
@@ -357,29 +383,30 @@
               (added)="drop($event)"
             />@if(!store.devices().length){
             <div class="empty-stage">
-              <h3>Tout commence par un appareil.</h3>
+              <h3>{{ 'Tout commence par un appareil.' | t }}</h3>
               <p>
-                Choisissez une fiche, cliquez sur +, puis ajustez les heures ou les cycles dans le panneau de
-                droite.
+                {{ 'Choisissez une fiche, cliquez sur +, puis ajustez les heures ou les cycles dans le panneau
+                de droite.' | t }}
               </p>
             </div>
             }
           </div>
           <footer class="scene-footer">
             <span
-              ><ww-icon name="move" />Glisser le décor pour orbiter · Clic droit pour déplacer · Molette pour
-              zoomer</span
-            ><span class="isometric-tag">VUE ISOMÉTRIQUE</span>
+              ><ww-icon name="move" />{{ 'Glisser le décor pour orbiter · Clic droit pour déplacer · Molette
+              pour zoomer' | t }}</span
+            ><span class="isometric-tag">{{ 'VUE ISOMÉTRIQUE' | t }}</span>
           </footer>
         </section>
         <section class="device-list">
           <div class="section-title">
-            <h2>Les appareils de votre logement <span>{{store.devices().length}}</span></h2>
+            <h2>{{ 'Les appareils de votre logement' | t }} <span>{{(store.devices().length) | t}}</span></h2>
             <ww-icon name="list" />
           </div>
           <div class="device-table">
             <div class="table-heading">
-              <span>APPAREIL</span><span>QUANTITÉ</span><span>KWH / AN</span><span>€ / AN</span><span></span>
+              <span>{{ 'APPAREIL' | t }}</span><span>{{ 'QUANTITÉ' | t }}</span
+              ><span>{{ 'KWH / AN' | t }}</span><span>{{ '€ / AN' | t }}</span><span></span>
             </div>
             @for(d of store.devices(); track d.id; let i = $index){
             <div class="device-row" [class.selected]="store.selectedId() === d.id">
@@ -387,106 +414,110 @@
                 <span class="device-icon small-icon" [style.--device-color]="colors[d.definition.category]"
                   ><ww-icon [name]="visualId(d.definition)" /></span
                 ><span
-                  ><strong>{{d.definition.name}}</strong><small>{{d.definition.category}}</small></span
+                  ><strong>{{i18n.deviceName(d.definition)}}</strong
+                  ><small>{{(d.definition.category) | t}}</small></span
                 ></button
-              ><span>× {{d.quantity}}</span><span>{{number(store.result().devices[i].kwh, 1)}}</span
-              ><span>{{money(store.result().devices[i].cost, 1)}}</span>
+              ><span>{{ '× {0}' | t:[((d.quantity) | t)] }}</span
+              ><span>{{(number(store.result().devices[i].kwh, 1)) | t}}</span
+              ><span>{{(money(store.result().devices[i].cost, 1)) | t}}</span>
               <div class="device-row-actions">
                 <button
                   class="icon-button"
-                  [attr.aria-label]="'Modifier ' + d.definition.name"
+                  [attr.aria-label]="('Modifier ' + i18n.deviceName(d.definition)) | t"
                   (click)="store.selectedId.set(d.id)"
                 >
                   <ww-icon name="chevron" />
                 </button>
                 <button
                   class="row-remove danger"
-                  [attr.aria-label]="(store.scenario() ? 'Retirer de ce scénario : ' : 'Retirer du logement : ') + d.definition.name"
-                  [title]="store.scenario() ? 'Retirer de ce scénario' : 'Retirer du logement'"
+                  [attr.aria-label]="((store.scenario() ? 'Retirer de ce scénario : ' : 'Retirer du logement : ') + i18n.deviceName(d.definition)) | t"
+                  [title]="(store.scenario() ? 'Retirer de ce scénario' : 'Retirer du logement') | t"
                   (click)="store.removeDevice(d.id)"
                 >
-                  <ww-icon name="trash" /><span>Retirer</span>
+                  <ww-icon name="trash" /><span>{{ 'Retirer' | t }}</span>
                 </button>
               </div>
             </div>
             } @empty {
             <p class="empty-small">
-              Choisissez une fiche dans la bibliothèque et cliquez sur +. Ajustez ensuite son usage dans le
-              panneau de droite.
+              {{'Choisissez une fiche dans la bibliothèque et cliquez sur +. Ajustez ensuite son usage dans le
+              panneau de droite.' | t}}
             </p>
             }
           </div>
         </section>
-        <section id="power-simulator" class="power-simulator" aria-label="Puissance simulée">
+        <section id="power-simulator" class="power-simulator" [attr.aria-label]="'Puissance simulée' | t">
           <div class="section-title power-title">
             <div>
-              <span class="eyebrow">EXPÉRIENCE INTERACTIVE</span>
-              <h2>Puissance simulée maintenant</h2>
+              <span class="eyebrow">{{ 'EXPÉRIENCE INTERACTIVE' | t }}</span>
+              <h2>{{ 'Puissance simulée maintenant' | t }}</h2>
             </div>
-            <strong class="power-total" aria-live="polite">{{powerLabel(powerSummary().watts)}}</strong>
+            <strong class="power-total" aria-live="polite">{{(powerLabel(powerSummary().watts)) | t}}</strong>
           </div>
           <p class="power-intro">
-            Imaginez les appareils en marche, en veille ou arrêtés. Ce total est une puissance estimée, pas
-            une mesure en direct.
+            {{ 'Imaginez les appareils en marche, en veille ou arrêtés. Ce total est une puissance estimée,
+            pas une mesure en direct.' | t }}
           </p>
           <div class="power-actions">
             <button type="button" class="text-button" (click)="setAllPowerStates('running')">
-              Tout en marche
+              {{ 'Tout en marche' | t }}
             </button>
-            <button type="button" class="text-button" (click)="setAllPowerStates('off')">Tout arrêter</button>
+            <button type="button" class="text-button" (click)="setAllPowerStates('off')">
+              {{ 'Tout arrêter' | t }}
+            </button>
           </div>
           <div class="power-list">
             @for(row of powerRows(); track row.device.id) {
             <div class="power-row">
               <div class="power-device">
-                <strong>{{row.device.definition.name}}</strong>
-                <span>× {{row.device.quantity}}</span>
+                <strong>{{i18n.deviceName(row.device.definition)}}</strong>
+                <span>{{ '× {0}' | t:[((row.device.quantity) | t)] }}</span>
               </div>
               <div
                 class="power-state"
                 role="group"
-                [attr.aria-label]="'État simulé de ' + row.device.definition.name"
+                [attr.aria-label]="('État simulé de ' + i18n.deviceName(row.device.definition)) | t"
               >
                 <button
                   type="button"
                   [attr.aria-pressed]="row.state === 'off'"
                   (click)="setPowerState(row.device.id, 'off')"
                 >
-                  Arrêt
+                  {{ 'Arrêt' | t }}
                 </button>
                 <button
                   type="button"
                   [attr.aria-pressed]="row.state === 'standby'"
                   (click)="setPowerState(row.device.id, 'standby')"
                 >
-                  Veille
+                  {{ 'Veille' | t }}
                 </button>
                 <button
                   type="button"
                   [attr.aria-pressed]="row.state === 'running'"
                   (click)="setPowerState(row.device.id, 'running')"
                 >
-                  En marche
+                  {{ 'En marche' | t }}
                 </button>
               </div>
               <div class="power-watts">
-                <strong>{{row.estimate.watts === null ? '—' : powerLabel(row.estimate.watts)}}</strong>
-                <span>{{powerBasis(row.estimate.basis)}}</span>
+                <strong>{{(row.estimate.watts === null ? '—' : powerLabel(row.estimate.watts)) | t}}</strong>
+                <span>{{(powerBasis(row.estimate.basis)) | t}}</span>
               </div>
             </div>
             } @empty {
-            <p class="empty-small">Ajoutez un appareil pour essayer la simulation.</p>
+            <p class="empty-small">{{'Ajoutez un appareil pour essayer la simulation.' | t}}</p>
             }
           </div>
           @if(powerSummary().unknown) {
           <p class="power-warning" role="status">
-            {{powerSummary().unknown}} appareil(s) sans puissance renseignée : le total affiché est partiel.
-            Ouvrez leur fiche pour indiquer une puissance de simulation.
+            {{ '{0} appareil(s) sans puissance renseignée : le total affiché est partiel. Ouvrez leur fiche
+            pour indiquer une puissance de simulation.' | t:[((powerSummary().unknown) | t)] }}
           </p>
           }
           <p class="power-footnote">
-            Ces états sont temporaires et ne modifient ni les kWh/an ni les scénarios. Une puissance moyenne
-            peut masquer les pointes d’un cycle.
+            {{ 'Ces états sont temporaires et ne modifient ni les kWh/an ni les scénarios. Une puissance
+            moyenne peut masquer les pointes d’un cycle.' | t }}
           </p>
         </section>
       </div>
@@ -494,10 +525,10 @@
       <aside class="inspector">
         @if(store.selected(); as selected){
         <div class="inspector-heading">
-          <span class="eyebrow">DANS VOTRE LOGEMENT</span
+          <span class="eyebrow">{{ 'DANS VOTRE LOGEMENT' | t }}</span
           ><button
             class="icon-button tiny"
-            aria-label="Fermer les paramètres de l’appareil"
+            [attr.aria-label]="'Fermer les paramètres de l’appareil' | t"
             (click)="store.selectedId.set(null)"
           >
             <ww-icon name="close" />
@@ -507,60 +538,70 @@
           <span class="device-icon" [style.--device-color]="colors[selected.definition.category]"
             ><ww-icon [name]="visualId(selected.definition)"
           /></span>
-          <h2>{{selected.definition.name}}</h2>
+          <h2>{{i18n.deviceName(selected.definition)}}</h2>
         </div>
         <div class="selected-stats">
-          <strong>{{number(selectedResult()?.kwh ?? 0)}}<small> kWh/an</small></strong
-          ><span>{{number((selectedResult()?.share ?? 0) * 100, 1)}} % du total</span>
+          <strong>{{(number(selectedResult()?.kwh ?? 0)) | t}}<small> {{ 'kWh/an' | t }}</small></strong
+          ><span>{{ '{0} % du total' | t:[((number((selectedResult()?.share ?? 0) * 100, 1)) | t)] }}</span>
         </div>
         @if(selectedBreakdown(); as breakdown) {
         <details class="calculation-detail">
-          <summary>Comprendre cette estimation</summary>
+          <summary>{{ 'Comprendre cette estimation' | t }}</summary>
           @if(selected.definition.energy.method === 'power') {
           <p>
-            {{number(selected.definition.energy.activeW, 1)}} W × {{number(selected.usage.hoursPerDay, 1)}}
-            h/j × {{number(selected.usage.daysPerYear)}} j/an × {{selected.quantity}}
+            {{ '{0} W × {1} h/j × {2} j/an × {3}' | t:[((number(selected.definition.energy.activeW, 1)) |
+            t),((number(selected.usage.hoursPerDay, 1)) | t),((number(selected.usage.daysPerYear)) |
+            t),((selected.quantity) | t)] }}
           </p>
           } @else if(selected.definition.energy.method === 'cycle') {
           <p>
-            {{number(selected.definition.energy.kwhPerCycle, 2)}} kWh/cycle ×
-            {{number(selected.usage.cyclesPerWeek, 1)}} cycles/semaine × 52 × {{selected.quantity}}
+            {{ '{0} kWh/cycle × {1} cycles/semaine × 52 × {2}' |
+            t:[((number(selected.definition.energy.kwhPerCycle, 2)) |
+            t),((number(selected.usage.cyclesPerWeek, 1)) | t),((selected.quantity) | t)] }}
           </p>
           } @else {
           <p>
-            {{number(selected.definition.energy.kwhPerYear, 1)}} kWh/an tout compris × {{selected.quantity}}
+            {{ '{0} kWh/an tout compris × {1}' | t:[((number(selected.definition.energy.kwhPerYear, 1)) |
+            t),((selected.quantity) | t)] }}
           </p>
           }
-          <div><span>Fonctionnement</span><strong>{{number(breakdown.activeKwh, 1)}} kWh/an</strong></div>
+          <div>
+            <span>{{ 'Fonctionnement' | t }}</span
+            ><strong>{{ '{0} kWh/an' | t:[((number(breakdown.activeKwh, 1)) | t)] }}</strong>
+          </div>
           @if(breakdown.activeHours !== null) {
           <div>
-            <span>Veille sur {{number(8760 - breakdown.activeHours, 1)}} h</span
-            ><strong>{{number(breakdown.standbyKwh, 1)}} kWh/an</strong>
+            <span>{{ 'Veille sur {0} h' | t:[((number(8760 - breakdown.activeHours, 1)) | t)] }}</span
+            ><strong>{{ '{0} kWh/an' | t:[((number(breakdown.standbyKwh, 1)) | t)] }}</strong>
           </div>
           }
-          <div><span>Total de ce groupe</span><strong>{{number(breakdown.totalKwh, 1)}} kWh/an</strong></div>
+          <div>
+            <span>{{ 'Total de ce groupe' | t }}</span
+            ><strong>{{ '{0} kWh/an' | t:[((number(breakdown.totalKwh, 1)) | t)] }}</strong>
+          </div>
           <p>
-            Coût énergie : {{money(selectedResult()?.cost ?? 0, 2)}} / an. L’abonnement est compté séparément.
+            {{ 'Coût énergie : {0} / an. L’abonnement est compté séparément.' |
+            t:[((money(selectedResult()?.cost ?? 0, 2)) | t)] }}
           </p>
           @if(selected.definition.notes) {
-          <p class="calculation-source">Hypothèse / source : {{selected.definition.notes}}</p>
+          <p class="calculation-source">{{ 'Hypothèse / source : {0}' | t:[(selected.definition.notes)] }}</p>
           }
         </details>
         }
         <div class="inspector-actions">
           <button class="btn secondary small" (click)="store.duplicateDevice(selected.id)">
-            <ww-icon name="copy" />Dupliquer</button
+            <ww-icon name="copy" />{{ 'Dupliquer' | t }}</button
           ><button
             class="icon-button danger"
-            [attr.aria-label]="store.scenario() ? 'Retirer cet appareil de ce scénario' : 'Retirer cet appareil du logement'"
-            [title]="store.scenario() ? 'Retirer de ce scénario' : 'Retirer du logement'"
+            [attr.aria-label]="(store.scenario() ? 'Retirer cet appareil de ce scénario' : 'Retirer cet appareil du logement') | t"
+            [title]="(store.scenario() ? 'Retirer de ce scénario' : 'Retirer du logement') | t"
             (click)="store.removeDevice(selected.id)"
           >
             <ww-icon name="trash" /></button
           ><button
             class="icon-button"
-            title="Enregistrer une copie dans la bibliothèque"
-            aria-label="Enregistrer une copie dans la bibliothèque"
+            [title]="'Enregistrer une copie dans la bibliothèque' | t"
+            [attr.aria-label]="'Enregistrer une copie dans la bibliothèque' | t"
             (click)="saveInstanceAsDefinition()"
           >
             <ww-icon name="save" />
@@ -572,29 +613,32 @@
           (committed)="saveDevice($event)"
         />
         } @else {
-        <span class="eyebrow">CHAQUE KWH A UNE HISTOIRE</span>
-        <h2>Où va votre énergie ?</h2>
-        <p class="subtle">La répartition de votre consommation annuelle.</p>
+        <span class="eyebrow">{{ 'CHAQUE KWH A UNE HISTOIRE' | t }}</span>
+        <h2>{{ 'Où va votre énergie ?' | t }}</h2>
+        <p class="subtle">{{ 'La répartition de votre consommation annuelle.' | t }}</p>
         <div class="donut" [style.background]="donut()">
           <div>
-            <ww-icon name="bolt" /><strong>{{number(store.result().kwh)}}</strong><span>kWh / an</span>
+            <ww-icon name="bolt" /><strong>{{(number(store.result().kwh)) | t}}</strong
+            ><span>{{ 'kWh / an' | t }}</span>
           </div>
         </div>
         <div class="category-legend">
           @for(c of store.result().categories; track c.name){
           <div>
-            <span class="legend-dot" [style.background]="colors[c.name]"></span><span>{{c.name}}</span
-            ><strong>{{number(c.share * 100, 1)}} %</strong>
+            <span class="legend-dot" [style.background]="colors[c.name]"></span><span>{{(c.name) | t}}</span
+            ><strong>{{ '{0} %' | t:[((number(c.share * 100, 1)) | t)] }}</strong>
           </div>
           }
         </div>
         <div class="insight">
           <ww-icon name="leaf" />
           <div>
-            <strong>Les petits gestes comptent.</strong>
-            <p>Testez une nouvelle habitude dans un scénario. Les économies deviennent concrètes.</p>
+            <strong>{{ 'Les petits gestes comptent.' | t }}</strong>
+            <p>
+              {{ 'Testez une nouvelle habitude dans un scénario. Les économies deviennent concrètes.' | t }}
+            </p>
             <button class="text-button" (click)="openName('new-scenario')">
-              Explorer un scénario <ww-icon name="chevron" />
+              {{ 'Explorer un scénario' | t }} <ww-icon name="chevron" />
             </button>
           </div>
         </div>
@@ -603,122 +647,156 @@
     </div>
     <section class="bill-reference">
       <div>
-        <span class="eyebrow">REPÈRE FACULTATIF</span>
-        <h2>Comparer à votre facture</h2>
+        <span class="eyebrow">{{ 'REPÈRE FACULTATIF' | t }}</span>
+        <h2>{{ 'Comparer à votre facture' | t }}</h2>
         @if(billComparison(); as bill) {
         <p>
-          Sur 12 mois : {{number(bill.observed, 1)}} kWh saisis · {{number(bill.estimated, 1)}} kWh estimés
-          pour le logement de référence.
+          {{ 'Sur 12 mois : {0} kWh saisis · {1} kWh estimés pour le logement de référence.' |
+          t:[((number(bill.observed, 1)) | t),((number(bill.estimated, 1)) | t)] }}
         </p>
         <strong
-          >Écart : {{number(bill.difference < 0 ? -bill.difference : bill.difference, 1)}} kWh
-          ({{bill.difference >= 0 ? 'facture supérieure' : 'estimation supérieure'}})</strong
+          >{{ 'Écart : {0} kWh ({1})' | t:[((number(bill.difference < 0 ? -bill.difference : bill.difference,
+          1)) | t),((bill.difference >= 0 ? 'facture supérieure' : 'estimation supérieure') | t)] }}</strong
         >
         } @else {
         <p>
-          Saisissez les kWh de 12 mois de factures pour voir l’écart avec votre modèle, sans connexion
-          externe.
+          {{ 'Saisissez les kWh de 12 mois de factures pour voir l’écart avec votre modèle, sans connexion
+          externe.' | t }}
         </p>
         }
       </div>
       <button type="button" class="btn secondary small" (click)="openBill()">
-        {{billComparison() ? 'Modifier le repère' : 'Saisir ma consommation'}}
+        {{(billComparison() ? 'Modifier le repère' : 'Saisir ma consommation') | t}}
       </button>
     </section>
     <section class="tariff-strip">
       <span class="tariff-icon"><ww-icon name="settings" /></span>
       <div>
-        <strong>Votre tarif d’électricité</strong
+        <strong>{{ 'Votre tarif d’électricité' | t }}</strong
         ><span
-          >{{store.snapshot()!.tariff.mode === 'base' ? 'Option Base · ' +
+          >{{ '{0} · Abonnement {1} / an' | t:[((store.snapshot()!.tariff.mode === 'base' ? 'Option Base · ' +
           money(store.snapshot()!.tariff.basePrice, 4) + ' / kWh' : 'HP ' +
           money(store.snapshot()!.tariff.peakPrice, 4) + ' · HC ' +
-          money(store.snapshot()!.tariff.offPeakPrice, 4) + ' / kWh'}} · Abonnement
-          {{money(store.snapshot()!.tariff.subscription)}} / an</span
+          money(store.snapshot()!.tariff.offPeakPrice, 4) + ' / kWh') |
+          t),((money(store.snapshot()!.tariff.subscription)) | t)] }}</span
         >
       </div>
       <button class="btn secondary small" (click)="openTariff()">
-        Ajuster mon tarif <ww-icon name="chevron" />
+        {{ 'Ajuster mon tarif' | t }} <ww-icon name="chevron" />
       </button>
     </section>
     <footer class="workspace-footer">
       <span
-        ><span class="status-dot"></span>{{store.saveStatus()}}@if(store.saveStatus() === 'Échec de la
-        sauvegarde'){<button class="text-button" (click)="store.retrySave()">Réessayer</button>}</span
-      ><span>Des estimations pour mieux décider. À ajuster avec vos usages réels.</span>
+        ><span class="status-dot"></span>{{(store.saveStatus()) | t}}@if(store.saveStatus() === 'Échec de la
+        sauvegarde'){<button class="text-button" (click)="store.retrySave()">{{ 'Réessayer' | t }}</button
+        >}</span
+      ><span>{{ 'Des estimations pour mieux décider. À ajuster avec vos usages réels.' | t }}</span>
     </footer>
     }
   </section>
 </main>
 } @if(store.error()){
 <div class="error-banner" role="alert">
-  <ww-icon name="info" /><span>{{store.error()}}</span
-  ><button class="icon-button" aria-label="Fermer le message d’erreur" (click)="store.error.set('')">
+  <ww-icon name="info" /><span>{{i18n.error(store.error())}}</span
+  ><button
+    class="icon-button"
+    [attr.aria-label]="'Fermer le message d’erreur' | t"
+    (click)="store.error.set('')"
+  >
     <ww-icon name="close" />
   </button>
 </div>
 } @if(toast()){
-<div class="toast" role="status"><ww-icon name="check" />{{toast()}}</div>
+<div class="toast" role="status"><ww-icon name="check" />{{(toast()) | t}}</div>
 } @if(busy() && !modal()){
-<div class="busy-status" role="status">Traitement du fichier…</div>
+<div class="busy-status" role="status">{{ 'Traitement du fichier…' | t }}</div>
 } @if(modal()) {
 <dialog #modalDialog class="modal" [class.wide-modal]="modal() === 'device'" (cancel)="cancelModal($event)">
   <div class="modal-header">
-    <span class="eyebrow">WATT WALLET</span
-    ><button class="icon-button" aria-label="Fermer la fenêtre" (click)="closeModal()" [disabled]="busy()">
+    <span class="eyebrow">{{ 'WATT WALLET' | t }}</span
+    ><button
+      class="icon-button"
+      [attr.aria-label]="'Fermer la fenêtre' | t"
+      (click)="closeModal()"
+      [disabled]="busy()"
+    >
       <ww-icon name="close" />
     </button>
   </div>
   @if(modal() === 'new-home' || modal() === 'new-scenario' || modal() === 'rename-home') {
   <h2>
-    {{modal() === 'new-home' ? 'Un nouveau chez-vous' : modal() === 'new-scenario' ? 'Imaginez une autre façon
-    de vivre' : 'Le nom de votre logement'}}
+    {{(modal() === 'new-home' ? 'Un nouveau chez-vous' : modal() === 'new-scenario' ? 'Imaginez une autre
+    façon de vivre' : 'Le nom de votre logement') | t}}
   </h2>
   <p class="subtle">
-    {{modal() === 'new-scenario' ? 'Une copie complète de la configuration actuelle. Votre référence reste
-    intacte.' : 'Un nom pour retrouver facilement votre logement.'}}
+    {{(modal() === 'new-scenario' ? 'Une copie complète de la configuration actuelle. Votre référence reste
+    intacte.' : 'Un nom pour retrouver facilement votre logement.') | t}}
   </p>
   <form [formGroup]="nameForm" (ngSubmit)="saveName()">
     <label
-      >Nom<input
+      >{{ 'Nom' | t }}<input
         formControlName="name"
         autofocus
         maxlength="100"
-        placeholder="Ex. Appartement à Lyon" /></label
+        [placeholder]="'Ex. Appartement à Lyon' | t" /></label
     >@if(modalError()){
-    <p class="inline-error">{{modalError()}}</p>
+    <p class="inline-error">{{(modalError()) | t}}</p>
     }<button class="btn primary full" type="submit">
-      {{modal() === 'rename-home' ? 'Enregistrer' : 'Créer'}}
+      {{(modal() === 'rename-home' ? 'Enregistrer' : 'Créer') | t}}
     </button>
   </form>
+  } @if(modal() === 'language') {
+  <h2>{{'Langue de l’application' | t}}</h2>
+  <p class="subtle">{{'Le changement s’applique immédiatement et reste enregistré sur cet appareil.' | t}}</p>
+  <div class="language-options" role="group" [attr.aria-label]="'Choisir la langue' | t">
+    <button
+      type="button"
+      class="btn secondary"
+      lang="fr"
+      [attr.aria-pressed]="i18n.language() === 'fr'"
+      (click)="i18n.setLanguage('fr')"
+    >
+      Français <ww-icon [name]="i18n.language() === 'fr' ? 'check' : 'globe'" />
+    </button>
+    <button
+      type="button"
+      class="btn secondary"
+      lang="en"
+      [attr.aria-pressed]="i18n.language() === 'en'"
+      (click)="i18n.setLanguage('en')"
+    >
+      English <ww-icon [name]="i18n.language() === 'en' ? 'check' : 'globe'" />
+    </button>
+  </div>
+  <button type="button" class="btn primary full" (click)="closeModal()">{{'Terminer' | t}}</button>
   } @if(modal() === 'palette') {
-  <h2>Les couleurs de votre chez-vous.</h2>
+  <h2>{{ 'Les couleurs de votre chez-vous.' | t }}</h2>
   <p class="subtle palette-description">
-    Choisissez votre couleur. Elle s’applique immédiatement à toute l’interface, en clair comme en sombre. Les
-    nuances s’adaptent pour garder le texte lisible.
+    {{ 'Choisissez votre couleur. Elle s’applique immédiatement à toute l’interface, en clair comme en sombre.
+    Les nuances s’adaptent pour garder le texte lisible.' | t }}
   </p>
-  <div class="accent-presets" role="group" aria-label="Couleurs du thème">
+  <div class="accent-presets" role="group" [attr.aria-label]="'Couleurs du thème' | t">
     @for(preset of theme.presets; track preset.color) {
     <button
       type="button"
       class="accent-preset"
-      [attr.aria-label]="'Couleur ' + preset.name"
+      [attr.aria-label]="('Couleur ' + i18n.t(preset.name)) | t"
       [attr.aria-pressed]="theme.accent() === preset.color"
       (click)="theme.setAccent(preset.color)"
     >
       <span class="accent-swatch" [style.background]="preset.color">
         @if(theme.accent() === preset.color) { <ww-icon name="check" /> }
       </span>
-      <span>{{preset.name}}</span>
+      <span>{{(preset.name) | t}}</span>
     </button>
     }
   </div>
   <label class="accent-custom">
-    Couleur personnalisée
+    {{ 'Couleur personnalisée' | t }}
     <span class="accent-custom-field">
       <input
         type="color"
-        aria-label="Couleur personnalisée"
+        [attr.aria-label]="'Couleur personnalisée' | t"
         [value]="theme.accent()"
         (input)="theme.setAccent(inputValue($event))"
       />
@@ -726,83 +804,109 @@
     </span>
   </label>
   <div class="palette-footer">
-    <button type="button" class="text-button" (click)="theme.resetAccent()">Revenir au vert d’origine</button>
-    <button type="button" class="btn primary" (click)="modal.set(null)">Terminer</button>
+    <button type="button" class="text-button" (click)="theme.resetAccent()">
+      {{ 'Revenir au vert d’origine' | t }}
+    </button>
+    <button type="button" class="btn primary" (click)="modal.set(null)">{{ 'Terminer' | t }}</button>
   </div>
   } @if(modal() === 'bill') {
-  <h2>Votre repère de consommation.</h2>
+  <h2>{{ 'Votre repère de consommation.' | t }}</h2>
   <p class="subtle">
-    Recopiez uniquement les kWh consommés sur 12 mois de factures. La comparaison porte sur le logement de
-    référence, jamais sur un scénario.
+    {{ 'Recopiez uniquement les kWh consommés sur 12 mois de factures. La comparaison porte sur le logement de
+    référence, jamais sur un scénario.' | t }}
   </p>
   <form [formGroup]="billForm" (ngSubmit)="saveBill()">
     <label
-      >Consommation constatée sur 12 mois <span>kWh</span>
+      >{{ 'Consommation constatée sur 12 mois' | t }} <span>{{ 'kWh' | t }}</span>
       <input formControlName="annualKwh" type="number" min="0" step="any" />
     </label>
     @if(modalError()) {
-    <p class="inline-error" role="alert">{{modalError()}}</p>
+    <p class="inline-error" role="alert">{{(modalError()) | t}}</p>
     }
-    <button type="submit" class="btn primary full">Enregistrer le repère</button>
+    <button type="submit" class="btn primary full">{{ 'Enregistrer le repère' | t }}</button>
     @if(store.home()?.observedAnnualKwh !== undefined) {
-    <button type="button" class="text-button danger" (click)="clearBill()">Effacer ce repère</button>
+    <button type="button" class="text-button danger" (click)="clearBill()">
+      {{ 'Effacer ce repère' | t }}
+    </button>
     }
   </form>
   } @if(modal() === 'tariff') {
-  <h2>Votre électricité, votre tarif.</h2>
-  <p class="subtle">Recopiez les prix TTC de votre contrat. Les valeurs proposées sont des exemples.</p>
+  <h2>{{ 'Votre électricité, votre tarif.' | t }}</h2>
+  <p class="subtle">
+    {{ 'Recopiez les prix TTC de votre contrat. Les valeurs proposées sont des exemples.' | t }}
+  </p>
   <form [formGroup]="tariffForm" (ngSubmit)="saveTariff()">
     <label
-      >Option tarifaire<select formControlName="mode">
-        <option value="base">Base — un prix unique</option>
-        <option value="hp-hc">Heures pleines / heures creuses</option>
+      >{{ 'Option tarifaire' | t }}<select formControlName="mode">
+        <option value="base">{{ 'Base — un prix unique' | t }}</option>
+        <option value="hp-hc">{{ 'Heures pleines / heures creuses' | t }}</option>
       </select></label
     >@if(tariffForm.controls.mode.value === 'base'){<label
-      >Prix du kWh TTC (€)<input formControlName="basePrice" type="number" min="0" step="any" /></label
+      >{{ 'Prix du kWh TTC (€)' | t }}<input
+        formControlName="basePrice"
+        type="number"
+        min="0"
+        step="any" /></label
     >} @else {
     <div class="form-row">
       <label
-        >Heures pleines (€/kWh)<input formControlName="peakPrice" type="number" min="0" step="any" /></label
+        >{{ 'Heures pleines (€/kWh)' | t }}<input
+          formControlName="peakPrice"
+          type="number"
+          min="0"
+          step="any" /></label
       ><label
-        >Heures creuses (€/kWh)<input formControlName="offPeakPrice" type="number" min="0" step="any"
+        >{{ 'Heures creuses (€/kWh)' | t }}<input
+          formControlName="offPeakPrice"
+          type="number"
+          min="0"
+          step="any"
       /></label>
     </div>
     <p class="field-hint">
-      Réglez la part en heures creuses dans chaque appareil. Aucune plage horaire n’est supposée
-      automatiquement.
+      {{ 'Réglez la part en heures creuses dans chaque appareil. Aucune plage horaire n’est supposée
+      automatiquement.' | t }}
     </p>
     }<label
-      >Abonnement annuel TTC (€)<input formControlName="subscription" type="number" min="0" step="any"
+      >{{ 'Abonnement annuel TTC (€)' | t }}<input
+        formControlName="subscription"
+        type="number"
+        min="0"
+        step="any"
     /></label>
-    <p class="field-hint">L’abonnement est affiché séparément de la consommation des appareils.</p>
+    <p class="field-hint">
+      {{ 'L’abonnement est affiché séparément de la consommation des appareils.' | t }}
+    </p>
     @if(modalError()){
-    <p role="alert" class="inline-error">{{modalError()}}</p>
-    }<button class="btn primary full" type="submit">Enregistrer mon tarif</button>
+    <p role="alert" class="inline-error">{{(modalError()) | t}}</p>
+    }<button class="btn primary full" type="submit">{{ 'Enregistrer mon tarif' | t }}</button>
   </form>
   } @if(modal() === 'device' && editingDefinition(); as definition){
-  <h2>{{definition.name || 'Un nouvel appareil, à votre façon.'}}</h2>
+  <h2>{{definition.name ? i18n.deviceName(definition) : ('Un nouvel appareil, à votre façon.' | t)}}</h2>
   <p class="subtle">
-    Une fiche réutilisable dans tous vos logements. Les appareils déjà installés conservent leurs
-    caractéristiques.
+    {{ 'Une fiche réutilisable dans tous vos logements. Les appareils déjà installés conservent leurs
+    caractéristiques.' | t }}
   </p>
   <ww-device-editor [definition]="definition" (committed)="saveDefinition($event)" />} @if(modal() ===
   'import' && prepared(); as p){
-  <h2>Un petit aperçu avant l’import.</h2>
+  <h2>{{ 'Un petit aperçu avant l’import.' | t }}</h2>
   <p class="subtle">
-    {{p.manifest.kind === 'home' ? 'Un logement complet, avec ses scénarios et ses paramètres.' : 'De
-    nouvelles fiches pour votre bibliothèque.'}}
+    {{(p.manifest.kind === 'home' ? 'Un logement complet, avec ses scénarios et ses paramètres.' : 'De
+    nouvelles fiches pour votre bibliothèque.') | t}}
   </p>
   <div class="import-summary">
-    <span>{{importCount()}} fiches d’appareils</span
-    ><span>{{assetCount()}} modèles 3D personnalisés</span>@if(p.manifest.kind === 'home'){<strong
-      >{{p.manifest.home.name}}</strong
-    ><span>{{p.manifest.home.scenarios.length}} scénarios</span>}
+    <span>{{ '{0} fiches d’appareils' | t:[((importCount()) | t)] }}</span
+    ><span>{{ '{0} modèles 3D personnalisés' | t:[((assetCount()) | t)] }}</span>@if(p.manifest.kind ===
+    'home'){<strong>{{p.manifest.home.name}}</strong
+    ><span>{{ '{0} scénarios' | t:[((p.manifest.home.scenarios.length) | t)] }}</span>}
   </div>
-  <p class="field-hint">Les éléments seront ajoutés comme nouvelles copies. Rien ne sera écrasé.</p>
+  <p class="field-hint">
+    {{ 'Les éléments seront ajoutés comme nouvelles copies. Rien ne sera écrasé.' | t }}
+  </p>
   @if(modalError()){
-  <p role="alert" class="inline-error">{{modalError()}}</p>
+  <p role="alert" class="inline-error">{{(modalError()) | t}}</p>
   }<button class="btn primary full" (click)="confirmImport()" [disabled]="busy()">
-    {{busy() ? 'Import en cours…' : 'Importer ces données'}}</button
+    {{(busy() ? 'Import en cours…' : 'Importer ces données') | t}}</button
   >}
 </dialog>
 }

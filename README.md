@@ -1,6 +1,6 @@
 # Watt Wallet
 
-Une application locale pour composer son logement, visualiser la consommation de ses appareils dans un diorama isométrique et comparer des scénarios. Angular 22, Three.js et Tauri 2. Interface française, euros, sans compte, serveur métier ni télémétrie.
+Une application locale pour composer son logement, visualiser la consommation de ses appareils dans un diorama isométrique et comparer des scénarios. Angular 22, Three.js et Tauri 2. Interface français/anglais, euros, sans compte, serveur métier ni télémétrie.
 
 ## Démarrer
 
@@ -25,7 +25,7 @@ L’application Windows fonctionne hors connexion. L’installateur télécharge
 
 ## Utilisation
 
-Le bouton lune/soleil dans l'en-tête active le mode sombre ou clair. Le premier affichage suit la préférence du système ; votre choix est ensuite conservé localement. Le bouton palette voisin propose six couleurs et un sélecteur personnalisé. La couleur teinte les surfaces, les commandes et le plateau 3D dans les deux modes ; les nuances conservent leur luminosité pour rester lisibles. Cette préférence est conservée sur cet appareil.
+Le bouton lune/soleil dans l'en-tête active le mode sombre ou clair. Le premier affichage suit la préférence du système ; votre choix est ensuite conservé localement. Le bouton palette voisin propose six couleurs et un sélecteur personnalisé. La couleur teinte les surfaces, les commandes et le plateau 3D dans les deux modes ; les nuances conservent leur luminosité pour rester lisibles. Cette préférence est conservée sur cet appareil. Le bouton globe voisin permet de choisir Français ou English sans rechargement. La langue, le titre de la fenêtre, les libellés accessibles et les formats numériques sont mis à jour, et le choix est conservé localement. Les noms et notes personnels restent inchangés ; les catégories gardent leurs valeurs de contrat dans le JSON et les fichiers `.wattpack`.
 
 - Ajouter un appareil par le bouton + ou glisser-déposer. Cliquer sur l’objet, son étiquette ou sa ligne pour ouvrir les paramètres. Le bouton « Retirer » de chaque ligne agit uniquement sur le logement ou le scénario affiché.
 - Passer en **Placement** pour organiser le plateau avec des tailles uniformes. Le mode **Consommation** fait varier le volume de la boîte englobante selon la part des kWh/an. Les pourcentages chiffrés sont exacts ; les appareils à zéro deviennent de petits repères gris.
@@ -51,7 +51,7 @@ Le bouton lune/soleil dans l'en-tête active le mode sombre ou clair. Le premier
 
 ## Données et architecture
 
-`src/app/domain` contient les contrats Zod/TypeScript et le moteur pur. `data` valide les GLB et les archives, et fournit les adaptateurs de stockage. `state.ts` orchestre les Signals et les sauvegardes sérialisées. `scene` gère uniquement le rendu et les interactions. Le frontend n’envoie aucune donnée à un service distant.
+`src/app/domain` contient les contrats Zod/TypeScript et le moteur pur. `data` valide les GLB et les archives, et fournit les adaptateurs de stockage. `state.ts` orchestre les Signals et les sauvegardes sérialisées. `scene` gère uniquement le rendu et les interactions. Le frontend n’envoie aucune donnée à un service distant. `ui/language.ts` gère la langue avec un Signal et `ui/i18n/en.json` contient le catalogue anglais, avec les messages français comme clés. Le pipe `t` traduit les textes, attributs accessibles et messages paramétrés ; les libellés du domaine restent indépendants de l’interface.
 
 L’inlining du CSS critique Angular est désactivé en production : son chargement différé utilise un gestionnaire HTML `onload`, incompatible avec la CSP stricte de Tauri. Le CSS est chargé comme une feuille externe ; la protection des scripts est conservée.
 

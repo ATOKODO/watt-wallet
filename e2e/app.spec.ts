@@ -486,3 +486,142 @@ test('plateau adaptatif, grande grille et positions sauvegardées', async ({ pag
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await stage.screenshot({ path: 'test-results/watt-wallet-adaptive-board-mobile.png' });
 });
+
+test('langues français/anglais, formulaires, scénarios, erreurs, données et persistance', async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/');
+  const metricBefore = await page.locator('.metric-value').first().innerText();
+  await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'English', exact: true }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(dialog.getByRole('heading')).toHaveText('App language');
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: 'A little world. A clearer picture of energy.' }),
+  ).toBeVisible();
+  await expect(page.locator('.workspace-footer')).toContainText('Saved on this device');
+  await expect(page.getByRole('button', { name: 'Add Electric heater', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Choose the theme color', exact: true }).click();
+  await expect(dialog.getByRole('button', { name: 'Color Lavender', exact: true })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Color Lavender', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await page.getByRole('button', { name: 'Enable dark mode', exact: true }).click();
+  await page.getByLabel('Search for a device', { exact: true }).fill('heater');
+  await expect(page.locator('.library-item')).toHaveCount(1);
+  await page.getByLabel('Search for a device', { exact: true }).fill('no such device');
+  await expect(page.locator('.empty-small').first()).toContainText('No devices found.');
+  await page.getByLabel('Search for a device', { exact: true }).fill('');
+  await page.getByLabel('Filter by category').selectOption({ label: 'Cooking' });
+  await expect(page.locator('.library-item')).toHaveCount(2);
+  await page.getByLabel('Filter by category').selectOption({ label: 'All' });
+  await page.getByRole('button', { name: 'Create a device', exact: true }).click();
+  await dialog.getByLabel('Device name').fill('Bibliothèque');
+  await dialog.getByLabel('Average running power').fill('100');
+  await dialog.getByRole('tab', { name: 'JSON', exact: true }).click();
+  const json = dialog.getByLabel('Profile JSON', { exact: true });
+  const original = await json.inputValue();
+  await json.fill('{');
+  await expect(dialog.locator('.json-validation')).toContainText('Invalid JSON syntax');
+  await expect(dialog.getByRole('button', { name: 'Save profile', exact: true })).toBeDisabled();
+  await json.fill('{}');
+  await expect(dialog.locator('.json-validation')).toContainText('Missing or incomplete required field:');
+  await json.fill(original);
+  await expect(dialog.locator('.definition-json-preview')).toContainText('182.5 kWh/year');
+  await expect(dialog.locator('.definition-json-preview h3')).toHaveText('Bibliothèque');
+  await dialog.getByRole('button', { name: 'Save profile', exact: true }).click();
+  await page.getByRole('button', { name: 'Add Bibliothèque', exact: true }).click();
+  await expect(page.locator('.inspector h2')).toHaveText('Bibliothèque');
+  await page.locator('.inspector').getByLabel('Source or notes').fill('Notes françaises personnelles');
+  await page.getByRole('button', { name: 'Apply changes', exact: true }).click();
+  await page.getByRole('button', { name: 'Choose language', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Français', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Terminer', exact: true }).click();
+  await expect(page.locator('.inspector h2')).toHaveText('Bibliothèque');
+  await expect(page.locator('.inspector').getByLabel('Source ou notes')).toHaveValue(
+    'Notes françaises personnelles',
+  );
+  // Keep an unsaved usage draft through a language switch.
+  await page.locator('.inspector').getByLabel('Heures / jour', { exact: true }).fill('7');
+  await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
+  await dialog.getByRole('button', { name: 'English', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(page.locator('.inspector').getByLabel('Hours / day', { exact: true })).toHaveValue('7');
+  await page.getByRole('button', { name: 'My scenarios', exact: true }).click();
+  await page.getByRole('button', { name: 'Create a scenario', exact: true }).click();
+  await expect(dialog.getByLabel('Name', { exact: true })).toHaveValue('Scenario 1');
+  await dialog.getByRole('button', { name: 'Create', exact: true }).click();
+  await expect(page.locator('.comparison-grid')).toContainText('No payback');
+  await page.getByRole('button', { name: 'Remove from this scenario: Bibliothèque', exact: true }).click();
+  await expect(page.locator('.comparison-grid')).toContainText('No extra cost');
+  await page.getByRole('button', { name: 'Reference', exact: true }).click();
+  await expect(page.locator('.device-row').filter({ hasText: 'Bibliothèque' })).toHaveCount(1);
+  await page.getByRole('button', { name: 'Arrange in a grid', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Snapping enabled', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Adjust my tariff', exact: true }).click();
+  await dialog.getByLabel('Tariff option').selectOption('hp-hc');
+  await dialog.getByLabel('Peak hours (€/kWh)', { exact: true }).fill('0.3');
+  await dialog.getByLabel('Off-peak hours (€/kWh)', { exact: true }).fill('0.2');
+  await dialog.getByRole('button', { name: 'Save my tariff', exact: true }).click();
+  await expect(page.locator('.tariff-strip')).toContainText('Peak €0.3 · Off-peak €0.2 / kWh');
+  await page.getByRole('button', { name: 'Enter my consumption', exact: true }).click();
+  await dialog.getByLabel('Actual consumption over 12 months').fill('0');
+  await dialog.getByRole('button', { name: 'Save benchmark', exact: true }).click();
+  await expect(dialog.locator('.inline-error')).toContainText('greater than zero');
+  await dialog.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  await page.getByRole('button', { name: 'Library', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Your device library', exact: true })).toBeVisible();
+  await expect(page.locator('.catalog-card').first()).toContainText('Generic device');
+  await page.getByRole('button', { name: 'My scenarios', exact: true }).click();
+  await page.getByRole('button', { name: 'Run all devices', exact: true }).click();
+  await expect(page.locator('.power-total')).not.toContainText('0 W');
+  await page.screenshot({ path: 'test-results/watt-wallet-english-dark.png', fullPage: true });
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('html')).toHaveAttribute('data-accent', '#7050a1');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(
+    page.getByRole('heading', { name: 'A little world. A clearer picture of energy.' }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Choose language', exact: true }).click();
+  await expect(dialog.getByRole('button', { name: 'English', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.screenshot({ path: 'test-results/watt-wallet-language-mobile.png', fullPage: true });
+  await dialog.getByRole('button', { name: 'Français', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Terminer', exact: true }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(391);
+  expect(errors).toEqual([]);
+  expect(metricBefore).toContain('kWh');
+});
+
+test('anglais hors WebGL, langue au clavier et conservation des données', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('watt-wallet-language', 'en');
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type: string, ...args: any[]) {
+      if (type.startsWith('webgl')) return null;
+      return original.apply(this, [type, ...args] as any);
+    } as any;
+  });
+  await page.goto('/');
+  await expect(page.locator('.webgl-fallback')).toContainText('The 3D view is unavailable');
+  const count = await page.locator('.device-row').count();
+  const chooser = page.getByRole('button', { name: 'Choose language', exact: true });
+  await chooser.focus();
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Français', exact: true }).focus();
+  await page.keyboard.press('Enter');
+  await expect(dialog.getByRole('heading')).toHaveText('Langue de l’application');
+  await dialog.getByRole('button', { name: 'Terminer', exact: true }).click();
+  await expect(page.locator('.webgl-fallback')).toContainText('La vue 3D n’est pas disponible');
+  await expect(page.locator('.device-row')).toHaveCount(count);
+});

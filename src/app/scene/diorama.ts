@@ -1,3 +1,4 @@
+import { LanguageService, TranslatePipe } from '../ui/language';
 import {
   AfterViewInit,
   Component,
@@ -41,7 +42,7 @@ interface Label {
 @Component({
   selector: 'ww-diorama',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, TranslatePipe],
   template: `
     <div
       #host
@@ -50,12 +51,12 @@ interface Label {
       [attr.data-plateau-depth]="plateauSize().halfDepth * 2"
       (dragover)="allowDrop($event)"
       (drop)="drop($event)"
-      aria-label="Diorama 3D orbitable du logement"
+      [attr.aria-label]="'Diorama 3D orbitable du logement' | t"
     >
       @if (failed()) {
         <div class="webgl-fallback">
-          <ww-icon name="box" /><strong>La vue 3D n’est pas disponible</strong>
-          <p>Votre logement reste accessible dans la liste des appareils ci-dessous.</p>
+          <ww-icon name="box" /><strong>{{ 'La vue 3D n’est pas disponible' | t }}</strong>
+          <p>{{ 'Votre logement reste accessible dans la liste des appareils ci-dessous.' | t }}</p>
         </div>
       }
       @for (label of labels(); track label.id) {
@@ -71,21 +72,21 @@ interface Label {
           <span
             >{{ label.name }}
             @if (label.quantity > 1) {
-              <b>×{{ label.quantity }}</b>
+              <b>{{ '×{0}' | t: [label.quantity | t] }}</b>
             }</span
-          ><strong>{{ label.percent }} %</strong>
+          ><strong>{{ '{0} %' | t: [label.percent | t] }}</strong>
         </button>
       }
     </div>
     @if (warning()) {
-      <div class="scene-warning" role="status">{{ warning() }}</div>
+      <div class="scene-warning" role="status">{{ warning() | t }}</div>
     }
     @if (gridMessage()) {
-      <div class="scene-grid-message" role="status">{{ gridMessage() }}</div>
+      <div class="scene-grid-message" role="status">{{ gridMessage() | t }}</div>
     }
     <div class="scene-grid-actions">
       <button type="button" (click)="organize()" [disabled]="failed() || !devices().length">
-        <ww-icon name="grid" /> Ranger en grille
+        <ww-icon name="grid" /> {{ 'Ranger en grille' | t }}
       </button>
       <button
         type="button"
@@ -94,15 +95,20 @@ interface Label {
         [disabled]="failed()"
         (click)="snap.set(!snap())"
       >
-        <ww-icon name="move" /> Accrochage {{ snap() ? 'activé' : 'désactivé' }}
+        <ww-icon name="move" /> {{ 'Accrochage {0}' | t: [(snap() ? 'activé' : 'désactivé') | t] }}
       </button>
     </div>
     <div class="scene-navigation">
-      <button title="Zoom avant" aria-label="Zoom avant" (click)="zoom(1.2)"><ww-icon name="plus" /></button
-      ><button title="Zoom arrière" aria-label="Zoom arrière" (click)="zoom(0.8)">
+      <button [title]="'Zoom avant' | t" [attr.aria-label]="'Zoom avant' | t" (click)="zoom(1.2)">
+        <ww-icon name="plus" /></button
+      ><button [title]="'Zoom arrière' | t" [attr.aria-label]="'Zoom arrière' | t" (click)="zoom(0.8)">
         <ww-icon name="minus" /></button
       ><span></span
-      ><button title="Recentrer le plateau" aria-label="Recentrer le plateau" (click)="reset()">
+      ><button
+        [title]="'Recentrer le plateau' | t"
+        [attr.aria-label]="'Recentrer le plateau' | t"
+        (click)="reset()"
+      >
         <ww-icon name="reset" />
       </button>
     </div>
@@ -286,6 +292,7 @@ interface Label {
   ],
 })
 export class DioramaComponent implements AfterViewInit, OnDestroy {
+  readonly i18n = inject(LanguageService);
   @ViewChild('host') host!: ElementRef<HTMLDivElement>;
   devices = input.required<DeviceInstance[]>();
   results = input.required<DeviceResult[]>();
@@ -327,6 +334,10 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   private selectionRing?: THREE.Mesh;
   private stage?: THREE.Group;
   constructor() {
+    effect(() => {
+      this.i18n.language();
+      this.requestRender();
+    });
     effect(() => {
       this.devices();
       this.results();
@@ -685,8 +696,8 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       candidates.push({
         label: {
           id: d.id,
-          name: d.definition.name,
-          percent: new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 }).format(share * 100),
+          name: this.i18n.deviceName(d.definition),
+          percent: this.i18n.number(share * 100, 1),
           quantity: d.quantity,
           x: ((p.x + 1) * w) / 2,
           y: ((1 - p.y) * h) / 2,
