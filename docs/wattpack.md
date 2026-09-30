@@ -52,7 +52,7 @@ Une `DeviceDefinition` contient `id`, `name`, `brand`, `reference`, `category`, 
 
 `defaultUsage` et l’usage de chaque instance contiennent `hoursPerDay`, `daysPerYear`, `cyclesPerWeek`, `cycleHours`, `offPeakPercent`. Les champs inactifs sont conservés pour faciliter le changement de méthode ; seule la méthode choisie détermine le calcul. Les pourcentages sont compris entre 0 et 100, jamais entre 0 et 1.
 
-Une `DeviceInstance` contient `id`, une copie complète `definition`, `usage`, `quantity` (entier ≥ 1) et `position: { x, z }`. Le schéma limite X à ±10 et Z à ±8 ; le glisser-déposer reste dans le plateau ±8/±6. Les unités du plateau sont abstraites, pas des mètres.
+Une `DeviceInstance` contient `id`, une copie complète `definition`, `usage`, `quantity` (entier ≥ 1) et `position: { x, z }`. Le schéma accepte X et Z entre −10 000 et +10 000. Le plateau et les limites de déplacement sont calculés à partir du nombre d’objets, de leurs dimensions affichées et de leurs positions ; leur taille ne constitue pas une donnée persistante. Les unités du plateau sont abstraites, pas des mètres.
 
 Les états temporaires arrêté, veille et en marche du simulateur ne sont pas stockés ni exportés et ne changent pas les résultats annuels. Les résultats ne sont pas stockés : ils sont recalculés. Les montants sont en euros TTC, puissances en watts, énergie en kWh, durées en heures. L’année vaut 365 jours / 8 760 heures et le modèle par cycle utilise 52 semaines.
 

@@ -1,5 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import {
+  POSITION_LIMIT,
   DeviceDefinition,
   DeviceInstance,
   Home,
@@ -147,8 +148,8 @@ export class WalletStore {
     if (!d) return;
     const next = copy(d);
     next.id = uid();
-    next.position.x = Math.min(10, next.position.x + 1);
-    next.position.z = Math.min(8, next.position.z + 1);
+    next.position.x = Math.min(POSITION_LIMIT, next.position.x + 1);
+    next.position.z = Math.min(POSITION_LIMIT, next.position.z + 1);
     this.mutate((w) => this.current(w).devices.push(next));
     this.selectedId.set(next.id);
   }

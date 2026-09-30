@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { arrangeGrid, gridCells, nearestFreeGridCell } from '../src/app/scene/grid';
+import {
+  adaptiveBounds,
+  arrangeGrid,
+  gridCells,
+  minimumBounds,
+  nearestFreeGridCell,
+} from '../src/app/scene/grid';
 
 describe('grille du diorama', () => {
   it('range des empreintes différentes avec une marge sans sortir du plateau', () => {
@@ -28,10 +34,45 @@ describe('grille du diorama', () => {
     }
   });
 
-  it('signale le manque de place sans modifier les appareils', () => {
+  it('agrandit le plateau pour ranger trente grands appareils sans chevauchement', () => {
     const items = Array.from({ length: 30 }, (_, index) => ({ id: String(index), width: 4, depth: 4 }));
-    expect(arrangeGrid(items)).toBeNull();
+    const bounds = adaptiveBounds(items);
+    const layout = arrangeGrid(items)!;
+    expect(layout).toHaveLength(30);
+    expect(bounds.halfWidth * bounds.halfDepth).toBeGreaterThan(8 * 6);
+    for (const [index, placed] of layout.entries()) {
+      expect(Math.abs(placed.position.x) + 2).toBeLessThanOrEqual(bounds.halfWidth);
+      expect(Math.abs(placed.position.z) + 2).toBeLessThanOrEqual(bounds.halfDepth);
+      for (const other of layout.slice(0, index)) {
+        const dx = Math.abs(placed.position.x - other.position.x);
+        const dz = Math.abs(placed.position.z - other.position.z);
+        expect(dx >= 4.44 || dz >= 4.44).toBe(true);
+      }
+    }
     expect(items[0]).toEqual({ id: '0', width: 4, depth: 4 });
+  });
+
+  it('garde les positions existantes sur le plateau et retrouve la taille minimale après retrait', () => {
+    const items = [{ id: 'a', width: 2, depth: 2 }];
+    expect(adaptiveBounds(items, [{ id: 'a', position: { x: 24, z: -17 } }])).toEqual({
+      halfWidth: 26,
+      halfDepth: 19,
+    });
+    expect(adaptiveBounds([])).toEqual(minimumBounds);
+  });
+
+  it('limite les repères pour des positions éloignées et refuse les dimensions invalides', () => {
+    const items = [{ id: 'a', width: 1, depth: 1 }];
+    const bounds = adaptiveBounds(items, [{ id: 'a', position: { x: 10000, z: 10000 } }]);
+    const cells = gridCells(items, bounds);
+    expect(cells.length).toBeGreaterThan(0);
+    expect(cells.length).toBeLessThanOrEqual(4096);
+    expect(arrangeGrid([{ id: 'invalid', width: Infinity, depth: 2 }])).toBeNull();
+  });
+
+  it('range les cinq cents objets autorisés avec des empreintes très allongées', () => {
+    const items = Array.from({ length: 500 }, (_, index) => ({ id: String(index), width: 100, depth: 0.5 }));
+    expect(arrangeGrid(items)).toHaveLength(500);
   });
 
   it('accroche à la cellule libre la plus proche', () => {

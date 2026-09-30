@@ -2,6 +2,7 @@ import { Component, DestroyRef, effect, inject, input, output, signal, untracked
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
+  POSITION_LIMIT,
   DeviceDefinition,
   DeviceInstance,
   UsageProfile,
@@ -172,8 +173,21 @@ import { IconComponent } from './icon';
         <p class="field-hint">GLB autonome · 20 Mio max · textures PNG/JPEG.</p>
         @if (instance()) {
           <div class="form-row">
-            <label>Position X<input formControlName="x" type="number" min="-10" max="10" step="0.1" /></label
-            ><label>Position Z<input formControlName="z" type="number" min="-8" max="8" step="0.1" /></label>
+            <label
+              >Position X<input
+                formControlName="x"
+                type="number"
+                [min]="positionLimit * -1"
+                [max]="positionLimit"
+                step="0.1" /></label
+            ><label
+              >Position Z<input
+                formControlName="z"
+                type="number"
+                [min]="positionLimit * -1"
+                [max]="positionLimit"
+                step="0.1"
+            /></label>
           </div>
         }
         <label>Source ou notes<textarea formControlName="notes" rows="2" maxlength="2000"></textarea></label>
@@ -278,6 +292,7 @@ import { IconComponent } from './icon';
   `,
 })
 export class DeviceEditorComponent {
+  readonly positionLimit = POSITION_LIMIT;
   definition = input.required<DeviceDefinition>();
   instance = input<DeviceInstance | null>(null);
   committed = output<{ definition: DeviceDefinition; instance: DeviceInstance | null }>();

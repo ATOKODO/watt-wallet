@@ -33,6 +33,8 @@ export const categoryColors: Record<string, string> = {
   Cuisson: '#d7b460',
   'Éclairage & autres': '#b2bd70',
 };
+export const POSITION_LIMIT = 10000;
+
 const positive = z.number().finite().min(0).max(1e9);
 const id = z.string().min(1).max(120);
 export const usageSchema = z
@@ -84,7 +86,10 @@ export const instanceSchema = z
     usage: usageSchema,
     quantity: z.number().int().min(1).max(10000),
     position: z
-      .object({ x: z.number().finite().min(-10).max(10), z: z.number().finite().min(-8).max(8) })
+      .object({
+        x: z.number().finite().min(-POSITION_LIMIT).max(POSITION_LIMIT),
+        z: z.number().finite().min(-POSITION_LIMIT).max(POSITION_LIMIT),
+      })
       .strict(),
   })
   .strict();

@@ -12,10 +12,19 @@ import {
 } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { DeviceInstance, DeviceResult } from '../domain/models';
+import { DeviceInstance, DeviceResult, POSITION_LIMIT } from '../domain/models';
 import { WalletStore } from '../state';
 import { ModelFactory, disposeObject, loadGlb } from './models';
-import { GridFootprint, GridPosition, arrangeGrid, gridCells, nearestFreeGridCell } from './grid';
+import {
+  GridBounds,
+  GridFootprint,
+  GridPosition,
+  adaptiveBounds,
+  arrangeGrid,
+  gridCells,
+  minimumBounds,
+  nearestFreeGridCell,
+} from './grid';
 import { IconComponent } from '../ui/icon';
 import { Theme } from '../ui/theme';
 import { defaultAccent, themeColor } from '../ui/palette';
@@ -37,6 +46,8 @@ interface Label {
     <div
       #host
       class="scene-canvas"
+      [attr.data-plateau-width]="plateauSize().halfWidth * 2"
+      [attr.data-plateau-depth]="plateauSize().halfDepth * 2"
       (dragover)="allowDrop($event)"
       (drop)="drop($event)"
       aria-label="Diorama 3D orbitable du logement"
@@ -291,6 +302,10 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   warning = signal('');
   gridMessage = signal('');
   snap = signal(true);
+  plateauSize = signal<GridBounds>({ ...minimumBounds });
+  private boardBounds = { ...minimumBounds };
+  private boardScale = 1;
+  private sun?: THREE.DirectionalLight;
   private store = inject(WalletStore);
   private renderer?: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
@@ -367,6 +382,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       this.controls.addEventListener('end', this.orbitEnd);
       this.scene.add(new THREE.HemisphereLight('#fff8e8', '#b6c6b6', 2.6));
       const sun = new THREE.DirectionalLight('#fff3d6', 3.2);
+      this.sun = sun;
       sun.position.set(-8, 18, 10);
       sun.castShadow = true;
       sun.shadow.mapSize.set(2048, 2048);
@@ -505,6 +521,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
         this.custom.delete(id);
       }
     this.activeCustom = usedAssets;
+    this.updateStage(this.footprints());
     this.updateGrid();
     this.requestRender();
   }
@@ -516,8 +533,38 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       return [{ id: device.id, width: size.x, depth: size.z }];
     });
   }
+  private updateStage(items: GridFootprint[]) {
+    const bounds = adaptiveBounds(items, this.devices());
+    if (bounds.halfWidth === this.boardBounds.halfWidth && bounds.halfDepth === this.boardBounds.halfDepth)
+      return;
+    const scale = Math.max(bounds.halfWidth / 8, bounds.halfDepth / 6);
+    const target = this.controls?.target ?? new THREE.Vector3();
+    this.camera.position.sub(target).multiplyScalar(scale / this.boardScale);
+    this.controls?.target.set(0, 0, 0);
+    this.camera.lookAt(0, 0, 0);
+    this.camera.zoom = 1;
+    this.camera.far = 150 * scale;
+    this.boardBounds = bounds;
+    this.boardScale = scale;
+    this.stage?.scale.set(bounds.halfWidth / 8, 1, bounds.halfDepth / 6);
+    if (this.sun) {
+      this.sun.position.set(-8 * scale, 18 * scale, 10 * scale);
+      Object.assign(this.sun.shadow.camera, {
+        left: -16 * scale,
+        right: 16 * scale,
+        top: 16 * scale,
+        bottom: -16 * scale,
+        far: 60 * scale,
+      });
+      this.sun.shadow.camera.updateProjectionMatrix();
+    }
+    this.plateauSize.set(bounds);
+    this.gridMessage.set('');
+    this.controls?.update();
+    this.resize();
+  }
   private updateGrid() {
-    this.slots = gridCells(this.footprints());
+    this.slots = gridCells(this.footprints(), this.boardBounds);
     if (this.guides) {
       this.scene.remove(this.guides);
       this.guides.geometry.dispose();
@@ -547,7 +594,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   organize() {
     const positions = arrangeGrid(this.footprints());
     if (!positions) {
-      this.gridMessage.set('Pas assez de place sur le plateau pour espacer tous les appareils en grille.');
+      this.gridMessage.set('Les dimensions d’un modèle empêchent son rangement en grille.');
       return;
     }
     this.gridMessage.set('');
@@ -584,8 +631,19 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     const { clientWidth: width, clientHeight: height } = this.host.nativeElement;
     if (!width || !height) return;
     this.renderer.setSize(width, height);
-    const aspect = width / height,
-      span = 17.5;
+    const aspect = width / height;
+    const inverseRotation = this.camera.quaternion.clone().invert();
+    const projected = new THREE.Box3();
+    const objectHeight = Math.max(
+      4,
+      ...[...this.objects.values()].map((object) => new THREE.Box3().setFromObject(object).max.y),
+    );
+    for (const x of [-this.boardBounds.halfWidth - 0.5, this.boardBounds.halfWidth + 0.5])
+      for (const z of [-this.boardBounds.halfDepth - 0.5, this.boardBounds.halfDepth + 0.5])
+        for (const y of [0, objectHeight])
+          projected.expandByPoint(new THREE.Vector3(x, y, z).applyQuaternion(inverseRotation));
+    const size = projected.getSize(new THREE.Vector3());
+    const span = Math.max(17.5 * this.boardScale, size.y * 1.12, (size.x * 1.12) / aspect);
     this.camera.left = (-span * aspect) / 2;
     this.camera.right = (span * aspect) / 2;
     this.camera.top = span / 2;
@@ -728,8 +786,14 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     if (!point || !object) return;
     point.sub(this.drag.offset);
     const target = {
-      x: Math.max(-8, Math.min(8, point.x)),
-      z: Math.max(-6, Math.min(6, point.z)),
+      x: Math.max(
+        -Math.min(POSITION_LIMIT, this.boardBounds.halfWidth),
+        Math.min(POSITION_LIMIT, this.boardBounds.halfWidth, point.x),
+      ),
+      z: Math.max(
+        -Math.min(POSITION_LIMIT, this.boardBounds.halfDepth),
+        Math.min(POSITION_LIMIT, this.boardBounds.halfDepth, point.z),
+      ),
     };
     const snapped = this.snap() ? this.nearestAvailable(target, this.drag.id) : target;
     if (!snapped) {
@@ -775,7 +839,16 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     const definitionId = e.dataTransfer?.getData('application/x-watt-device');
     if (!definitionId) return;
     const p = this.renderer ? this.ground(e) : null;
-    const position = { x: Math.max(-8, Math.min(8, p?.x ?? 0)), z: Math.max(-6, Math.min(6, p?.z ?? 0)) };
+    const position = {
+      x: Math.max(
+        -Math.min(POSITION_LIMIT, this.boardBounds.halfWidth),
+        Math.min(POSITION_LIMIT, this.boardBounds.halfWidth, p?.x ?? 0),
+      ),
+      z: Math.max(
+        -Math.min(POSITION_LIMIT, this.boardBounds.halfDepth),
+        Math.min(POSITION_LIMIT, this.boardBounds.halfDepth, p?.z ?? 0),
+      ),
+    };
     this.added.emit({
       definitionId,
       position: (this.snap() ? this.nearestAvailable(position) : null) ?? position,
@@ -787,11 +860,12 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     this.requestRender();
   }
   reset() {
-    this.camera.position.set(18, 21, 24);
+    this.camera.position.set(18 * this.boardScale, 21 * this.boardScale, 24 * this.boardScale);
     this.camera.zoom = 1;
     this.camera.lookAt(0, 0, 0);
     this.controls?.target.set(0, 0, 0);
     this.controls?.update();
+    this.resize();
     this.camera.updateProjectionMatrix();
     this.requestRender();
   }

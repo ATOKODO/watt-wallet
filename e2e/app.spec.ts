@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { seedLibrary, seedWorkspace, makeInstance } from '../src/app/domain/seed';
+import { encodePack, decodePack } from '../src/app/data/wattpack';
 
 test('ajout, déplacement et orbite autour du plateau', async ({ page }) => {
   await page.goto('/');
@@ -426,4 +428,61 @@ test('palette globale, couleur personnalisée et persistance clair sombre', asyn
   await dialog.getByRole('button', { name: 'Terminer' }).click();
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-accent', '#315b43');
+});
+
+test('plateau adaptatif, grande grille et positions sauvegardées', async ({ page }) => {
+  const home = seedWorkspace().homes[0];
+  home.id = 'large-home';
+  home.name = 'Grand logement';
+  home.devices = Array.from({ length: 120 }, (_, index) => {
+    const device = makeInstance(seedLibrary()[3], index);
+    device.position = { x: 0, z: 0 };
+    return device;
+  });
+  const pack = encodePack({ format: 'watt-wallet', version: 1, kind: 'home', home }, {});
+  await page.goto('/');
+  const chooserPromise = page.waitForEvent('filechooser');
+  await page.locator('.heading-actions').getByRole('button', { name: 'Importer', exact: true }).click();
+  await (
+    await chooserPromise
+  ).setFiles({ name: 'grand-logement.wattpack', mimeType: 'application/zip', buffer: Buffer.from(pack) });
+  await page.getByRole('button', { name: 'Importer ces données' }).click();
+  await expect(page.locator('.device-row')).toHaveCount(120);
+  await page.getByRole('button', { name: 'Placement', exact: true }).click();
+  const stage = page.locator('ww-diorama .scene-canvas');
+  await expect
+    .poll(async () => {
+      const width = Number(await stage.getAttribute('data-plateau-width'));
+      const depth = Number(await stage.getAttribute('data-plateau-depth'));
+      return width * depth;
+    })
+    .toBeGreaterThan(16 * 12);
+  await page.getByRole('button', { name: 'Ranger en grille' }).click();
+  await expect(page.locator('.scene-grid-message')).toHaveCount(0);
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Partager le logement' }).click();
+  const downloaded = await downloadPromise;
+  const prepared = decodePack(new Uint8Array(await readFile((await downloaded.path())!)));
+  if (prepared.manifest.kind !== 'home') throw new Error('Logement attendu');
+  const positions = prepared.manifest.home.devices.map((device) => device.position);
+  expect(new Set(positions.map((position) => JSON.stringify(position))).size).toBe(120);
+  expect(positions.some((position) => Math.abs(position.x) > 10 || Math.abs(position.z) > 8)).toBe(true);
+  await page.getByRole('button', { name: 'Recentrer le plateau' }).click();
+  await stage.screenshot({ path: 'test-results/watt-wallet-adaptive-board.png' });
+  await page.reload();
+  await expect(page.locator('.device-row')).toHaveCount(120);
+  await expect(page.locator('.error-banner')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Placement', exact: true }).click();
+  await expect
+    .poll(
+      async () =>
+        Number(await stage.getAttribute('data-plateau-width')) *
+        Number(await stage.getAttribute('data-plateau-depth')),
+    )
+    .toBeGreaterThan(16 * 12);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Recentrer le plateau' }).click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await stage.screenshot({ path: 'test-results/watt-wallet-adaptive-board-mobile.png' });
 });

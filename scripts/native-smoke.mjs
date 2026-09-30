@@ -2,18 +2,26 @@ import { chromium, expect } from '@playwright/test';
 import { spawn } from 'node:child_process';
 import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { createServer } from 'node:net';
 const exe = path.resolve(process.argv[2] ?? 'src-tauri/target/release/watt-wallet.exe');
 await mkdir('.cache', { recursive: true });
 const root = await mkdtemp(path.resolve('.cache/native-smoke-'));
 await mkdir('test-results', { recursive: true });
-const port = 9227;
 async function launch() {
+  const server = createServer();
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
+  });
+  const port = server.address().port;
+  await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
   const child = spawn(exe, ['--smoke-test'], {
     windowsHide: true,
     stdio: 'pipe',
     env: {
       ...process.env,
       WATT_WALLET_SMOKE_DIR: root,
+      WEBVIEW2_USER_DATA_FOLDER: path.join(root, 'webview'),
       WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${port}`,
     },
   });
@@ -81,10 +89,9 @@ try {
   await page.getByRole('dialog').getByRole('button', { name: 'Couleur Lavande' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Terminer' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-accent', '#7050a1');
-  const themedHeader = await page
-    .locator('.app-header')
-    .evaluate((element) => getComputedStyle(element).backgroundColor);
-  if (themedHeader === originalHeader) throw new Error('La palette native ne recolore pas les surfaces.');
+  await expect
+    .poll(() => page.locator('.app-header').evaluate((element) => getComputedStyle(element).backgroundColor))
+    .not.toBe(originalHeader);
   const annualKwh = await page.locator('.metric').first().locator('.metric-value').innerText();
   await page.getByRole('button', { name: 'Tout en marche' }).click();
   await expect(page.locator('.power-total')).toContainText('7,39 kW');
@@ -126,6 +133,8 @@ try {
   await expect(page.locator('.device-row')).toHaveCount(7);
   await page.getByRole('button', { name: 'Ajouter Télévision', exact: true }).click();
   await page.locator('.inspector').getByLabel('Quantité', { exact: true }).fill('4');
+  await page.locator('.inspector').getByLabel('Position X', { exact: true }).fill('20');
+  await page.locator('.inspector').getByLabel('Position Z', { exact: true }).fill('12');
   await page.getByRole('button', { name: 'Appliquer les modifications' }).click();
   await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
   await page.getByRole('button', { name: 'Saisir ma consommation' }).click();
@@ -135,6 +144,9 @@ try {
   await expect(page.locator('.bill-reference')).toContainText('6 000 kWh saisis');
   const saved = JSON.parse(await readFile(path.join(root, 'workspace.json'), 'utf8'));
   if (saved.homes[0].devices.at(-1).quantity !== 4) throw new Error('Sauvegarde native incorrecte.');
+  if (saved.homes[0].devices.at(-1).position.x !== 20)
+    throw new Error('Position du plateau agrandi non sauvegardée.');
+  await expect.poll(async () => Number(await scene.getAttribute('data-plateau-width'))).toBeGreaterThan(40);
   if (saved.homes[0].observedAnnualKwh !== 6000) throw new Error('Repère de facture natif non sauvegardé.');
   await page.getByRole('button', { name: 'Fermer les paramètres de l’appareil' }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -171,7 +183,7 @@ try {
   await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(
-    'WebView2 natif : mode sombre, palette persistante, scène 3D, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde et redémarrage OK.',
+    'WebView2 natif : mode sombre, palette persistante, scène 3D, plateau adaptatif, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde et redémarrage OK.',
   );
 } finally {
   if (run) {
