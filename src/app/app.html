@@ -22,6 +22,16 @@
       (click)="theme.toggle()"
     >
       <ww-icon [name]="theme.theme() === 'dark' ? 'sun' : 'moon'" /></button
+    ><button
+      type="button"
+      class="theme-toggle palette-toggle"
+      aria-label="Choisir la couleur du thème"
+      title="Choisir la couleur du thème"
+      aria-haspopup="dialog"
+      (click)="modal.set('palette')"
+    >
+      <ww-icon name="palette" />
+      <span class="palette-indicator" [style.background]="theme.accent()"></span></button
     ><span class="status-dot"></span>100 % local<span class="version">BÊTA 0.1</span>
   </div>
 </header>
@@ -339,6 +349,7 @@
               [results]="store.result().devices"
               [mode]="mode()"
               [theme]="theme.theme()"
+              [accent]="theme.accent()"
               [selectedId]="store.selectedId()"
               (selected)="store.selectedId.set($event)"
               (moved)="store.moveDevice($event.id, $event.position)"
@@ -680,6 +691,44 @@
       {{modal() === 'rename-home' ? 'Enregistrer' : 'Créer'}}
     </button>
   </form>
+  } @if(modal() === 'palette') {
+  <h2>Les couleurs de votre chez-vous.</h2>
+  <p class="subtle palette-description">
+    Choisissez votre couleur. Elle s’applique immédiatement à toute l’interface, en clair comme en sombre. Les
+    nuances s’adaptent pour garder le texte lisible.
+  </p>
+  <div class="accent-presets" role="group" aria-label="Couleurs du thème">
+    @for(preset of theme.presets; track preset.color) {
+    <button
+      type="button"
+      class="accent-preset"
+      [attr.aria-label]="'Couleur ' + preset.name"
+      [attr.aria-pressed]="theme.accent() === preset.color"
+      (click)="theme.setAccent(preset.color)"
+    >
+      <span class="accent-swatch" [style.background]="preset.color">
+        @if(theme.accent() === preset.color) { <ww-icon name="check" /> }
+      </span>
+      <span>{{preset.name}}</span>
+    </button>
+    }
+  </div>
+  <label class="accent-custom">
+    Couleur personnalisée
+    <span class="accent-custom-field">
+      <input
+        type="color"
+        aria-label="Couleur personnalisée"
+        [value]="theme.accent()"
+        (input)="theme.setAccent(inputValue($event))"
+      />
+      <code>{{theme.accent()}}</code>
+    </span>
+  </label>
+  <div class="palette-footer">
+    <button type="button" class="text-button" (click)="theme.resetAccent()">Revenir au vert d’origine</button>
+    <button type="button" class="btn primary" (click)="modal.set(null)">Terminer</button>
+  </div>
   } @if(modal() === 'bill') {
   <h2>Votre repère de consommation.</h2>
   <p class="subtle">

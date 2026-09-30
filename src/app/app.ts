@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild, computed, inject, signal } from '@ang
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconComponent } from './ui/icon';
 import { ThemeService } from './ui/theme';
+import { themeColor } from './ui/palette';
 import { DeviceEditorComponent } from './ui/device-editor';
 import { DioramaComponent } from './scene/diorama';
 import { WalletStore } from './state';
@@ -48,7 +49,7 @@ export class AppComponent {
   busy = signal(false);
   modalError = signal('');
   modal = signal<
-    'new-home' | 'new-scenario' | 'rename-home' | 'tariff' | 'bill' | 'device' | 'import' | null
+    'new-home' | 'new-scenario' | 'rename-home' | 'tariff' | 'bill' | 'device' | 'import' | 'palette' | null
   >(null);
   editingDefinition = signal<DeviceDefinition | null>(null);
   prepared = signal<PreparedPack | null>(null);
@@ -89,8 +90,8 @@ export class AppComponent {
     return parts.length
       ? `conic-gradient(${parts.join(',')})`
       : this.theme.theme() === 'dark'
-        ? '#485d49'
-        : '#e8eade';
+        ? themeColor('#485d49', this.theme.accent())
+        : themeColor('#e8eade', this.theme.accent());
   });
   selectedResult = computed(() => this.store.result().devices.find((d) => d.id === this.store.selectedId()));
   powerContext = computed(() => `${this.store.home()?.id ?? ''}:${this.store.scenarioId() ?? 'reference'}`);

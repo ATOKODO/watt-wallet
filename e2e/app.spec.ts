@@ -357,3 +357,73 @@ test('puissance simulee, detail annuel et repere de facture partageable', async 
   await expect(fresh.locator('.bill-reference')).toContainText('6 000 kWh saisis');
   await context.close();
 });
+
+test('palette globale, couleur personnalisée et persistance clair sombre', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  const accentButton = page.getByRole('button', { name: 'Choisir la couleur du thème' });
+  const primary = page.getByRole('button', { name: 'Partager le logement' });
+  const color = (selector: string) =>
+    page
+      .locator(selector)
+      .first()
+      .evaluate((element) => getComputedStyle(element).backgroundColor);
+  const originalButton = await primary.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const originalHeader = await color('.app-header');
+  await accentButton.click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Couleur Lavande' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-accent', '#7050a1');
+  expect(await color('.app-header')).not.toBe(originalHeader);
+  expect(await primary.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(
+    originalButton,
+  );
+  await expect(dialog.getByRole('button', { name: 'Couleur Lavande' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await dialog.getByRole('button', { name: 'Terminer' }).click();
+  await page.screenshot({ path: 'test-results/watt-wallet-palette-light.png', fullPage: true });
+  await page.getByRole('button', { name: 'Activer le mode sombre' }).click();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-accent', '#7050a1');
+  await accentButton.click();
+  for (const accent of ['#ffff00', '#000000', '#0000ff']) {
+    await dialog.getByLabel('Couleur personnalisée', { exact: true }).evaluate((element, value) => {
+      const input = element as HTMLInputElement;
+      input.value = value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }, accent);
+    await expect(page.locator('html')).toHaveAttribute('data-accent', accent);
+    const contrast = await primary.evaluate((element) => {
+      const context = document.createElement('canvas').getContext('2d')!;
+      const luminance = (css: string) => {
+        context.clearRect(0, 0, 1, 1);
+        context.fillStyle = css;
+        context.fillRect(0, 0, 1, 1);
+        const [r, g, b] = [...context.getImageData(0, 0, 1, 1).data].slice(0, 3).map((c) => {
+          const value = c / 255;
+          return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const css = getComputedStyle(element);
+      const a = luminance(css.color),
+        b = luminance(css.backgroundColor);
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    });
+    expect(contrast).toBeGreaterThanOrEqual(4.5);
+  }
+  await dialog.getByRole('button', { name: 'Terminer' }).click();
+  await page.screenshot({ path: 'test-results/watt-wallet-palette-dark.png', fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await accentButton.click();
+  await expect(dialog).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: 'test-results/watt-wallet-palette-mobile.png', fullPage: true });
+  await dialog.getByRole('button', { name: 'Revenir au vert d’origine' }).click();
+  await dialog.getByRole('button', { name: 'Terminer' }).click();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-accent', '#315b43');
+});

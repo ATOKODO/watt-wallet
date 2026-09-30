@@ -25,7 +25,7 @@ L’application Windows fonctionne hors connexion. L’installateur télécharge
 
 ## Utilisation
 
-Le bouton lune/soleil dans l'en-tête active le mode sombre ou clair. Le premier affichage suit la préférence du système ; votre choix est ensuite conservé localement.
+Le bouton lune/soleil dans l'en-tête active le mode sombre ou clair. Le premier affichage suit la préférence du système ; votre choix est ensuite conservé localement. Le bouton palette voisin propose six couleurs et un sélecteur personnalisé. La couleur teinte les surfaces, les commandes et le plateau 3D dans les deux modes ; les nuances conservent leur luminosité pour rester lisibles. Cette préférence est conservée sur cet appareil.
 
 - Ajouter un appareil par le bouton + ou glisser-déposer. Cliquer sur l’objet, son étiquette ou sa ligne pour ouvrir les paramètres. Le bouton « Retirer » de chaque ligne agit uniquement sur le logement ou le scénario affiché.
 - Passer en **Placement** pour organiser le plateau avec des tailles uniformes. Le mode **Consommation** fait varier le volume de la boîte englobante selon la part des kWh/an. Les pourcentages chiffrés sont exacts ; les appareils à zéro deviennent de petits repères gris.

@@ -18,6 +18,7 @@ import { ModelFactory, disposeObject, loadGlb } from './models';
 import { GridFootprint, GridPosition, arrangeGrid, gridCells, nearestFreeGridCell } from './grid';
 import { IconComponent } from '../ui/icon';
 import { Theme } from '../ui/theme';
+import { defaultAccent, themeColor } from '../ui/palette';
 
 interface Label {
   id: string;
@@ -132,17 +133,17 @@ interface Label {
         align-items: center;
         gap: 5px;
         padding: 6px 8px;
-        border: 1px solid #dce3d1;
+        border: 1px solid oklch(from #dce3d1 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         border-radius: 7px;
-        background: #fffdf7ee;
-        color: #667b5e;
+        background: oklch(from #fffdf7ee l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+        color: oklch(from #667b5e l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         font-size: 10px;
         cursor: pointer;
       }
       .scene-grid-actions button.active {
-        background: #e9f1db;
-        border-color: #aac394;
-        color: #315c41;
+        background: oklch(from #e9f1db l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+        border-color: oklch(from #aac394 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+        color: oklch(from #315c41 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
       }
       .scene-grid-actions button:disabled {
         opacity: 0.5;
@@ -161,7 +162,7 @@ interface Label {
         width: fit-content;
         max-width: calc(100% - 125px);
         border: 1px solid #e4c3ad;
-        background: #fff8e9;
+        background: oklch(from #fff8e9 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         border-radius: 8px;
         padding: 8px 10px;
         color: #8d624f;
@@ -184,9 +185,9 @@ interface Label {
         position: absolute;
         right: 20px;
         bottom: 22px;
-        background: #fffdf7;
-        border: 1px solid #e1e4d9;
-        box-shadow: 0 3px 9px #344c3510;
+        background: oklch(from #fffdf7 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+        border: 1px solid oklch(from #e1e4d9 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+        box-shadow: 0 3px 9px oklch(from #344c3510 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         border-radius: 12px;
         display: flex;
         padding: 4px;
@@ -199,14 +200,14 @@ interface Label {
         border-radius: 7px;
         display: grid;
         place-items: center;
-        color: #4a5d50;
+        color: oklch(from #4a5d50 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         cursor: pointer;
       }
       .scene-navigation button:hover {
-        background: #e8eddf;
+        background: oklch(from #e8eddf l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
       }
       .scene-navigation span {
-        border-left: 1px solid #e1e4d9;
+        border-left: 1px solid oklch(from #e1e4d9 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         margin: 5px;
       }
       .object-label {
@@ -215,16 +216,16 @@ interface Label {
         display: flex;
         gap: 8px;
         align-items: center;
-        border: 1px solid #d7dfd1;
+        border: 1px solid oklch(from #d7dfd1 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         background: #fffffff0;
-        color: #405046;
+        color: oklch(from #405046 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         padding: 6px 9px;
         border-radius: 9px;
         font: 10px inherit;
         white-space: nowrap;
         max-width: 210px;
         cursor: pointer;
-        box-shadow: 0 4px 14px #283e3610;
+        box-shadow: 0 4px 14px oklch(from #283e3610 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
       }
       .object-label span {
         font-size: 10px;
@@ -233,15 +234,15 @@ interface Label {
       }
       .object-label strong {
         font-size: 11px;
-        color: #315c41;
+        color: oklch(from #315c41 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
       }
       .object-label b {
         font-weight: 500;
-        color: #8a9387;
+        color: oklch(from #8a9387 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
       }
       .object-label.selected {
-        border-color: #4e7b4f;
-        background: #edf3db;
+        border-color: oklch(from #4e7b4f l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+        background: oklch(from #edf3db l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         z-index: 2;
       }
       .webgl-fallback {
@@ -254,7 +255,7 @@ interface Label {
         padding: 40px;
         text-align: center;
         gap: 16px;
-        color: #74806e;
+        color: oklch(from #74806e l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
       }
       .webgl-fallback ww-icon {
         width: 48px;
@@ -266,7 +267,7 @@ interface Label {
         left: 20px;
         right: 20px;
         font-size: 12px;
-        background: #fff8e9;
+        background: oklch(from #fff8e9 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
         padding: 10px;
         border-radius: 8px;
       }
@@ -279,6 +280,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   results = input.required<DeviceResult[]>();
   mode = input<'consumption' | 'placement'>('consumption');
   theme = input<Theme>('light');
+  accent = input(defaultAccent);
   selectedId = input<string | null>(null);
   selected = output<string>();
   moved = output<{ id: string; position: { x: number; z: number } }>();
@@ -327,7 +329,8 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     });
     effect(() => {
       const theme = this.theme();
-      if (this.renderer && this.stage) this.applySceneTheme(theme);
+      const accent = this.accent();
+      if (this.renderer && this.stage) this.applySceneTheme(theme, accent);
     });
   }
   ngAfterViewInit() {
@@ -392,7 +395,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       this.selectionRing.rotation.x = -Math.PI / 2;
       this.selectionRing.position.y = 0.03;
       this.scene.add(this.selectionRing);
-      this.applySceneTheme(this.theme());
+      this.applySceneTheme(this.theme(), this.accent());
       const canvas = this.renderer.domElement;
       canvas.addEventListener('pointerdown', this.pointerDown, true);
       canvas.addEventListener('pointermove', this.pointerMove);
@@ -408,15 +411,19 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
       this.renderer?.dispose();
     }
   }
-  private applySceneTheme(theme: Theme) {
+  private applySceneTheme(theme: Theme, accent: string) {
     const dark = theme === 'dark';
-    this.factory.material('#d7dcca').color.set(dark ? '#172820' : '#d7dcca');
-    this.factory.material('#f0eddf').color.set(dark ? '#344b3b' : '#f0eddf');
-    this.factory.material('#cfd3c3').color.set(dark ? '#708773' : '#cfd3c3');
+    this.factory.material('#d7dcca').color.set(themeColor(dark ? '#172820' : '#d7dcca', accent));
+    this.factory.material('#f0eddf').color.set(themeColor(dark ? '#344b3b' : '#f0eddf', accent));
+    this.factory.material('#cfd3c3').color.set(themeColor(dark ? '#708773' : '#cfd3c3', accent));
     if (this.guides)
-      (this.guides.material as THREE.MeshBasicMaterial).color.set(dark ? '#a4c493' : '#7fa66e');
+      (this.guides.material as THREE.MeshBasicMaterial).color.set(
+        themeColor(dark ? '#a4c493' : '#7fa66e', accent),
+      );
     if (this.selectionRing)
-      (this.selectionRing.material as THREE.MeshBasicMaterial).color.set(dark ? '#a6d394' : '#4e7952');
+      (this.selectionRing.material as THREE.MeshBasicMaterial).color.set(
+        themeColor(dark ? '#a6d394' : '#4e7952', accent),
+      );
     this.requestRender();
   }
   private async rebuild() {
@@ -520,7 +527,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     if (!this.slots.length) return;
     const geometry = new THREE.CylinderGeometry(0.045, 0.045, 0.012, 8);
     const material = new THREE.MeshBasicMaterial({
-      color: this.theme() === 'dark' ? '#a4c493' : '#7fa66e',
+      color: themeColor(this.theme() === 'dark' ? '#a4c493' : '#7fa66e', this.accent()),
       transparent: true,
       opacity: 0.55,
     });

@@ -74,6 +74,17 @@ try {
   );
   const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
   if (pageHeight > 5000) throw new Error(`Mise en page native incorrecte : ${pageHeight}px.`);
+  const originalHeader = await page
+    .locator('.app-header')
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  await page.getByRole('button', { name: 'Choisir la couleur du thème' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Couleur Lavande' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Terminer' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-accent', '#7050a1');
+  const themedHeader = await page
+    .locator('.app-header')
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  if (themedHeader === originalHeader) throw new Error('La palette native ne recolore pas les surfaces.');
   const annualKwh = await page.locator('.metric').first().locator('.metric-value').innerText();
   await page.getByRole('button', { name: 'Tout en marche' }).click();
   await expect(page.locator('.power-total')).toContainText('7,39 kW');
@@ -138,6 +149,7 @@ try {
   await expect(run.page.locator('.bill-reference')).toContainText('6 000 kWh saisis');
   await expect(run.page.locator('.power-total')).toContainText('0 W');
   await expect(run.page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(run.page.locator('html')).toHaveAttribute('data-accent', '#7050a1');
   const nativePage = run.page;
   nativePage.on('pageerror', (error) => errors.push(error.message));
   await nativePage.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
@@ -159,7 +171,7 @@ try {
   await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(
-    'WebView2 natif : mode sombre, scène 3D, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde et redémarrage OK.',
+    'WebView2 natif : mode sombre, palette persistante, scène 3D, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde et redémarrage OK.',
   );
 } finally {
   if (run) {
