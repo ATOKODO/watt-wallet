@@ -128,13 +128,24 @@ export function arrangeGrid(
   }));
 }
 
+export interface GridOccupant {
+  position: GridPosition;
+  width: number;
+  depth: number;
+}
 export function nearestFreeGridCell(
   point: GridPosition,
   cells: GridPosition[],
-  occupied: GridPosition[],
+  occupied: GridOccupant[],
+  footprint: Pick<GridFootprint, 'width' | 'depth'>,
 ): GridPosition | null {
   const free = cells.filter(
-    (cell) => !occupied.some((position) => Math.hypot(position.x - cell.x, position.z - cell.z) < 0.05),
+    (cell) =>
+      !occupied.some(
+        (other) =>
+          Math.abs(other.position.x - cell.x) < (footprint.width + other.width) / 2 + GAP - 0.01 &&
+          Math.abs(other.position.z - cell.z) < (footprint.depth + other.depth) / 2 + GAP - 0.01,
+      ),
   );
   if (!free.length) return null;
   return free.reduce((nearest, candidate) =>

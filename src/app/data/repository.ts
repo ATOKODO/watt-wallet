@@ -8,8 +8,34 @@ export interface WorkspaceRepository {
   getAsset(id: string): Promise<Uint8Array | null>;
   putAsset(id: string, bytes: Uint8Array): Promise<void>;
 }
+export const workspaceConflictCode = 'WORKSPACE_CONFLICT';
+export class WorkspaceConflictError extends Error {
+  constructor() {
+    super(
+      'Les données ont changé dans une autre fenêtre. Exportez vos modifications si nécessaire, puis rechargez les données avant de continuer.',
+    );
+    this.name = 'WorkspaceConflictError';
+  }
+}
 export function validateWorkspace(value: unknown): Workspace {
-  const w = workspaceSchema.parse(value);
+  const parsed = workspaceSchema.safeParse(value);
+  if (!parsed.success) {
+    const capacity = parsed.error.issues.find(
+      (issue) => issue.code === 'too_big' && issue.origin === 'array',
+    );
+    const messages: Record<string, string> = {
+      library:
+        'Votre bibliothèque est limitée à 2 000 fiches. Retirez une fiche avant d’en ajouter une autre.',
+      homes: 'Vous pouvez conserver au maximum 100 logements.',
+      scenarios: 'Ce logement est limité à 50 scénarios. Supprimez un scénario avant d’en créer un autre.',
+      devices:
+        'Cette configuration est limitée à 500 objets. Utilisez les quantités pour regrouper vos appareils.',
+    };
+    const message = capacity && messages[String(capacity.path.at(-1))];
+    if (message) throw new Error(message);
+    throw parsed.error;
+  }
+  const w = parsed.data;
   if (!w.homes.some((h) => h.id === w.activeHomeId)) throw new Error('Logement actif introuvable.');
   if (
     new Set(w.homes.map((h) => h.id)).size !== w.homes.length ||
@@ -25,7 +51,8 @@ export function validateWorkspace(value: unknown): Workspace {
   }
   return w;
 }
-class BrowserRepository implements WorkspaceRepository {
+export class BrowserRepository implements WorkspaceRepository {
+  private expected = 'null';
   private db = new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open('watt-wallet', 1);
     request.onupgradeneeded = () => {
@@ -55,10 +82,34 @@ class BrowserRepository implements WorkspaceRepository {
   }
   async load() {
     const w = await this.read('workspace', 'current');
-    return w ? validateWorkspace(w) : null;
+    const parsed = w ? validateWorkspace(w) : null;
+    this.expected = JSON.stringify(w ?? null);
+    return parsed;
   }
-  save(w: Workspace) {
-    return this.write('workspace', 'current', validateWorkspace(w));
+  async save(w: Workspace) {
+    const next = validateWorkspace(w),
+      serialized = JSON.stringify(next),
+      expected = this.expected;
+    const db = await this.db;
+    return new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction('workspace', 'readwrite');
+      const store = transaction.objectStore('workspace');
+      const request = store.get('current');
+      let conflict: WorkspaceConflictError | undefined;
+      request.onsuccess = () => {
+        if (JSON.stringify(request.result ?? null) !== expected) {
+          conflict = new WorkspaceConflictError();
+          transaction.abort();
+        } else store.put(next, 'current');
+      };
+      transaction.oncomplete = () => {
+        this.expected = serialized;
+        resolve();
+      };
+      transaction.onerror = () => reject(conflict ?? transaction.error);
+      transaction.onabort = () =>
+        reject(conflict ?? transaction.error ?? new Error('Sauvegarde interrompue.'));
+    });
   }
   async getAsset(id: string) {
     return (await this.read('assets', id)) ?? null;
@@ -68,12 +119,22 @@ class BrowserRepository implements WorkspaceRepository {
   }
 }
 class NativeRepository implements WorkspaceRepository {
+  private expectedJson: string | null = null;
   async load() {
     const json = await invoke<string | null>('load_workspace');
-    return json ? validateWorkspace(JSON.parse(json)) : null;
+    const parsed = json ? validateWorkspace(JSON.parse(json)) : null;
+    this.expectedJson = json;
+    return parsed;
   }
   async save(w: Workspace) {
-    await invoke('save_workspace', { json: JSON.stringify(validateWorkspace(w)) });
+    const json = JSON.stringify(validateWorkspace(w));
+    try {
+      await invoke('save_workspace', { json, expectedJson: this.expectedJson });
+      this.expectedJson = json;
+    } catch (error) {
+      if (error === workspaceConflictCode) throw new WorkspaceConflictError();
+      throw error;
+    }
   }
   async getAsset(id: string) {
     const bytes = await invoke<number[] | null>('read_asset', { id });

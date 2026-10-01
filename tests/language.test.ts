@@ -13,6 +13,10 @@ describe('languages', () => {
       'Including €180 for the standing charge.',
     );
     expect(translate('Ajouter My heater', 'en')).toBe('Add My heater');
+    expect(translate('Ajouter Refrigerator au logement', 'en')).toBe('Add Refrigerator to the home');
+    expect(translate('Ajouter {0} au logement', 'en', ['Bibliothèque au logement'])).toBe(
+      'Add Bibliothèque au logement to the home',
+    );
     expect(translate('Retirer de ce scénario : My heater', 'en')).toBe(
       'Remove from this scenario: My heater',
     );

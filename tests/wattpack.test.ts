@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { strToU8, zipSync } from 'fflate';
-import { decodePack, encodePack, importCopies, WattPack } from '../src/app/data/wattpack';
+import { decodePack, encodePack, importCopies, WattPack, MAX_PACK_BYTES } from '../src/app/data/wattpack';
 import { validateGlb } from '../src/app/data/glb';
 import { seedWorkspace, seedLibrary } from '../src/app/domain/seed';
 import { calculate } from '../src/app/domain/energy';
@@ -69,6 +69,51 @@ describe('wattpack autonome', () => {
     expect(v.kind).toBe('glb');
     if (v.kind === 'glb') expect(result.assets[v.assetId]).toEqual(triangleGlb());
   });
+  it('importe un nom de logement de 100 caractères sans dépasser le contrat', () => {
+    const home = seedWorkspace().homes[0];
+    home.name = 'x'.repeat(100);
+    const result = importCopies(
+      decodePack(encodePack({ format: 'watt-wallet', version: 1, kind: 'home', home }, {})),
+      seedWorkspace(),
+    );
+    expect(result.workspace.homes[1].name).toHaveLength(100);
+    expect(result.workspace.homes[1].name).toMatch(/ \(importé\)$/);
+    expect(home.name).toHaveLength(100);
+  });
+  it('valide les capacités de destination avant de rendre les ressources à importer', () => {
+    const workspace = seedWorkspace();
+    workspace.library = Array.from({ length: 2000 }, (_, i) => ({
+      ...copy(workspace.library[0]),
+      id: 'd' + i,
+    }));
+    const before = copy(workspace);
+    const p = library();
+    if (p.kind !== 'library') return;
+    p.definitions[0].visual = { kind: 'glb', assetId: 'mesh', fallback: 'radiator' };
+    expect(() => importCopies(decodePack(encodePack(p, { mesh: triangleGlb() })), workspace)).toThrow(
+      '2 000',
+    );
+    expect(workspace).toEqual(before);
+  });
+  it('partage un logement dont le manifeste dépasse 2 Mio avec tous ses scénarios', () => {
+    const home = seedWorkspace().homes[0];
+    home.devices = Array.from({ length: 200 }, (_, i) => ({
+      ...copy(home.devices[i % 6]),
+      id: 'device-' + i,
+    }));
+    home.scenarios = Array.from({ length: 18 }, (_, i) => ({
+      id: 'scenario-' + i,
+      name: 'Scenario ' + i,
+      initialCost: 0,
+      devices: copy(home.devices),
+      tariff: copy(home.tariff),
+    }));
+    const manifest: WattPack = { format: 'watt-wallet', version: 1, kind: 'home', home };
+    expect(new TextEncoder().encode(JSON.stringify(manifest)).length).toBeGreaterThan(2 * 1024 * 1024);
+    const decoded = decodePack(encodePack(manifest, {}));
+    expect(decoded.manifest).toEqual(manifest);
+    if (decoded.manifest.kind === 'home') expect(calculate(decoded.manifest.home)).toEqual(calculate(home));
+  });
   it('refuse une version inconnue', () =>
     expect(() =>
       decodePack(zipSync({ 'manifest.json': strToU8(JSON.stringify({ ...library(), version: 2 })) })),
@@ -104,11 +149,15 @@ describe('wattpack autonome', () => {
     corrupt[60] ^= 255;
     expect(() => decodePack(corrupt)).toThrow();
   });
-  it('refuse plus de 200 entrées et un manifeste de plus de 2 Mio', () => {
+  it('refuse plus de 200 entrées et plus de 100 Mio décompressés avant inflation', () => {
     const files: Record<string, Uint8Array> = { 'manifest.json': strToU8(JSON.stringify(library())) };
     for (let i = 0; i < 200; i++) files[`assets/a${i}.glb`] = new Uint8Array(0);
     expect(() => decodePack(zipSync(files))).toThrow();
-    expect(() => decodePack(zipSync({ 'manifest.json': new Uint8Array(2 * 1024 * 1024 + 1) }))).toThrow();
+    const oversized = zipSync({ 'manifest.json': strToU8(JSON.stringify(library())) });
+    const view = new DataView(oversized.buffer);
+    const central = view.getUint32(oversized.length - 22 + 16, true);
+    view.setUint32(central + 24, MAX_PACK_BYTES + 1, true);
+    expect(() => decodePack(oversized)).toThrow('volumineuse');
   });
   it('refuse les valeurs négatives, même dans un scénario', () => {
     const h = seedWorkspace().homes[0];

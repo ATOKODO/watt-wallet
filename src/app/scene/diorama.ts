@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { DeviceInstance, DeviceResult, POSITION_LIMIT } from '../domain/models';
+import { DeviceInstance, DeviceResult, POSITION_LIMIT, uid } from '../domain/models';
 import { WalletStore } from '../state';
 import { ModelFactory, disposeObject, loadGlb } from './models';
 import {
@@ -303,7 +303,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   selected = output<string>();
   moved = output<{ id: string; position: { x: number; z: number } }>();
   arranged = output<{ id: string; position: { x: number; z: number } }[]>();
-  added = output<{ definitionId: string; position: { x: number; z: number } }>();
+  added = output<{ definitionId: string; instanceId: string; position: { x: number; z: number } }>();
   failed = signal(false);
   labels = signal<Label[]>([]);
   warning = signal('');
@@ -323,6 +323,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
   private custom = new Map<string, THREE.Group>();
   private activeCustom = new Set<string>();
   private slots: GridPosition[] = [];
+  private pendingDrop?: { id: string; point: GridPosition };
   private guides?: THREE.InstancedMesh;
   private resizeObserver?: ResizeObserver;
   private ray = new THREE.Raycaster();
@@ -534,6 +535,7 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     this.activeCustom = usedAssets;
     this.updateStage(this.footprints());
     this.updateGrid();
+    this.placePendingDrop();
     this.requestRender();
   }
   private footprints(): GridFootprint[] {
@@ -611,21 +613,43 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
     this.gridMessage.set('');
     if (positions.length) this.arranged.emit(positions);
   }
-  private nearestAvailable(point: GridPosition, movingId?: string): GridPosition | null {
-    const occupied = this.devices()
-      .filter((device) => device.id !== movingId)
-      .flatMap((device) => {
-        const object = this.objects.get(device.id);
-        if (!object || !this.slots.length) return [];
-        const nearest = this.slots.reduce((best, cell) =>
-          (cell.x - object.position.x) ** 2 + (cell.z - object.position.z) ** 2 <
-          (best.x - object.position.x) ** 2 + (best.z - object.position.z) ** 2
-            ? cell
-            : best,
-        );
-        return [nearest];
+  private nearestAvailable(point: GridPosition, movingId?: string, cells = this.slots): GridPosition | null {
+    const items = this.footprints();
+    const moving = items.find((item) => item.id === movingId);
+    if (!moving) return null;
+    const occupied = items
+      .filter((item) => item.id !== movingId)
+      .map((item) => {
+        const box = new THREE.Box3().setFromObject(this.objects.get(item.id)!);
+        const center = box.getCenter(new THREE.Vector3());
+        return { ...item, position: { x: center.x, z: center.z } };
       });
-    return nearestFreeGridCell(point, this.slots, occupied);
+    return nearestFreeGridCell(
+      point,
+      cells.filter((cell) => Math.abs(cell.x) <= POSITION_LIMIT && Math.abs(cell.z) <= POSITION_LIMIT),
+      occupied,
+      moving,
+    );
+  }
+  private placePendingDrop() {
+    const pending = this.pendingDrop;
+    if (!pending || !this.objects.has(pending.id)) return;
+    this.pendingDrop = undefined;
+    const items = this.footprints();
+    const width = Math.max(...items.map((item) => item.width)) + 0.45;
+    const depth = Math.max(...items.map((item) => item.depth)) + 0.45;
+    let bounds = { ...this.boardBounds };
+    let position = this.nearestAvailable(pending.point, pending.id);
+    // Free placement can obstruct several cells; a new drop may need another row.
+    for (let attempt = 0; !position && attempt < 16; attempt++) {
+      bounds = { halfWidth: bounds.halfWidth + width, halfDepth: bounds.halfDepth + depth };
+      position = this.nearestAvailable(pending.point, pending.id, gridCells(items, bounds));
+    }
+    if (position) this.moved.emit({ id: pending.id, position });
+    else
+      this.gridMessage.set(
+        'Aucune cellule libre ne peut accueillir cet appareil. Déplacez les objets ou utilisez le placement libre.',
+      );
   }
   private releaseTemporary(objects: Map<string, THREE.Group>) {
     objects.forEach((g) =>
@@ -860,10 +884,9 @@ export class DioramaComponent implements AfterViewInit, OnDestroy {
         Math.min(POSITION_LIMIT, this.boardBounds.halfDepth, p?.z ?? 0),
       ),
     };
-    this.added.emit({
-      definitionId,
-      position: (this.snap() ? this.nearestAvailable(position) : null) ?? position,
-    });
+    const instanceId = uid();
+    if (this.snap()) this.pendingDrop = { id: instanceId, point: position };
+    this.added.emit({ definitionId, instanceId, position });
   }
   zoom(factor: number) {
     this.camera.zoom = Math.max(0.65, Math.min(3, this.camera.zoom * factor));

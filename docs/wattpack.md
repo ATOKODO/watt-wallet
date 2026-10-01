@@ -68,7 +68,7 @@ GLB 2 autonome exclusivement : un bloc JSON, éventuellement un bloc BIN ; aucun
 
 ## Validation et limites
 
-- Paquet compressé et somme décompressée ≤ 100 Mio, au plus 200 entrées ; manifeste ≤ 2 Mio, chaque GLB ≤ 20 Mio.
+- Paquet compressé et somme décompressée ≤ 100 Mio, au plus 200 entrées ; manifeste inclus dans la limite globale de 100 Mio, chaque GLB ≤ 20 Mio.
 - ZIP standard, méthodes Store ou Deflate, sans chiffrement, multiparties ni ZIP64. Les chemins absolus, répertoires parents, entrées dupliquées et archives imbriquées sont refusés.
 - Vérification des en-têtes, tailles déclarées et effectivement décompressées, CRC32 et références de ressources. L’archive est lue en mémoire, sans extraction des chemins fournis sur disque.
 - Manifeste à champs stricts : nombres finis et positifs ou nuls ; quantités entières ; noms non vides ; bornes d’usage ; validation des scénarios comme de la référence. La durée annuelle des cycles ne peut dépasser 8 760 h.

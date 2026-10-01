@@ -78,8 +78,25 @@ describe('grille du diorama', () => {
   it('accroche à la cellule libre la plus proche', () => {
     const cells = gridCells([{ id: 'a', width: 2, depth: 2 }]);
     const target = cells[0];
-    const free = nearestFreeGridCell(target, cells, [target]);
+    const free = nearestFreeGridCell(target, cells, [{ position: target, width: 2, depth: 2 }], {
+      width: 2,
+      depth: 2,
+    });
     expect(free).not.toBeNull();
     expect(free).not.toEqual(target);
   });
+});
+
+it('évite les empreintes hors grille et conserve une marge après accrochage', () => {
+  const size = { width: 4, depth: 4 };
+  const cells = [
+    { x: 0, z: 0 },
+    { x: 4.45, z: 0 },
+    { x: 8.9, z: 0 },
+  ];
+  const occupied = [{ position: { x: 2.225, z: 0 }, ...size }];
+  const free = nearestFreeGridCell({ x: 4.45, z: 0 }, cells, occupied, size);
+  expect(free).toEqual({ x: 8.9, z: 0 });
+  expect(Math.abs(free!.x - occupied[0].position.x) - 4).toBeGreaterThanOrEqual(0.44);
+  expect(nearestFreeGridCell({ x: 0, z: 0 }, cells.slice(0, 2), occupied, size)).toBeNull();
 });

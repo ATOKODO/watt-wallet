@@ -19,8 +19,14 @@ const patterns = Object.entries(dictionary)
       indexes.push(Number(match[1]));
       start = match.index! + match[0].length;
     }
-    return { expression: new RegExp(expression + escapeRegex(key.slice(start)) + '$'), indexes, value };
-  });
+    return {
+      expression: new RegExp(expression + escapeRegex(key.slice(start)) + '$'),
+      indexes,
+      value,
+      specificity: key.replace(/\{\d+\}/g, '').length,
+    };
+  })
+  .sort((a, b) => b.specificity - a.specificity);
 export function translate(source: string, language: Language, parameters: readonly unknown[] = []): string {
   let value = source;
   if (language === 'en') {

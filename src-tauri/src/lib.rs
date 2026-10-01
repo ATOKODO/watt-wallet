@@ -23,6 +23,35 @@ fn atomic_write(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
     Ok(())
 }
 
+fn read_workspace(path: &std::path::Path) -> Result<Option<String>, String> {
+    match fs::read_to_string(path) {
+        Ok(value) => Ok(Some(value)),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+fn replace_workspace(
+    root: &std::path::Path,
+    json: &str,
+    expected: Option<&str>,
+) -> Result<(), String> {
+    // A separate file keeps the lock stable while workspace.json is atomically replaced.
+    let lock = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(root.join("workspace.lock"))
+        .map_err(|e| e.to_string())?;
+    lock.lock().map_err(|e| e.to_string())?;
+    let path = root.join("workspace.json");
+    if read_workspace(&path)?.as_deref() != expected {
+        return Err("WORKSPACE_CONFLICT".into());
+    }
+    atomic_write(&path, json.as_bytes())
+}
+
 fn asset_path(app: &tauri::AppHandle, id: &str) -> Result<PathBuf, String> {
     if id.is_empty()
         || id.len() > 100
@@ -38,11 +67,7 @@ fn asset_path(app: &tauri::AppHandle, id: &str) -> Result<PathBuf, String> {
 #[tauri::command]
 fn load_workspace(app: tauri::AppHandle) -> Result<Option<String>, String> {
     let path = app_dir(&app)?.join("workspace.json");
-    match fs::read_to_string(path) {
-        Ok(value) => Ok(Some(value)),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
-        Err(e) => Err(e.to_string()),
-    }
+    read_workspace(&path)
 }
 
 #[tauri::command]
@@ -50,6 +75,7 @@ fn save_workspace(
     app: tauri::AppHandle,
     lock: tauri::State<StorageLock>,
     json: String,
+    expected_json: Option<String>,
 ) -> Result<(), String> {
     if json.len() > 100 * 1024 * 1024 {
         return Err("Sauvegarde trop volumineuse".into());
@@ -59,7 +85,7 @@ fn save_workspace(
         return Err("Version de sauvegarde inconnue".into());
     }
     let _guard = lock.0.lock().map_err(|e| e.to_string())?;
-    atomic_write(&app_dir(&app)?.join("workspace.json"), json.as_bytes())
+    replace_workspace(&app_dir(&app)?, &json, expected_json.as_deref())
 }
 
 #[tauri::command]
@@ -120,5 +146,50 @@ mod tests {
         atomic_write(&path, b"old").unwrap();
         atomic_write(&path, b"new complete content").unwrap();
         assert_eq!(fs::read(path).unwrap(), b"new complete content");
+    }
+    #[test]
+    fn stale_writer_cannot_replace_newer_workspace() {
+        let dir = tempfile::tempdir().unwrap();
+        replace_workspace(dir.path(), "initial", None).unwrap();
+        replace_workspace(dir.path(), "first change", Some("initial")).unwrap();
+        assert_eq!(
+            replace_workspace(dir.path(), "stale change", Some("initial")),
+            Err("WORKSPACE_CONFLICT".into())
+        );
+        assert_eq!(
+            read_workspace(&dir.path().join("workspace.json"))
+                .unwrap()
+                .as_deref(),
+            Some("first change")
+        );
+    }
+    #[test]
+    fn concurrent_writers_share_the_file_lock() {
+        let dir = tempfile::tempdir().unwrap();
+        replace_workspace(dir.path(), "initial", None).unwrap();
+        let barrier = std::sync::Arc::new(std::sync::Barrier::new(2));
+        let threads: Vec<_> = ["first", "second"]
+            .into_iter()
+            .map(|value| {
+                let root = dir.path().to_path_buf();
+                let barrier = barrier.clone();
+                std::thread::spawn(move || {
+                    barrier.wait();
+                    replace_workspace(&root, value, Some("initial"))
+                })
+            })
+            .collect();
+        let results: Vec<_> = threads
+            .into_iter()
+            .map(|thread| thread.join().unwrap())
+            .collect();
+        assert_eq!(results.iter().filter(|result| result.is_ok()).count(), 1);
+        assert_eq!(
+            results
+                .iter()
+                .filter(|result| **result == Err("WORKSPACE_CONFLICT".into()))
+                .count(),
+            1
+        );
     }
 }

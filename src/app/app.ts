@@ -29,7 +29,7 @@ import {
   encodePack,
   importCopies,
 } from './data/wattpack';
-import { chooseFile, downloadPack } from './data/repository';
+import { WorkspaceConflictError, chooseFile, downloadPack } from './data/repository';
 import { validateRenderableGlb } from './scene/models';
 
 @Component({
@@ -183,20 +183,19 @@ export class AppComponent {
     this.modalError.set('');
     this.modal.set('bill');
   }
-  saveBill() {
+  async saveBill() {
     const value = this.billForm.controls.annualKwh.value;
     if (!Number.isFinite(value) || value <= 0 || value > 1e9) {
       this.modalError.set('Indiquez une consommation sur 12 mois supérieure à zéro.');
       return;
     }
-    this.store.updateObservedAnnualKwh(value);
-    this.closeModal();
-    this.notify('Repère de facture enregistré');
+    await this.commitModalChange(
+      () => this.store.updateObservedAnnualKwh(value),
+      'Repère de facture enregistré',
+    );
   }
   clearBill() {
-    this.store.updateObservedAnnualKwh(null);
-    this.closeModal();
-    this.notify('Repère de facture retiré');
+    return this.commitModalChange(() => this.store.updateObservedAnnualKwh(null), 'Repère de facture retiré');
   }
   inputValue(e: Event) {
     return (e.target as HTMLInputElement).value;
@@ -206,18 +205,19 @@ export class AppComponent {
     window.clearTimeout(this.toastTimer);
     this.toastTimer = window.setTimeout(() => this.toast.set(''), 4000);
   }
-  add(d: DeviceDefinition) {
-    this.store.addDevice(d);
-    this.tab.set('home');
-    this.notify(this.i18n.t('{0} ajouté au logement', [this.i18n.deviceName(d)]));
+  async add(d: DeviceDefinition) {
+    if (await this.store.addDevice(d)) {
+      this.tab.set('home');
+      this.notify(this.i18n.t('{0} ajouté au logement', [this.i18n.deviceName(d)]));
+    }
   }
   drag(event: DragEvent, d: DeviceDefinition) {
     event.dataTransfer?.setData('application/x-watt-device', d.id);
     if (event.dataTransfer) event.dataTransfer.effectAllowed = 'copy';
   }
-  drop(value: { definitionId: string; position: { x: number; z: number } }) {
+  drop(value: { definitionId: string; instanceId: string; position: { x: number; z: number } }) {
     const d = this.store.workspace()?.library.find((d) => d.id === value.definitionId);
-    if (d) this.store.addDevice(d, value.position);
+    if (d) void this.store.addDevice(d, value.position, value.instanceId);
   }
   chooseTab(tab: 'home' | 'scenarios' | 'library') {
     this.tab.set(tab);
@@ -234,34 +234,35 @@ export class AppComponent {
     });
     this.modal.set(type);
   }
-  saveName() {
+  async saveName() {
     const name = this.nameForm.controls.name.value.trim();
     if (!name || name.length > 100) {
       this.modalError.set('Indiquez un nom de 1 à 100 caractères.');
       return;
     }
-    if (this.modal() === 'new-home') this.store.addHome(name);
-    if (this.modal() === 'new-scenario') {
-      this.store.addScenario(name);
+    const type = this.modal();
+    const saved = await this.commitModalChange(() => {
+      if (type === 'new-home') return this.store.addHome(name);
+      if (type === 'new-scenario') return this.store.addScenario(name);
+      return this.store.mutate((w) => {
+        w.homes.find((h) => h.id === w.activeHomeId)!.name = name;
+      });
+    });
+    if (saved && type === 'new-scenario') {
       this.tab.set('scenarios');
       this.costForm.reset({ initialCost: 0 });
     }
-    if (this.modal() === 'rename-home')
-      this.store.mutate((w) => {
-        w.homes.find((h) => h.id === w.activeHomeId)!.name = name;
-      });
-    this.closeModal();
   }
+
   openTariff() {
     this.tariffForm.reset(this.store.snapshot()!.tariff);
     this.modalError.set('');
     this.modal.set('tariff');
   }
-  saveTariff() {
+  async saveTariff() {
     try {
-      this.store.updateTariff(tariffSchema.parse(this.tariffForm.getRawValue()));
-      this.closeModal();
-      this.notify('Tarif mis à jour');
+      const tariff = tariffSchema.parse(this.tariffForm.getRawValue());
+      await this.commitModalChange(() => this.store.updateTariff(tariff), 'Tarif mis à jour');
     } catch {
       this.modalError.set('Indiquez des prix valides, positifs ou nuls.');
     }
@@ -270,14 +271,13 @@ export class AppComponent {
     this.store.switchScenario(id);
     this.costForm.reset({ initialCost: this.store.scenario()?.initialCost ?? 0 });
   }
-  saveCost() {
+  async saveCost() {
     const cost = this.costForm.controls.initialCost.value;
     if (cost === null || !Number.isFinite(cost) || cost < 0 || cost > 1e9) {
       this.store.error.set('Le surcoût doit être un montant positif ou nul.');
       return;
     }
-    this.store.updateScenarioCost(cost);
-    this.notify('Surcoût enregistré');
+    if (await this.store.updateScenarioCost(cost)) this.notify('Surcoût enregistré');
   }
   newDefinition() {
     this.editingDefinition.set({
@@ -292,31 +292,31 @@ export class AppComponent {
       visual: { kind: 'builtin', id: 'bulb' },
       notes: '',
     });
+    this.modalError.set('');
     this.modal.set('device');
   }
   editDefinition(d: DeviceDefinition) {
+    this.modalError.set('');
     this.editingDefinition.set(copy(d));
     this.modal.set('device');
   }
   saveDefinition(event: { definition: DeviceDefinition; instance: DeviceInstance | null }) {
-    this.store.saveDefinition(event.definition);
-    this.closeModal();
-    this.notify('Fiche enregistrée dans la bibliothèque');
+    return this.commitModalChange(
+      () => this.store.saveDefinition(event.definition),
+      'Fiche enregistrée dans la bibliothèque',
+    );
   }
-  saveDevice(event: { definition: DeviceDefinition; instance: DeviceInstance | null }) {
-    if (event.instance) {
-      this.store.updateDevice(event.instance);
-      this.notify('Appareil mis à jour');
-    }
+  async saveDevice(event: { definition: DeviceDefinition; instance: DeviceInstance | null }) {
+    if (event.instance && (await this.store.updateDevice(event.instance))) this.notify('Appareil mis à jour');
   }
-  saveInstanceAsDefinition() {
+  async saveInstanceAsDefinition() {
     const d = this.store.selected();
     if (!d) return;
     const definition = copy(d.definition);
     definition.id = uid();
     definition.defaultUsage = copy(d.usage);
-    this.store.saveDefinition(definition);
-    this.notify('Une copie de la fiche a été ajoutée à la bibliothèque');
+    if (await this.store.saveDefinition(definition))
+      this.notify('Une copie de la fiche a été ajoutée à la bibliothèque');
   }
   deleteDefinition(d: DeviceDefinition) {
     if (
@@ -327,6 +327,37 @@ export class AppComponent {
       )
     )
       this.store.removeDefinition(d.id);
+  }
+  private async commitModalChange(change: () => Promise<boolean>, message?: string): Promise<boolean> {
+    if (this.busy()) return false;
+    this.busy.set(true);
+    this.modalError.set('');
+    try {
+      if (!(await change())) {
+        this.modalError.set(this.store.error());
+        return false;
+      }
+      this.busy.set(false);
+      this.closeModal();
+      if (message) this.notify(message);
+      return true;
+    } catch (error) {
+      this.modalError.set(this.store.message(error));
+      return false;
+    } finally {
+      this.busy.set(false);
+    }
+  }
+  reloadWorkspace() {
+    if (
+      window.confirm(
+        this.i18n.t(
+          'Recharger les données enregistrées ? Les modifications non sauvegardées dans cette fenêtre seront abandonnées. Exportez-les avant de continuer si vous souhaitez les conserver.',
+        ),
+      )
+    ) {
+      void this.store.initialize();
+    }
   }
   closeModal() {
     if (this.busy()) return;
@@ -396,10 +427,14 @@ export class AppComponent {
     if (!this.prepared()) return;
     this.busy.set(true);
     try {
+      if (this.store.saveConflict()) throw new WorkspaceConflictError();
       const result = importCopies(this.prepared()!, this.store.workspace()!);
       for (const [id, bytes] of Object.entries(result.assets))
         await this.store.repository.putAsset(id, bytes);
-      this.store.replace(result.workspace);
+      if (!(await this.store.replace(result.workspace))) {
+        this.modalError.set(this.store.error());
+        return;
+      }
       this.store.scenarioId.set(null);
       this.store.selectedId.set(null);
       this.tab.set(this.prepared()!.manifest.kind === 'home' ? 'home' : 'library');

@@ -70,6 +70,29 @@ try {
     timeout: 30000,
   });
   await expect(page.locator('ww-diorama canvas')).toBeAttached();
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  await page.evaluate(async () => {
+    const invoke = window.__TAURI_INTERNALS__.invoke;
+    const previous = await invoke('load_workspace');
+    const newer = JSON.parse(previous);
+    newer.homes[0].name = 'Fenêtre concurrente';
+    await invoke('save_workspace', { json: JSON.stringify(newer), expectedJson: previous });
+  });
+  await page.getByRole('button', { name: 'Ajouter Box Internet', exact: true }).click();
+  await expect(page.locator('.error-banner')).toContainText('autre fenêtre');
+  const conflictSaved = JSON.parse(await readFile(path.join(root, 'workspace.json'), 'utf8'));
+  if (conflictSaved.homes[0].devices.length !== 6)
+    throw new Error('Écrasement concurrent de la sauvegarde native.');
+  await page.reload();
+  await expect(page.locator('.diorama-header h2')).toContainText('Fenêtre concurrente');
+  await expect(page.locator('.error-banner')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Modifier Radiateur électrique', exact: true }).click();
+  const draftHours = page.locator('.inspector').getByLabel('Heures / jour', { exact: true });
+  await draftHours.fill('7');
+  await page.getByRole('button', { name: 'Ranger en grille', exact: true }).click();
+  await expect(draftHours).toHaveValue('7');
+  await page.getByRole('button', { name: 'Fermer les paramètres de l’appareil', exact: true }).click();
+
   await expect(page.locator('.app-header')).toHaveCSS('display', 'flex');
   await expect(page.locator('.brand-mark ww-icon')).toHaveCSS('width', '26px');
   await expect(page.locator('ww-diorama .scene-canvas')).toHaveCSS('position', 'absolute');

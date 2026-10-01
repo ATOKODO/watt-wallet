@@ -13,7 +13,7 @@ import {
 } from './domain/models';
 import { calculate, compare } from './domain/energy';
 import { makeInstance, seedWorkspace } from './domain/seed';
-import { createRepository, validateWorkspace } from './data/repository';
+import { WorkspaceConflictError, createRepository, validateWorkspace } from './data/repository';
 
 @Injectable({ providedIn: 'root' })
 export class WalletStore {
@@ -22,6 +22,9 @@ export class WalletStore {
   readonly loadError = signal('');
   readonly saveStatus = signal('Chargement…');
   readonly error = signal('');
+  readonly saveConflict = signal(false);
+  readonly saveFailed = computed(() => this.saveStatus() === 'Échec de la sauvegarde');
+  private initializing = false;
   readonly scenarioId = signal<string | null>(null);
   readonly selectedId = signal<string | null>(null);
   readonly home = computed(
@@ -39,18 +42,35 @@ export class WalletStore {
       ? compare(calculate(this.home()!), this.result(), this.scenario()!.initialCost)
       : null,
   );
-  private queue = Promise.resolve();
+  private queue: Promise<boolean> = Promise.resolve(true);
   private revision = 0;
+  private saveError = '';
 
   async initialize() {
+    this.initializing = true;
+    await this.queue;
     this.loadError.set('');
+    this.saveConflict.set(false);
+    this.error.set('');
     try {
       const existing = await this.repository.load();
       this.workspace.set(existing ?? seedWorkspace());
       this.saveStatus.set('Enregistré sur cet appareil');
-      if (!existing) await this.persist(this.workspace()!);
+      if (!existing && !(await this.persist(this.workspace()!)) && this.saveConflict()) {
+        const latest = await this.repository.load();
+        if (latest) {
+          this.workspace.set(latest);
+          this.saveConflict.set(false);
+          this.error.set('');
+          this.saveStatus.set('Enregistré sur cet appareil');
+        }
+      }
+      this.scenarioId.set(null);
+      this.selectedId.set(null);
     } catch (e) {
       this.loadError.set(this.message(e));
+    } finally {
+      this.initializing = false;
     }
   }
   message(e: unknown) {
@@ -59,37 +79,51 @@ export class WalletStore {
   report(e: unknown) {
     this.error.set(this.message(e));
   }
-  private persist(w: Workspace) {
+  private persist(w: Workspace): Promise<boolean> {
     const rev = ++this.revision;
     this.saveStatus.set('Enregistrement…');
-    this.queue = this.queue
-      .catch(() => {})
-      .then(() => this.repository.save(w))
-      .then(() => {
-        if (rev === this.revision) this.saveStatus.set('Enregistré sur cet appareil');
-      })
-      .catch((e) => {
-        this.saveStatus.set('Échec de la sauvegarde');
-        this.report(e);
-      });
+    this.queue = this.queue.then(async () => {
+      try {
+        if (this.saveConflict()) throw new WorkspaceConflictError();
+        await this.repository.save(w);
+        if (rev === this.revision) {
+          this.saveStatus.set('Enregistré sur cet appareil');
+          if (this.error() === this.saveError) this.error.set('');
+          this.saveError = '';
+        }
+        return true;
+      } catch (error) {
+        if (error instanceof WorkspaceConflictError) this.saveConflict.set(true);
+        if (rev === this.revision) this.saveStatus.set('Échec de la sauvegarde');
+        this.saveError = this.message(error);
+        this.report(error);
+        return false;
+      }
+    });
     return this.queue;
   }
   retrySave() {
-    if (this.workspace()) void this.persist(copy(this.workspace()!));
+    if (this.workspace() && !this.saveConflict()) void this.persist(copy(this.workspace()!));
   }
-  replace(w: Workspace) {
-    validateWorkspace(w);
-    this.workspace.set(w);
-    void this.persist(copy(w));
+  replace(w: Workspace): Promise<boolean> {
+    if (this.initializing || this.saveConflict()) {
+      if (this.saveConflict()) this.report(new WorkspaceConflictError());
+      return Promise.resolve(false);
+    }
+    const next = validateWorkspace(w);
+    this.error.set('');
+    this.workspace.set(next);
+    return this.persist(copy(next));
   }
-  mutate(fn: (w: Workspace) => void) {
-    if (!this.workspace()) return;
+  mutate(fn: (w: Workspace) => void): Promise<boolean> {
+    if (!this.workspace()) return Promise.resolve(false);
     try {
       const next = copy(this.workspace()!);
       fn(next);
-      this.replace(next);
-    } catch (e) {
-      this.report(e);
+      return this.replace(next);
+    } catch (error) {
+      this.report(error);
+      return Promise.resolve(false);
     }
   }
   private current(w: Workspace): Home | Scenario {
@@ -97,11 +131,14 @@ export class WalletStore {
     return home.scenarios.find((s) => s.id === this.scenarioId()) ?? home;
   }
   switchHome(id: string) {
-    this.scenarioId.set(null);
-    this.selectedId.set(null);
-    this.mutate((w) => {
+    const saved = this.mutate((w) => {
       w.activeHomeId = id;
     });
+    if (this.home()?.id === id) {
+      this.scenarioId.set(null);
+      this.selectedId.set(null);
+    }
+    return saved;
   }
   switchScenario(id: string | null) {
     this.scenarioId.set(id);
@@ -109,33 +146,38 @@ export class WalletStore {
   }
   addHome(name: string) {
     const id = uid();
-    this.mutate((w) => {
+    const saved = this.mutate((w) => {
       w.homes.push({ id, name, tariff: copy(defaultTariff), devices: [], scenarios: [] });
       w.activeHomeId = id;
     });
-    this.scenarioId.set(null);
-    this.selectedId.set(null);
+    if (this.workspace()?.activeHomeId === id) {
+      this.scenarioId.set(null);
+      this.selectedId.set(null);
+    }
+    return saved;
   }
-  addDevice(definition: DeviceDefinition, position?: { x: number; z: number }) {
+  addDevice(definition: DeviceDefinition, position?: { x: number; z: number }, instanceId?: string) {
     const device = makeInstance(definition, this.devices().length);
     if (position) device.position = position;
-    this.mutate((w) => this.current(w).devices.push(device));
-    this.selectedId.set(device.id);
+    if (instanceId) device.id = instanceId;
+    const saved = this.mutate((w) => this.current(w).devices.push(device));
+    if (this.devices().some((d) => d.id === device.id)) this.selectedId.set(device.id);
+    return saved;
   }
   updateDevice(value: DeviceInstance) {
-    this.mutate((w) => {
+    return this.mutate((w) => {
       const current = this.current(w);
       current.devices = current.devices.map((d) => (d.id === value.id ? value : d));
     });
   }
   moveDevice(id: string, position: { x: number; z: number }) {
-    this.mutate((w) => {
+    return this.mutate((w) => {
       const d = this.current(w).devices.find((d) => d.id === id);
       if (d) d.position = position;
     });
   }
   moveDevices(positions: { id: string; position: { x: number; z: number } }[]) {
-    this.mutate((w) => {
+    return this.mutate((w) => {
       const byId = new Map(positions.map(({ id, position }) => [id, position]));
       for (const device of this.current(w).devices) {
         const position = byId.get(device.id);
@@ -145,40 +187,42 @@ export class WalletStore {
   }
   duplicateDevice(id: string) {
     const d = this.devices().find((d) => d.id === id);
-    if (!d) return;
+    if (!d) return Promise.resolve(false);
     const next = copy(d);
     next.id = uid();
     next.position.x = Math.min(POSITION_LIMIT, next.position.x + 1);
     next.position.z = Math.min(POSITION_LIMIT, next.position.z + 1);
-    this.mutate((w) => this.current(w).devices.push(next));
-    this.selectedId.set(next.id);
+    const saved = this.mutate((w) => this.current(w).devices.push(next));
+    if (this.devices().some((d) => d.id === next.id)) this.selectedId.set(next.id);
+    return saved;
   }
   removeDevice(id: string) {
-    this.mutate((w) => {
+    const saved = this.mutate((w) => {
       const c = this.current(w);
       c.devices = c.devices.filter((d) => d.id !== id);
     });
-    this.selectedId.set(null);
+    if (!this.devices().some((d) => d.id === id)) this.selectedId.set(null);
+    return saved;
   }
   saveDefinition(d: DeviceDefinition) {
-    this.mutate((w) => {
+    return this.mutate((w) => {
       const index = w.library.findIndex((item) => item.id === d.id);
       if (index < 0) w.library.push(d);
       else w.library[index] = d;
     });
   }
   removeDefinition(id: string) {
-    this.mutate((w) => {
+    return this.mutate((w) => {
       w.library = w.library.filter((d) => d.id !== id);
     });
   }
   updateTariff(tariff: Tariff) {
-    this.mutate((w) => {
+    return this.mutate((w) => {
       this.current(w).tariff = tariff;
     });
   }
   updateObservedAnnualKwh(value: number | null) {
-    this.mutate((w) => {
+    return this.mutate((w) => {
       const home = w.homes.find((h) => h.id === w.activeHomeId)!;
       if (value === null) delete home.observedAnnualKwh;
       else home.observedAnnualKwh = value;
@@ -187,7 +231,7 @@ export class WalletStore {
   addScenario(name: string) {
     const id = uid(),
       current = this.snapshot()!;
-    this.mutate((w) => {
+    const saved = this.mutate((w) => {
       const h = w.homes.find((h) => h.id === w.activeHomeId)!;
       h.scenarios.push({
         id,
@@ -197,22 +241,28 @@ export class WalletStore {
         tariff: copy(current.tariff),
       });
     });
-    this.scenarioId.set(id);
-    this.selectedId.set(null);
+    if (this.home()?.scenarios.some((s) => s.id === id)) {
+      this.scenarioId.set(id);
+      this.selectedId.set(null);
+    }
+    return saved;
   }
   updateScenarioCost(initialCost: number) {
-    this.mutate((w) => {
+    return this.mutate((w) => {
       const c = this.current(w);
       if ('initialCost' in c) c.initialCost = initialCost;
     });
   }
   removeScenario() {
     const id = this.scenarioId();
-    this.mutate((w) => {
+    const saved = this.mutate((w) => {
       const h = w.homes.find((h) => h.id === w.activeHomeId)!;
       h.scenarios = h.scenarios.filter((s) => s.id !== id);
     });
-    this.scenarioId.set(null);
-    this.selectedId.set(null);
+    if (!this.home()?.scenarios.some((s) => s.id === id)) {
+      this.scenarioId.set(null);
+      this.selectedId.set(null);
+    }
+    return saved;
   }
 }

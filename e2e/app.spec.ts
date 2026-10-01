@@ -625,3 +625,168 @@ test('anglais hors WebGL, langue au clavier et conservation des données', async
   await expect(page.locator('.webgl-fallback')).toContainText('La vue 3D n’est pas disponible');
   await expect(page.locator('.device-row')).toHaveCount(count);
 });
+
+test('brouillon conservé lors du rangement et positions actualisées après application', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Modifier Radiateur électrique', exact: true }).click();
+  const inspector = page.locator('.inspector');
+  const hours = inspector.getByLabel('Heures / jour', { exact: true });
+  await hours.fill('7');
+  await page.getByRole('button', { name: 'Ranger en grille', exact: true }).click();
+  await expect(hours).toHaveValue('7');
+  const x = await inspector.getByLabel('Position X', { exact: true }).inputValue();
+  const z = await inspector.getByLabel('Position Z', { exact: true }).inputValue();
+  await page.getByRole('button', { name: 'Appliquer les modifications', exact: true }).click();
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  await page.reload();
+  await page.getByRole('button', { name: 'Modifier Radiateur électrique', exact: true }).click();
+  await expect(hours).toHaveValue('7');
+  await expect(inspector.getByLabel('Position X', { exact: true })).toHaveValue(x);
+  await expect(inspector.getByLabel('Position Z', { exact: true })).toHaveValue(z);
+});
+
+test('deux onglets refusent un écrasement concurrent et permettent le rechargement', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  const second = await page.context().newPage();
+  await second.goto('/');
+  await expect(second.locator('.device-row')).toHaveCount(6);
+  await page.getByRole('button', { name: 'Ajouter Box Internet', exact: true }).click();
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  await expect(page.locator('.device-row')).toHaveCount(7);
+  await second.getByRole('button', { name: 'Ajouter Climatiseur', exact: true }).click();
+  await expect(second.locator('.error-banner')).toContainText('autre fenêtre');
+  await expect(second.locator('.toast')).toHaveCount(0);
+  await expect(second.locator('.device-row').filter({ hasText: 'Climatiseur' })).toHaveCount(1);
+  await page.reload();
+  await expect(page.locator('.device-row').filter({ hasText: 'Box Internet' })).toHaveCount(1);
+  await expect(page.locator('.device-row').filter({ hasText: 'Climatiseur' })).toHaveCount(0);
+  second.once('dialog', (dialog) => dialog.accept());
+  await second
+    .locator('.workspace-footer')
+    .getByRole('button', { name: 'Recharger les données', exact: true })
+    .click();
+  await expect(second.locator('.device-row').filter({ hasText: 'Box Internet' })).toHaveCount(1);
+  await expect(second.locator('.error-banner')).toHaveCount(0);
+  await second.getByRole('button', { name: 'Ajouter Climatiseur', exact: true }).click();
+  await expect(second.locator('.toast')).toContainText('ajouté au logement');
+  await page.reload();
+  await expect(page.locator('.device-row')).toHaveCount(8);
+  await second.close();
+});
+
+async function replaceStoredWorkspace(
+  page: import('@playwright/test').Page,
+  workspace: ReturnType<typeof seedWorkspace>,
+) {
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  await page.evaluate(async (workspace) => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('watt-wallet', 1);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const t = db.transaction('workspace', 'readwrite');
+      t.objectStore('workspace').put(workspace, 'current');
+      t.oncomplete = () => resolve();
+      t.onerror = () => reject(t.error);
+    });
+    db.close();
+  }, workspace);
+  await page.reload();
+}
+
+test('fiche refusée à la capacité conserve le formulaire sans annoncer de réussite', async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type: any, ...args: any[]) {
+      if (String(type).startsWith('webgl')) return null;
+      return original.apply(this, [type, ...args] as any);
+    };
+  });
+  await page.goto('/');
+  const workspace = seedWorkspace();
+  workspace.library = Array.from({ length: 2000 }, (_, i) => ({
+    ...structuredClone(workspace.library[0]),
+    id: 'capacity-' + i,
+    name: 'Device ' + i,
+  }));
+  await replaceStoredWorkspace(page, workspace);
+  await page.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Nom de l’appareil').fill('Brouillon à conserver');
+  await dialog.getByRole('button', { name: 'Enregistrer la fiche', exact: true }).click();
+  await expect(dialog.locator('.inline-error')).toContainText('2 000');
+  await expect(dialog.getByLabel('Nom de l’appareil')).toHaveValue('Brouillon à conserver');
+  await expect(page.locator('.toast')).toHaveCount(0);
+  await dialog.getByRole('button', { name: 'Fermer la fenêtre', exact: true }).click();
+  const pack = seedWorkspace();
+  pack.homes[0].devices[0].definition.visual = { kind: 'glb', assetId: 'mesh', fallback: 'radiator' };
+  const bytes = await readFile('examples/triangle.glb');
+  const buffer = Buffer.from(
+    encodePack(
+      {
+        format: 'watt-wallet',
+        version: 1,
+        kind: 'library',
+        definitions: [pack.homes[0].devices[0].definition],
+      },
+      { mesh: new Uint8Array(bytes) },
+    ),
+  );
+  const chooser = page.waitForEvent('filechooser');
+  await page.locator('.heading-actions').getByRole('button', { name: 'Importer', exact: true }).click();
+  await (await chooser).setFiles({ name: 'capacity.wattpack', mimeType: 'application/zip', buffer });
+  await dialog.getByRole('button', { name: 'Importer ces données', exact: true }).click();
+  await expect(dialog.locator('.inline-error')).toContainText('2 000');
+  const count = await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve) => {
+      const r = indexedDB.open('watt-wallet', 1);
+      r.onsuccess = () => resolve(r.result);
+    });
+    const count = await new Promise<number>((resolve) => {
+      const r = db.transaction('assets').objectStore('assets').count();
+      r.onsuccess = () => resolve(r.result);
+    });
+    db.close();
+    return count;
+  });
+  expect(count).toBe(0);
+});
+
+test('accrochage évite les objets hors grille avec leurs dimensions affichées', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('ww-diorama canvas')).toBeVisible();
+  await expect(page.locator('.object-label')).toHaveCount(6);
+  const violations = await page.evaluate(() => {
+    const scene = (window as any).ng.getComponent(document.querySelector('ww-diorama'));
+    const items = scene.footprints();
+    const violations = [];
+    for (const moving of items)
+      for (const target of scene.slots) {
+        const position = scene.nearestAvailable(target, moving.id);
+        if (!position) continue;
+        for (const other of items) {
+          if (other.id === moving.id) continue;
+          const placed = scene.objects.get(other.id).position;
+          const gapX = Math.abs(position.x - placed.x) - (moving.width + other.width) / 2;
+          const gapZ = Math.abs(position.z - placed.z) - (moving.depth + other.depth) / 2;
+          if (gapX < 0.439 && gapZ < 0.439) violations.push({ gapX, gapZ });
+        }
+      }
+    return violations;
+  });
+  expect(violations).toEqual([]);
+});
+
+test('libellés accessibles du catalogue anglais traduits avec les noms personnels préservés', async ({
+  page,
+}) => {
+  await page.addInitScript(() => localStorage.setItem('watt-wallet-language', 'en'));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Library', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Add Refrigerator to the home', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Add Refrigerator to the home', exact: true }).click();
+  await expect(page.locator('.inspector h2')).toHaveText('Refrigerator');
+});

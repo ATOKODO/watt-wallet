@@ -57,7 +57,7 @@ L’inlining du CSS critique Angular est désactivé en production : son chargem
 
 L’interception native des fichiers glissés dans la WebView est désactivée pour laisser fonctionner le glisser-déposer HTML des appareils sous Windows. L’import de fichiers passe par les sélecteurs dédiés.
 
-Navigateur : IndexedDB `watt-wallet`, stores `workspace` et `assets`, propres à l’origine du site. Windows : dossier applicatif `app.wattwallet.desktop` sous AppData, avec `workspace.json` et `assets/*.glb`. Les écritures natives utilisent un fichier temporaire dans le même dossier, synchronisé puis remplacé atomiquement. Une erreur de chargement n’écrase pas la sauvegarde existante. Exporter régulièrement un `.wattpack` pour sauvegarder hors du profil de l’application.
+Navigateur : IndexedDB `watt-wallet`, stores `workspace` et `assets`, propres à l’origine du site. Windows : dossier applicatif `app.wattwallet.desktop` sous AppData, avec `workspace.json` et `assets/*.glb`. Les écritures natives utilisent un fichier temporaire dans le même dossier, synchronisé puis remplacé atomiquement. Une erreur de chargement n’écrase pas la sauvegarde existante. Les sauvegardes détectent les modifications concurrentes entre onglets ou fenêtres Windows et refusent d’écraser une version plus récente. En cas de conflit, la copie locale reste disponible pour export ; « Recharger les données » permet de retrouver la sauvegarde après confirmation. Exporter régulièrement un `.wattpack` pour sauvegarder hors du profil de l’application.
 
 Les ressources GLB importées puis retirées d’une fiche peuvent rester dans le stockage local ; elles ne sont pas exportées si aucune fiche du paquet ne les référence. La V1 ne propose pas encore de compactage de ce stockage.
 

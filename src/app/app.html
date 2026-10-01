@@ -102,7 +102,7 @@
           <strong>{{i18n.deviceName(d)}}</strong><span>{{(energyLabel(d)) | t}}</span></button
         ><button
           class="add-device"
-          [attr.aria-label]="('Ajouter ' + i18n.deviceName(d)) | t"
+          [attr.aria-label]="'Ajouter {0}' | t:[i18n.deviceName(d)]"
           (click)="add(d)"
         >
           <ww-icon name="plus" />
@@ -198,20 +198,20 @@
           <button class="btn secondary small" (click)="editDefinition(d)">{{ 'Modifier' | t }}</button
           ><button
             class="icon-button"
-            [attr.aria-label]="('Exporter ' + i18n.deviceName(d)) | t"
+            [attr.aria-label]="'Exporter {0}' | t:[i18n.deviceName(d)]"
             (click)="exportPack(d)"
             [disabled]="busy()"
           >
             <ww-icon name="download" /></button
           ><button
             class="icon-button"
-            [attr.aria-label]="('Supprimer la fiche ' + i18n.deviceName(d)) | t"
+            [attr.aria-label]="'Supprimer la fiche {0}' | t:[i18n.deviceName(d)]"
             (click)="deleteDefinition(d)"
           >
             <ww-icon name="trash" /></button
           ><button
             class="icon-button add-device"
-            [attr.aria-label]="('Ajouter ' + i18n.deviceName(d) + ' au logement') | t"
+            [attr.aria-label]="'Ajouter {0} au logement' | t:[i18n.deviceName(d)]"
             (click)="add(d)"
           >
             <ww-icon name="plus" />
@@ -423,14 +423,14 @@
               <div class="device-row-actions">
                 <button
                   class="icon-button"
-                  [attr.aria-label]="('Modifier ' + i18n.deviceName(d.definition)) | t"
+                  [attr.aria-label]="'Modifier {0}' | t:[i18n.deviceName(d.definition)]"
                   (click)="store.selectedId.set(d.id)"
                 >
                   <ww-icon name="chevron" />
                 </button>
                 <button
                   class="row-remove danger"
-                  [attr.aria-label]="((store.scenario() ? 'Retirer de ce scénario : ' : 'Retirer du logement : ') + i18n.deviceName(d.definition)) | t"
+                  [attr.aria-label]="(store.scenario() ? 'Retirer de ce scénario : {0}' : 'Retirer du logement : {0}') | t:[i18n.deviceName(d.definition)]"
                   [title]="(store.scenario() ? 'Retirer de ce scénario' : 'Retirer du logement') | t"
                   (click)="store.removeDevice(d.id)"
                 >
@@ -476,7 +476,7 @@
               <div
                 class="power-state"
                 role="group"
-                [attr.aria-label]="('État simulé de ' + i18n.deviceName(row.device.definition)) | t"
+                [attr.aria-label]="'État simulé de {0}' | t:[i18n.deviceName(row.device.definition)]"
               >
                 <button
                   type="button"
@@ -687,8 +687,11 @@
     </section>
     <footer class="workspace-footer">
       <span
-        ><span class="status-dot"></span>{{(store.saveStatus()) | t}}@if(store.saveStatus() === 'Échec de la
-        sauvegarde'){<button class="text-button" (click)="store.retrySave()">{{ 'Réessayer' | t }}</button
+        ><span class="status-dot"></span>{{(store.saveStatus()) | t}}@if(store.saveFailed()){<button
+          class="text-button"
+          (click)="store.saveConflict() ? reloadWorkspace() : store.retrySave()"
+        >
+          {{ (store.saveConflict() ? 'Recharger les données' : 'Réessayer') | t }}</button
         >}</span
       ><span>{{ 'Des estimations pour mieux décider. À ajuster avec vos usages réels.' | t }}</span>
     </footer>
@@ -697,8 +700,9 @@
 </main>
 } @if(store.error()){
 <div class="error-banner" role="alert">
-  <ww-icon name="info" /><span>{{i18n.error(store.error())}}</span
-  ><button
+  <ww-icon name="info" /><span>{{i18n.error(store.error())}}</span>@if(store.saveConflict()) {
+  <button class="btn secondary small" (click)="reloadWorkspace()">{{'Recharger les données' | t}}</button>
+  }<button
     class="icon-button"
     [attr.aria-label]="'Fermer le message d’erreur' | t"
     (click)="store.error.set('')"
@@ -740,7 +744,7 @@
         maxlength="100"
         [placeholder]="'Ex. Appartement à Lyon' | t" /></label
     >@if(modalError()){
-    <p class="inline-error">{{(modalError()) | t}}</p>
+    <p class="inline-error">{{i18n.error(modalError())}}</p>
     }<button class="btn primary full" type="submit">
       {{(modal() === 'rename-home' ? 'Enregistrer' : 'Créer') | t}}
     </button>
@@ -780,7 +784,7 @@
     <button
       type="button"
       class="accent-preset"
-      [attr.aria-label]="('Couleur ' + i18n.t(preset.name)) | t"
+      [attr.aria-label]="'Couleur {0}' | t:[i18n.t(preset.name)]"
       [attr.aria-pressed]="theme.accent() === preset.color"
       (click)="theme.setAccent(preset.color)"
     >
@@ -821,7 +825,7 @@
       <input formControlName="annualKwh" type="number" min="0" step="any" />
     </label>
     @if(modalError()) {
-    <p class="inline-error" role="alert">{{(modalError()) | t}}</p>
+    <p class="inline-error" role="alert">{{i18n.error(modalError())}}</p>
     }
     <button type="submit" class="btn primary full">{{ 'Enregistrer le repère' | t }}</button>
     @if(store.home()?.observedAnnualKwh !== undefined) {
@@ -878,7 +882,7 @@
       {{ 'L’abonnement est affiché séparément de la consommation des appareils.' | t }}
     </p>
     @if(modalError()){
-    <p role="alert" class="inline-error">{{(modalError()) | t}}</p>
+    <p role="alert" class="inline-error">{{i18n.error(modalError())}}</p>
     }<button class="btn primary full" type="submit">{{ 'Enregistrer mon tarif' | t }}</button>
   </form>
   } @if(modal() === 'device' && editingDefinition(); as definition){
@@ -887,8 +891,10 @@
     {{ 'Une fiche réutilisable dans tous vos logements. Les appareils déjà installés conservent leurs
     caractéristiques.' | t }}
   </p>
-  <ww-device-editor [definition]="definition" (committed)="saveDefinition($event)" />} @if(modal() ===
-  'import' && prepared(); as p){
+  <ww-device-editor [definition]="definition" [saving]="busy()" (committed)="saveDefinition($event)" />
+  @if(modalError()) {
+  <p class="inline-error" role="alert">{{i18n.error(modalError())}}</p>
+  }} @if(modal() === 'import' && prepared(); as p){
   <h2>{{ 'Un petit aperçu avant l’import.' | t }}</h2>
   <p class="subtle">
     {{(p.manifest.kind === 'home' ? 'Un logement complet, avec ses scénarios et ses paramètres.' : 'De
@@ -904,7 +910,7 @@
     {{ 'Les éléments seront ajoutés comme nouvelles copies. Rien ne sera écrasé.' | t }}
   </p>
   @if(modalError()){
-  <p role="alert" class="inline-error">{{(modalError()) | t}}</p>
+  <p role="alert" class="inline-error">{{i18n.error(modalError())}}</p>
   }<button class="btn primary full" (click)="confirmImport()" [disabled]="busy()">
     {{(busy() ? 'Import en cours…' : 'Importer ces données') | t}}</button
   >}

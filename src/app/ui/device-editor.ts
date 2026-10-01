@@ -172,7 +172,12 @@ import { IconComponent } from './icon';
           </select></label
         >
         <div class="upload-row">
-          <button class="btn secondary small" type="button" (click)="importGlb()" [disabled]="importing()">
+          <button
+            class="btn secondary small"
+            type="button"
+            (click)="importGlb()"
+            [disabled]="saving() || importing()"
+          >
             <ww-icon name="upload" /> {{ (importing() ? 'Vérification…' : 'Importer un GLB') | t }}
           </button>
           @if (customVisual()) {
@@ -220,7 +225,11 @@ import { IconComponent } from './icon';
             }}
           </p>
         }
-        <button class="btn primary full" type="submit" [disabled]="importing() || jsonDirtyInvalid()">
+        <button
+          class="btn primary full"
+          type="submit"
+          [disabled]="saving() || importing() || jsonDirtyInvalid()"
+        >
           <ww-icon name="check" />
           {{ (instance() ? 'Appliquer les modifications' : 'Enregistrer la fiche') | t }}
         </button>
@@ -318,7 +327,7 @@ import { IconComponent } from './icon';
         class="btn primary full"
         type="button"
         (click)="submit()"
-        [disabled]="importing() || jsonStatus() !== 'valid' || jsonDirtyInvalid()"
+        [disabled]="saving() || importing() || jsonStatus() !== 'valid' || jsonDirtyInvalid()"
       >
         <ww-icon name="check" /> {{ 'Enregistrer la fiche' | t }}
       </button>
@@ -330,6 +339,7 @@ export class DeviceEditorComponent {
   readonly positionLimit = POSITION_LIMIT;
   definition = input.required<DeviceDefinition>();
   instance = input<DeviceInstance | null>(null);
+  saving = input(false);
   committed = output<{ definition: DeviceDefinition; instance: DeviceInstance | null }>();
   private store = inject(WalletStore);
   private fb = inject(FormBuilder);
@@ -347,6 +357,9 @@ export class DeviceEditorComponent {
   jsonPreview = signal<{ definition: DeviceDefinition; kwh: number } | null>(null);
   jsonDirtyInvalid = signal(false);
   private jsonRevision = 0;
+  private loadedKey = '';
+  private loadedContent = '';
+  private loadedPosition: { x: number; z: number } | null = null;
   form = this.fb.nonNullable.group({
     name: ['', Validators.required],
     brand: '',
@@ -380,6 +393,31 @@ export class DeviceEditorComponent {
         i = this.instance(),
         e = d.energy,
         u = i?.usage ?? d.defaultUsage;
+      const key = i
+        ? this.store.home()?.id + ':' + (this.store.scenarioId() ?? 'reference') + ':' + i.id
+        : 'definition:' + d.id;
+      const parsed = definitionSchema.safeParse(d);
+      const content = JSON.stringify({
+        definition: parsed.success ? parsed.data : d,
+        usage: {
+          hoursPerDay: u.hoursPerDay,
+          daysPerYear: u.daysPerYear,
+          cyclesPerWeek: u.cyclesPerWeek,
+          cycleHours: u.cycleHours,
+          offPeakPercent: u.offPeakPercent,
+        },
+        quantity: i?.quantity,
+      });
+      if (key === this.loadedKey && content === this.loadedContent) {
+        if (i && (i.position.x !== this.loadedPosition?.x || i.position.z !== this.loadedPosition?.z)) {
+          this.form.patchValue({ x: i.position.x, z: i.position.z }, { emitEvent: false });
+          this.loadedPosition = { ...i.position };
+        }
+        return;
+      }
+      this.loadedKey = key;
+      this.loadedContent = content;
+      this.loadedPosition = i ? { ...i.position } : null;
       this.form.reset(
         {
           name: d.name,
@@ -626,6 +664,7 @@ export class DeviceEditorComponent {
     }
   }
   submit() {
+    if (this.saving()) return;
     this.error.set('');
     if (this.jsonDirtyInvalid()) {
       this.error.set('Corrigez ou réinitialisez le JSON avant d’enregistrer.');

@@ -286,7 +286,6 @@
   "Textures invalides ou trop grandes : 4 096 pixels par côté, 64 mégapixels au total.": "Textures are invalid or too large: 4,096 pixels per side, 64 megapixels in total.",
   "Fiches en double dans le paquet.": "Duplicate profiles in the package.",
   "Scénarios en double.": "Duplicate scenarios.",
-  "Le manifeste dépasse 2 Mio.": "The manifest exceeds 2 MiB.",
   "Un modèle 3D est manquant.": "A 3D model is missing.",
   "Le paquet dépasse les limites du format.": "The package exceeds the format limits.",
   "Archive invalide ou supérieure à 100 Mio.": "Archive is invalid or exceeds 100 MiB.",
@@ -425,5 +424,13 @@
   "Identifiant de ressource invalide": "Invalid asset identifier",
   "Sauvegarde trop volumineuse": "Backup is too large",
   "Version de sauvegarde inconnue": "Unknown backup version",
-  "Ressource GLB invalide": "Invalid GLB asset"
+  "Ressource GLB invalide": "Invalid GLB asset",
+  "Les données ont changé dans une autre fenêtre. Exportez vos modifications si nécessaire, puis rechargez les données avant de continuer.": "Data changed in another window. Export your changes if needed, then reload the saved data before continuing.",
+  "Recharger les données": "Reload saved data",
+  "Recharger les données enregistrées ? Les modifications non sauvegardées dans cette fenêtre seront abandonnées. Exportez-les avant de continuer si vous souhaitez les conserver.": "Reload saved data? Unsaved changes in this window will be discarded. Export them first if you want to keep them.",
+  "Votre bibliothèque est limitée à 2 000 fiches. Retirez une fiche avant d’en ajouter une autre.": "Your library is limited to 2,000 profiles. Remove a profile before adding another one.",
+  "Vous pouvez conserver au maximum 100 logements.": "You can keep at most 100 homes.",
+  "Ce logement est limité à 50 scénarios. Supprimez un scénario avant d’en créer un autre.": "This home is limited to 50 scenarios. Delete a scenario before creating another one.",
+  "Cette configuration est limitée à 500 objets. Utilisez les quantités pour regrouper vos appareils.": "This configuration is limited to 500 objects. Use quantities to group your devices.",
+  "Aucune cellule libre ne peut accueillir cet appareil. Déplacez les objets ou utilisez le placement libre.": "No free cell can fit this device. Move the objects or use free placement."
 }

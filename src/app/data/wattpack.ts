@@ -3,6 +3,7 @@ import { strFromU8, strToU8, zipSync, Unzip, UnzipInflate } from 'fflate';
 import { DeviceDefinition, Home, Workspace, copy, definitionSchema, homeSchema, uid } from '../domain/models';
 import { validateSnapshot, validateUsage } from '../domain/energy';
 import { validateGlb } from './glb';
+import { validateWorkspace } from './repository';
 
 export const MAX_PACK_BYTES = 100 * 1024 * 1024;
 export const packSchema = z.discriminatedUnion('kind', [
@@ -61,8 +62,7 @@ export function validateManifest(input: unknown): WattPack {
 
 export function encodePack(manifest: WattPack, assets: Record<string, Uint8Array>): Uint8Array {
   const valid = validateManifest(manifest);
-  const files: Record<string, Uint8Array> = { 'manifest.json': strToU8(JSON.stringify(valid, null, 2)) };
-  if (files['manifest.json'].length > 2 * 1024 * 1024) throw new Error('Le manifeste dépasse 2 Mio.');
+  const files: Record<string, Uint8Array> = { 'manifest.json': strToU8(JSON.stringify(valid)) };
   for (const id of assetIds(valid)) {
     if (!assets[id]) throw new Error('Un modèle 3D est manquant.');
     validateGlb(assets[id]);
@@ -126,7 +126,7 @@ function inspectZip(data: Uint8Array): Map<string, { size: number; crc: number }
     )
       throw new Error('Entrée ZIP incohérente.');
     total += size;
-    if (total > MAX_PACK_BYTES || size > (name === 'manifest.json' ? 2 : 20) * 1024 * 1024)
+    if (total > MAX_PACK_BYTES || size > (name === 'manifest.json' ? MAX_PACK_BYTES : 20 * 1024 * 1024))
       throw new Error('Archive décompressée trop volumineuse.');
     files.set(name, { size, crc: v.getUint32(pos + 16, true) });
     pos += 46 + nameLength + extra + comment;
@@ -224,7 +224,8 @@ export function importCopies(
     next.library.push(...p.definitions);
   } else {
     p.home.id = uid();
-    p.home.name += ' (importé)';
+    const suffix = ' (importé)';
+    p.home.name = p.home.name.slice(0, 100 - suffix.length).trimEnd() + suffix;
     for (const snapshot of [p.home, ...p.home.scenarios]) {
       if ('initialCost' in snapshot) snapshot.id = uid();
       for (const d of snapshot.devices) {
@@ -235,5 +236,5 @@ export function importCopies(
     next.homes.push(p.home);
     next.activeHomeId = p.home.id;
   }
-  return { workspace: next, assets };
+  return { workspace: validateWorkspace(next), assets };
 }
