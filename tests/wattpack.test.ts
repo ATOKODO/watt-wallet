@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { strToU8, zipSync } from 'fflate';
-import { decodePack, encodePack, importCopies, WattPack, MAX_PACK_BYTES } from '../src/app/data/wattpack';
+import {
+  decodePack,
+  encodePack,
+  importCopies,
+  createImportPlan,
+  applyImportPlan,
+  WattPack,
+  MAX_PACK_BYTES,
+} from '../src/app/data/wattpack';
 import { validateGlb } from '../src/app/data/glb';
 import { seedWorkspace, seedLibrary } from '../src/app/domain/seed';
 import { calculate } from '../src/app/domain/energy';
@@ -209,4 +217,45 @@ describe('GLB', () => {
     new DataView(b.buffer).setUint32(8, 1, true);
     expect(() => validateGlb(b)).toThrow();
   });
+});
+
+describe('reprise d’un import', () => {
+  it.each(['home', 'library'] as const)(
+    'réapplique le même import %s sans doublons et conserve les changements locaux',
+    (kind) => {
+      const workspace = seedWorkspace();
+      const home = copy(workspace.homes[0]);
+      home.devices[0].definition.visual = { kind: 'glb', assetId: 'shared', fallback: 'radiator' };
+      home.scenarios.push({
+        id: 's',
+        name: 'Copie',
+        initialCost: 250,
+        devices: copy(home.devices),
+        tariff: copy(home.tariff),
+      });
+      const manifest: WattPack =
+        kind === 'home'
+          ? { format: 'watt-wallet', version: 1, kind, home }
+          : { format: 'watt-wallet', version: 1, kind, definitions: [home.devices[0].definition] };
+      const prepared = decodePack(encodePack(manifest, { shared: triangleGlb() }));
+      const before = copy(prepared.manifest);
+      const plan = createImportPlan(prepared);
+      const first = applyImportPlan(plan, workspace);
+      const current = copy(first.workspace);
+      current.homes[0].name = 'Changement intervenu après la tentative';
+      if (kind === 'home') current.homes[1].name = 'Logement importé ajusté';
+      else current.library.at(-1)!.notes = 'Fiche importée ajustée';
+      const retried = applyImportPlan(plan, current);
+      expect(retried.workspace).toEqual(current);
+      expect(retried.assets).toBe(plan.assets);
+      expect(Object.keys(retried.assets)).toHaveLength(1);
+      expect(Object.values(retried.assets)[0]).toEqual(triangleGlb());
+      expect(prepared.manifest).toEqual(before);
+      const separate = importCopies(prepared, retried.workspace);
+      expect(kind === 'home' ? separate.workspace.homes.length : separate.workspace.library.length).toBe(
+        (kind === 'home' ? current.homes.length : current.library.length) + 1,
+      );
+      expect(Object.keys(separate.assets)).not.toEqual(Object.keys(plan.assets));
+    },
+  );
 });

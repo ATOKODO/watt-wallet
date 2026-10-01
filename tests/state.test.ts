@@ -91,3 +91,28 @@ describe('mutations et sauvegardes', () => {
     expect(await s.addDevice(s.workspace()!.library[10])).toBe(true);
   });
 });
+
+describe('nouvelles tentatives de création', () => {
+  it.each(['home', 'scenario'] as const)(
+    'réutilise la copie %s après un échec et conserve ses modifications',
+    async (kind) => {
+      const s = await store();
+      const id = 'stable-creation';
+      const create = (name: string) => (kind === 'home' ? s.addHome(name, id) : s.addScenario(name, id));
+      repository.save.mockRejectedValueOnce(new Error('Disque plein'));
+      expect(await create('Première saisie')).toBe(false);
+      const definition = s.workspace()!.library[0];
+      expect(await s.addDevice(definition)).toBe(true);
+      if (kind === 'scenario') expect(await s.updateScenarioCost(250)).toBe(true);
+      expect(await create('Nom corrigé')).toBe(true);
+      const w = s.workspace()!;
+      expect(w.homes).toHaveLength(kind === 'home' ? 2 : 1);
+      expect(s.home()!.scenarios).toHaveLength(kind === 'scenario' ? 1 : 0);
+      expect(s.snapshot()!.id).toBe(id);
+      expect(s.snapshot()!.name).toBe('Nom corrigé');
+      expect(s.devices()).toHaveLength(kind === 'home' ? 1 : 7);
+      if (kind === 'scenario') expect(s.scenario()!.initialCost).toBe(250);
+      expect(repository.save.mock.calls.at(-1)![0]).toEqual(w);
+    },
+  );
+});

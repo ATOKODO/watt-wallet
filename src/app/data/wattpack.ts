@@ -211,8 +211,12 @@ export function importCopies(
   prepared: PreparedPack,
   workspace: Workspace,
 ): { workspace: Workspace; assets: Record<string, Uint8Array> } {
-  const next = copy(workspace),
-    p = copy(prepared.manifest);
+  return applyImportPlan(createImportPlan(prepared), workspace);
+}
+
+// Keep this plan for the lifetime of an import dialog so retries reuse all IDs.
+export function createImportPlan(prepared: PreparedPack): PreparedPack {
+  const p = copy(prepared.manifest);
   const assetMap = new Map(Object.keys(prepared.assets).map((id) => [id, uid()]));
   const assets = Object.fromEntries(Object.entries(prepared.assets).map(([id, b]) => [assetMap.get(id)!, b]));
   function remapDefinition(d: DeviceDefinition) {
@@ -221,7 +225,6 @@ export function importCopies(
   }
   if (p.kind === 'library') {
     p.definitions.forEach(remapDefinition);
-    next.library.push(...p.definitions);
   } else {
     p.home.id = uid();
     const suffix = ' (importé)';
@@ -233,8 +236,22 @@ export function importCopies(
         remapDefinition(d.definition);
       }
     }
-    next.homes.push(p.home);
+  }
+  return { manifest: p, assets };
+}
+
+export function applyImportPlan(
+  plan: PreparedPack,
+  workspace: Workspace,
+): { workspace: Workspace; assets: Record<string, Uint8Array> } {
+  const next = copy(workspace),
+    p = copy(plan.manifest);
+  if (p.kind === 'library') {
+    const existing = new Set(next.library.map((definition) => definition.id));
+    next.library.push(...p.definitions.filter((definition) => !existing.has(definition.id)));
+  } else {
+    if (!next.homes.some((home) => home.id === p.home.id)) next.homes.push(p.home);
     next.activeHomeId = p.home.id;
   }
-  return { workspace: validateWorkspace(next), assets };
+  return { workspace: validateWorkspace(next), assets: plan.assets };
 }

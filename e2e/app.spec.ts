@@ -198,9 +198,10 @@ test('GLB personnalisé partagé avec sa fiche et placement sans glisser-dépose
   await expect(dialog.getByText('Modèle personnalisé associé à cette fiche.')).toBeVisible();
   await dialog.getByRole('button', { name: 'Enregistrer la fiche' }).click();
   await page.getByRole('button', { name: 'Ajouter Mon appareil GLB', exact: true }).click();
+  // Use uniform sizes: the flat example can extend beyond the camera in consumption mode.
+  await page.getByRole('button', { name: 'Placement', exact: true }).click();
   await expect(page.locator('.object-label').filter({ hasText: 'Mon appareil GLB' })).toBeVisible();
   await expect(page.locator('.scene-warning')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Placement', exact: true }).click();
   await page.locator('.inspector').getByLabel('Position X').fill('5');
   await page.locator('.inspector').getByLabel('Position Z').fill('3');
   await page.getByRole('button', { name: 'Appliquer les modifications' }).click();
@@ -537,6 +538,8 @@ test('langues français/anglais, formulaires, scénarios, erreurs, données et p
   await expect(page.locator('.inspector h2')).toHaveText('Bibliothèque');
   await page.locator('.inspector').getByLabel('Source or notes').fill('Notes françaises personnelles');
   await page.getByRole('button', { name: 'Apply changes', exact: true }).click();
+  await expect(page.locator('.inspector').getByLabel('Source or notes')).toHaveClass(/ng-pristine/);
+  await expect(page.locator('.workspace-footer')).toContainText('Saved on this device');
   await page.getByRole('button', { name: 'Choose language', exact: true }).click();
   await dialog.getByRole('button', { name: 'Français', exact: true }).click();
   await dialog.getByRole('button', { name: 'Terminer', exact: true }).click();
@@ -790,3 +793,176 @@ test('libellés accessibles du catalogue anglais traduits avec les noms personne
   await page.getByRole('button', { name: 'Add Refrigerator to the home', exact: true }).click();
   await expect(page.locator('.inspector h2')).toHaveText('Refrigerator');
 });
+
+async function failWorkspaceSaves(page: import('@playwright/test').Page, count = 2) {
+  await page.evaluate((count) => {
+    const repository = (window as any).ng.getComponent(document.querySelector('ww-app')).store.repository;
+    const save = repository.save.bind(repository);
+    repository.save = async (workspace: unknown) => {
+      if (count-- > 0) throw new DOMException('Quota de test dépassé', 'QuotaExceededError');
+      return save(workspace);
+    };
+  }, count);
+}
+async function disableWebGl(page: import('@playwright/test').Page) {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type: any, ...args: any[]) {
+      return String(type).startsWith('webgl') ? null : original.apply(this, [type, ...args] as any);
+    };
+  });
+}
+for (const kind of ['home', 'scenario'] as const) {
+  test('reprise de création ' + kind + ' sans doublon après deux échecs de stockage', async ({ page }) => {
+    await disableWebGl(page);
+    await page.goto('/');
+    await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+    await failWorkspaceSaves(page);
+    if (kind === 'scenario') await page.getByRole('button', { name: 'Mes scénarios', exact: true }).click();
+    const open = () =>
+      page
+        .getByRole('button', {
+          name: kind === 'home' ? 'Créer un logement' : 'Créer un scénario',
+          exact: true,
+        })
+        .click();
+    await open();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Nom', { exact: true }).fill('Copie unique');
+    await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+    await expect(dialog.locator('.inline-error')).toContainText('Quota de test');
+    const createdId = await page.evaluate((kind) => {
+      const s = (window as any).ng.getComponent(document.querySelector('ww-app')).store;
+      return kind === 'home' ? s.home().id : s.scenario().id;
+    }, kind);
+    await dialog.getByLabel('Nom', { exact: true }).fill('Nom corrigé');
+    await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+    await expect(dialog.locator('.inline-error')).toContainText('Quota de test');
+    await expect(page.locator('.toast')).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+    await expect(dialog).not.toBeVisible();
+    await page.reload();
+    await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+    const copies = () =>
+      page.evaluate((kind) => {
+        const s = (window as any).ng.getComponent(document.querySelector('ww-app')).store;
+        return kind === 'home' ? s.workspace().homes : s.home().scenarios;
+      }, kind);
+    const saved = await copies();
+    expect(saved).toHaveLength(kind === 'home' ? 2 : 1);
+    expect(saved.at(-1)).toMatchObject({ id: createdId, name: 'Nom corrigé' });
+    if (kind === 'scenario') await page.getByRole('button', { name: 'Mes scénarios', exact: true }).click();
+    await open();
+    await dialog.getByLabel('Nom', { exact: true }).fill('Nouvelle demande');
+    await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+    await expect(dialog).not.toBeVisible();
+    const separate = await copies();
+    expect(separate).toHaveLength(saved.length + 1);
+    expect(separate.at(-1).id).not.toBe(createdId);
+  });
+}
+for (const kind of ['home', 'library'] as const) {
+  test(
+    'reprise import ' + kind + ' avec GLB sans recopier les données ni les ressources',
+    async ({ page }) => {
+      await disableWebGl(page);
+      await page.goto('/');
+      await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+      const w = seedWorkspace();
+      const home = w.homes[0];
+      home.devices[0].definition.visual = { kind: 'glb', assetId: 'mesh', fallback: 'radiator' };
+      home.scenarios.push({
+        id: 's',
+        name: 'Scénario importé',
+        initialCost: 120,
+        devices: structuredClone(home.devices),
+        tariff: structuredClone(home.tariff),
+      });
+      const manifest =
+        kind === 'home'
+          ? { format: 'watt-wallet' as const, version: 1 as const, kind, home }
+          : {
+              format: 'watt-wallet' as const,
+              version: 1 as const,
+              kind,
+              definitions: [home.devices[0].definition],
+            };
+      const glb = await readFile('examples/triangle.glb');
+      const buffer = Buffer.from(encodePack(manifest, { mesh: new Uint8Array(glb) }));
+      await failWorkspaceSaves(page);
+      await page.evaluate(() => {
+        const repository = (window as any).ng.getComponent(document.querySelector('ww-app')).store.repository;
+        const putAsset = repository.putAsset.bind(repository);
+        let first = true;
+        repository.putAsset = async (id: string, bytes: Uint8Array) => {
+          if (first) {
+            first = false;
+            throw new Error('Ressource de test indisponible');
+          }
+          return putAsset(id, bytes);
+        };
+      });
+      const open = async () => {
+        const chooser = page.waitForEvent('filechooser');
+        await page.locator('.heading-actions').getByRole('button', { name: 'Importer', exact: true }).click();
+        await (await chooser).setFiles({ name: 'retry.wattpack', mimeType: 'application/zip', buffer });
+      };
+      const snapshot = () =>
+        page.evaluate(async () => {
+          const s = (window as any).ng.getComponent(document.querySelector('ww-app')).store;
+          const db = await new Promise<IDBDatabase>((resolve) => {
+            const r = indexedDB.open('watt-wallet', 1);
+            r.onsuccess = () => resolve(r.result);
+          });
+          const assets = await new Promise<{ key: IDBValidKey; bytes: number[] }[]>((resolve) => {
+            const entries: { key: IDBValidKey; bytes: number[] }[] = [];
+            const r = db.transaction('assets').objectStore('assets').openCursor();
+            r.onsuccess = () => {
+              const cursor = r.result;
+              if (cursor) {
+                entries.push({ key: cursor.key, bytes: Array.from(cursor.value) });
+                cursor.continue();
+              } else resolve(entries);
+            };
+          });
+          db.close();
+          return { workspace: s.workspace(), assets };
+        });
+      const initial = await snapshot();
+      await open();
+      const dialog = page.getByRole('dialog');
+      const submit = () => dialog.getByRole('button', { name: 'Importer ces données', exact: true }).click();
+      await submit();
+      await expect(dialog.locator('.inline-error')).toContainText('Ressource de test');
+      expect((await snapshot()).workspace).toEqual(initial.workspace);
+      await submit();
+      await expect(dialog.locator('.inline-error')).toContainText('Quota de test');
+      const first = await snapshot();
+      await submit();
+      await expect(dialog.locator('.inline-error')).toContainText('Quota de test');
+      expect(await snapshot()).toEqual(first);
+      await expect(page.locator('.toast')).toHaveCount(0);
+      await submit();
+      await expect(dialog).not.toBeVisible();
+      await page.reload();
+      await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+      const saved = await snapshot();
+      expect(saved).toEqual(first);
+      expect(saved.assets).toHaveLength(1);
+      expect(saved.assets[0].bytes).toEqual(Array.from(glb));
+      expect(saved.workspace.homes).toHaveLength(kind === 'home' ? 2 : 1);
+      expect(saved.workspace.library).toHaveLength(
+        initial.workspace.library.length + (kind === 'library' ? 1 : 0),
+      );
+      if (kind === 'home') expect(saved.workspace.homes[1].scenarios).toHaveLength(1);
+      await open();
+      await submit();
+      await expect(dialog).not.toBeVisible();
+      const separate = await snapshot();
+      expect(separate.assets).toHaveLength(2);
+      expect(kind === 'home' ? separate.workspace.homes.length : separate.workspace.library.length).toBe(
+        (kind === 'home' ? saved.workspace.homes.length : saved.workspace.library.length) + 1,
+      );
+    },
+  );
+}

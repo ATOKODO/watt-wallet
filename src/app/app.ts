@@ -27,7 +27,8 @@ import {
   decodePack,
   definitionsIn,
   encodePack,
-  importCopies,
+  createImportPlan,
+  applyImportPlan,
 } from './data/wattpack';
 import { WorkspaceConflictError, chooseFile, downloadPack } from './data/repository';
 import { validateRenderableGlb } from './scene/models';
@@ -67,6 +68,8 @@ export class AppComponent {
   categories = categories;
   colors = categoryColors;
   private toastTimer = 0;
+  private nameCreationId?: string;
+  private importPlan: PreparedPack | null = null;
   nameForm = this.fb.nonNullable.group({ name: ['', [Validators.required, Validators.maxLength(100)]] });
   tariffForm = this.fb.nonNullable.group({
     mode: 'base',
@@ -223,6 +226,7 @@ export class AppComponent {
     this.tab.set(tab);
   }
   openName(type: 'new-home' | 'new-scenario' | 'rename-home') {
+    this.nameCreationId = uid();
     this.modalError.set('');
     this.nameForm.reset({
       name:
@@ -242,8 +246,8 @@ export class AppComponent {
     }
     const type = this.modal();
     const saved = await this.commitModalChange(() => {
-      if (type === 'new-home') return this.store.addHome(name);
-      if (type === 'new-scenario') return this.store.addScenario(name);
+      if (type === 'new-home') return this.store.addHome(name, this.nameCreationId);
+      if (type === 'new-scenario') return this.store.addScenario(name, this.nameCreationId);
       return this.store.mutate((w) => {
         w.homes.find((h) => h.id === w.activeHomeId)!.name = name;
       });
@@ -363,6 +367,8 @@ export class AppComponent {
     if (this.busy()) return;
     this.modal.set(null);
     this.prepared.set(null);
+    this.importPlan = null;
+    this.nameCreationId = undefined;
     this.modalError.set('');
   }
   cancelModal(event: Event) {
@@ -409,6 +415,7 @@ export class AppComponent {
       const p = decodePack(bytes);
       for (const b of Object.values(p.assets)) await validateRenderableGlb(b);
       this.prepared.set(p);
+      this.importPlan = null;
       this.modal.set('import');
     } catch (e) {
       this.store.report(e);
@@ -424,13 +431,17 @@ export class AppComponent {
     return Object.keys(this.prepared()?.assets ?? {}).length;
   }
   async confirmImport() {
-    if (!this.prepared()) return;
+    if (!this.prepared() || this.busy()) return;
     this.busy.set(true);
+    this.modalError.set('');
     try {
       if (this.store.saveConflict()) throw new WorkspaceConflictError();
-      const result = importCopies(this.prepared()!, this.store.workspace()!);
+      const plan = (this.importPlan ??= createImportPlan(this.prepared()!));
+      const before = this.store.workspace()!;
+      let result = applyImportPlan(plan, before);
       for (const [id, bytes] of Object.entries(result.assets))
         await this.store.repository.putAsset(id, bytes);
+      if (this.store.workspace() !== before) result = applyImportPlan(plan, this.store.workspace()!);
       if (!(await this.store.replace(result.workspace))) {
         this.modalError.set(this.store.error());
         return;

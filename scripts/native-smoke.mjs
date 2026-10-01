@@ -1,6 +1,6 @@
 import { chromium, expect } from '@playwright/test';
 import { spawn } from 'node:child_process';
-import { mkdir, mkdtemp, readFile } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createServer } from 'node:net';
 const exe = path.resolve(process.argv[2] ?? 'src-tauri/target/release/watt-wallet.exe');
@@ -216,9 +216,46 @@ try {
   await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(0);
   await nativePage.getByRole('button', { name: 'Référence', exact: true }).click();
   await expect(nativePage.locator('.device-row').filter({ hasText: 'Radiateur électrique' })).toHaveCount(1);
+
+  for (const kind of ['home', 'scenario']) {
+    const workspacePath = path.join(root, 'workspace.json');
+    const previousJson = await readFile(workspacePath, 'utf8');
+    const beforeRetry = JSON.parse(previousJson);
+    // Windows refuses atomic replacement of a read-only destination file.
+    await chmod(workspacePath, 0o444);
+    try {
+      if (kind === 'scenario')
+        await nativePage.getByRole('button', { name: 'Mes scénarios', exact: true }).click();
+      await nativePage
+        .getByRole('button', {
+          name: kind === 'home' ? 'Créer un logement' : 'Créer un scénario',
+          exact: true,
+        })
+        .click();
+      await dialog.getByLabel('Nom', { exact: true }).fill('Reprise native ' + kind);
+      await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+      await expect(dialog.locator('.inline-error')).toContainText('Une erreur est survenue.');
+      await dialog.getByLabel('Nom', { exact: true }).fill('Reprise native corrigée ' + kind);
+      await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+      await expect(dialog.locator('.inline-error')).toContainText('Une erreur est survenue.');
+      expect(await readFile(workspacePath, 'utf8')).toBe(previousJson);
+    } finally {
+      await chmod(workspacePath, 0o666);
+    }
+    await dialog.getByRole('button', { name: 'Créer', exact: true }).click();
+    await expect(dialog).not.toBeVisible();
+    const entities = (w) =>
+      kind === 'home' ? w.homes : w.homes.find((h) => h.id === w.activeHomeId).scenarios;
+    const durable = JSON.parse(await readFile(workspacePath, 'utf8'));
+    expect(entities(durable)).toHaveLength(entities(beforeRetry).length + 1);
+    expect(entities(durable).at(-1).name).toBe('Reprise native corrigée ' + kind);
+    await nativePage.reload();
+    await expect(nativePage.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+    await expect(nativePage.locator('.error-banner')).toHaveCount(0);
+  }
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(
-    'WebView2 natif : français/anglais persistants, mode sombre, palette persistante, scène 3D, plateau adaptatif, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde et redémarrage OK.',
+    'WebView2 natif : français/anglais persistants, mode sombre, palette persistante, scène 3D, plateau adaptatif, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde, redémarrage et reprises de création sans doublons OK.',
   );
 } finally {
   if (run) {

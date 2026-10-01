@@ -144,10 +144,11 @@ export class WalletStore {
     this.scenarioId.set(id);
     this.selectedId.set(null);
   }
-  addHome(name: string) {
-    const id = uid();
+  addHome(name: string, id: string = uid()) {
     const saved = this.mutate((w) => {
-      w.homes.push({ id, name, tariff: copy(defaultTariff), devices: [], scenarios: [] });
+      const existing = w.homes.find((home) => home.id === id);
+      if (existing) existing.name = name;
+      else w.homes.push({ id, name, tariff: copy(defaultTariff), devices: [], scenarios: [] });
       w.activeHomeId = id;
     });
     if (this.workspace()?.activeHomeId === id) {
@@ -228,18 +229,20 @@ export class WalletStore {
       else home.observedAnnualKwh = value;
     });
   }
-  addScenario(name: string) {
-    const id = uid(),
-      current = this.snapshot()!;
+  addScenario(name: string, id: string = uid()) {
+    const current = this.snapshot()!;
     const saved = this.mutate((w) => {
       const h = w.homes.find((h) => h.id === w.activeHomeId)!;
-      h.scenarios.push({
-        id,
-        name,
-        initialCost: 0,
-        devices: copy(current.devices),
-        tariff: copy(current.tariff),
-      });
+      const existing = h.scenarios.find((scenario) => scenario.id === id);
+      if (existing) existing.name = name;
+      else
+        h.scenarios.push({
+          id,
+          name,
+          initialCost: 0,
+          devices: copy(current.devices),
+          tariff: copy(current.tariff),
+        });
     });
     if (this.home()?.scenarios.some((s) => s.id === id)) {
       this.scenarioId.set(id);
