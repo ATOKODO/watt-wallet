@@ -1,4 +1,65 @@
 export const MAX_GLB_BYTES = 20 * 1024 * 1024;
+export const MAX_GLB_GEOMETRY_BYTES = 64 * 1024 * 1024;
+const componentBytes = new Map([
+  [5120, 1],
+  [5121, 1],
+  [5122, 2],
+  [5123, 2],
+  [5125, 4],
+  [5126, 4],
+]);
+const accessorComponents = new Map([
+  ['SCALAR', 1],
+  ['VEC2', 2],
+  ['VEC3', 3],
+  ['VEC4', 4],
+  ['MAT2', 4],
+  ['MAT3', 9],
+  ['MAT4', 16],
+]);
+
+function validateGeometryBudget(gltf: any): void {
+  let decodedBytes = 0;
+  const reserve = (bytes: number) => {
+    if (!Number.isSafeInteger(bytes) || bytes < 0 || decodedBytes + bytes > MAX_GLB_GEOMETRY_BYTES)
+      throw new Error('La géométrie décodée du GLB dépasse la limite de 64 Mio.');
+    decodedBytes += bytes;
+  };
+  // The loader copies each binary view, even when several views overlap the same bytes.
+  for (const view of gltf.bufferViews ?? []) reserve(view.byteLength);
+  for (const accessor of gltf.accessors ?? []) {
+    const components = accessorComponents.get(accessor?.type);
+    const bytes = componentBytes.get(accessor?.componentType);
+    if (
+      !components ||
+      !bytes ||
+      !Number.isInteger(accessor.count) ||
+      accessor.count < 0 ||
+      accessor.count > 2000000
+    )
+      throw new Error('Géométrie GLB trop complexe ou invalide.');
+    const itemBytes = components * bytes;
+    const view = accessor.bufferView === undefined ? undefined : gltf.bufferViews?.[accessor.bufferView];
+    if (
+      accessor.bufferView !== undefined &&
+      (!Number.isInteger(accessor.bufferView) || accessor.bufferView < 0 || !view)
+    )
+      throw new Error('Géométrie GLB trop complexe ou invalide.');
+    const stride = view?.byteStride ?? itemBytes;
+    if (
+      !Number.isInteger(stride) ||
+      stride < itemBytes ||
+      (view?.byteStride !== undefined && (stride > 252 || stride % 4))
+    )
+      throw new Error('Géométrie GLB trop complexe ou invalide.');
+    // Bufferless and sparse accessors allocate their full declared size before mesh checks.
+    // Stored/interleaved attributes share their binary view; count their logical data,
+    // rather than charging the entire interleaved stride for every attribute.
+    reserve(accessor.count * itemBytes);
+    // Sparse overrides of a stored accessor require an additional writable copy.
+    if (accessor.sparse !== undefined && view) reserve(accessor.count * stride);
+  }
+}
 export function validateGlb(bytes: Uint8Array): void {
   if (bytes.byteLength < 28 || bytes.byteLength > MAX_GLB_BYTES)
     throw new Error('Le GLB doit faire moins de 20 Mio et contenir une scène valide.');
@@ -83,8 +144,7 @@ export function validateGlb(bytes: Uint8Array): void {
   ];
   if ((gltf.extensionsRequired ?? []).some((e: string) => !supported.includes(e)))
     throw new Error('Ce GLB nécessite une extension non prise en charge.');
-  if ((gltf.accessors ?? []).some((a: any) => !Number.isInteger(a.count) || a.count < 0 || a.count > 2000000))
-    throw new Error('Géométrie GLB trop complexe ou invalide.');
+  validateGeometryBudget(gltf);
   // Images cannot request huge GPU allocations even when their compressed file is small.
   let totalPixels = 0;
   for (const img of gltf.images ?? []) {

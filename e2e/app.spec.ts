@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { zipSync, strToU8 } from 'fflate';
+import { oversizedGeometryGlb } from '../tests/fixtures';
 import { seedLibrary, seedWorkspace, makeInstance } from '../src/app/domain/seed';
 import { encodePack, decodePack } from '../src/app/data/wattpack';
 
@@ -966,3 +968,72 @@ for (const kind of ['home', 'library'] as const) {
     },
   );
 }
+
+test('limite de géométrie GLB : rejet avant stockage, formulaire intact et erreur traduite', async ({
+  page,
+}) => {
+  await disableWebGl(page);
+  await page.goto('/');
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  const assetKeys = () =>
+    page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve) => {
+        const request = indexedDB.open('watt-wallet', 1);
+        request.onsuccess = () => resolve(request.result);
+      });
+      const keys = await new Promise<IDBValidKey[]>((resolve) => {
+        const request = db.transaction('assets').objectStore('assets').getAllKeys();
+        request.onsuccess = () => resolve(request.result);
+      });
+      db.close();
+      return keys;
+    });
+  await page.getByRole('button', { name: 'Créer un appareil', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('Nom de l’appareil').fill('Fiche conservée');
+  const chooseGlb = async (file: Parameters<import('@playwright/test').FileChooser['setFiles']>[0]) => {
+    const chooser = page.waitForEvent('filechooser');
+    await dialog.getByRole('button', { name: 'Importer un GLB', exact: true }).click();
+    await (await chooser).setFiles(file);
+  };
+  await chooseGlb({
+    name: 'expanded.glb',
+    mimeType: 'model/gltf-binary',
+    buffer: Buffer.from(oversizedGeometryGlb()),
+  });
+  await expect(dialog.locator('.inline-error')).toContainText(
+    'La géométrie décodée du GLB dépasse la limite de 64 Mio.',
+  );
+  await expect(dialog.getByLabel('Nom de l’appareil')).toHaveValue('Fiche conservée');
+  expect(await assetKeys()).toEqual([]);
+  await chooseGlb('examples/triangle.glb');
+  await expect(dialog.getByText('Modèle personnalisé associé à cette fiche.')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Enregistrer la fiche', exact: true }).click();
+  await expect(dialog).not.toBeVisible();
+  expect(await assetKeys()).toHaveLength(1);
+  await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
+  await dialog.getByRole('button', { name: 'English', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  const snapshot = () =>
+    page.evaluate(() => (window as any).ng.getComponent(document.querySelector('ww-app')).store.workspace());
+  const before = await snapshot();
+  const definition = seedLibrary()[0];
+  definition.visual = { kind: 'glb', assetId: 'expanded', fallback: 'radiator' };
+  const buffer = Buffer.from(
+    zipSync({
+      'manifest.json': strToU8(
+        JSON.stringify({ format: 'watt-wallet', version: 1, kind: 'library', definitions: [definition] }),
+      ),
+      'assets/expanded.glb': oversizedGeometryGlb(),
+    }),
+  );
+  const chooser = page.waitForEvent('filechooser');
+  await page.locator('.heading-actions').getByRole('button', { name: 'Import', exact: true }).click();
+  await (await chooser).setFiles({ name: 'expanded.wattpack', mimeType: 'application/zip', buffer });
+  await expect(page.locator('.error-banner')).toContainText(
+    'The decoded GLB geometry exceeds the 64 MiB limit.',
+  );
+  await expect(dialog).not.toBeVisible();
+  expect(await snapshot()).toEqual(before);
+  expect(await assetKeys()).toHaveLength(1);
+});

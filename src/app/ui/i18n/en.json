@@ -432,5 +432,6 @@
   "Vous pouvez conserver au maximum 100 logements.": "You can keep at most 100 homes.",
   "Ce logement est limité à 50 scénarios. Supprimez un scénario avant d’en créer un autre.": "This home is limited to 50 scenarios. Delete a scenario before creating another one.",
   "Cette configuration est limitée à 500 objets. Utilisez les quantités pour regrouper vos appareils.": "This configuration is limited to 500 objects. Use quantities to group your devices.",
-  "Aucune cellule libre ne peut accueillir cet appareil. Déplacez les objets ou utilisez le placement libre.": "No free cell can fit this device. Move the objects or use free placement."
+  "Aucune cellule libre ne peut accueillir cet appareil. Déplacez les objets ou utilisez le placement libre.": "No free cell can fit this device. Move the objects or use free placement.",
+  "La géométrie décodée du GLB dépasse la limite de 64 Mio.": "The decoded GLB geometry exceeds the 64 MiB limit."
 }

@@ -13,7 +13,7 @@ import { validateGlb } from '../src/app/data/glb';
 import { seedWorkspace, seedLibrary } from '../src/app/domain/seed';
 import { calculate } from '../src/app/domain/energy';
 import { copy } from '../src/app/domain/models';
-import { buildGlb, triangleGlb } from './fixtures';
+import { buildGlb, triangleGlb, oversizedGeometryGlb } from './fixtures';
 
 function library(): WattPack {
   return { format: 'watt-wallet', version: 1, kind: 'library', definitions: seedLibrary() };
@@ -258,4 +258,18 @@ describe('reprise d’un import', () => {
       expect(Object.keys(separate.assets)).not.toEqual(Object.keys(plan.assets));
     },
   );
+});
+
+describe('budget GLB dans un paquet partagé', () => {
+  it('rejette le paquet avant de présenter ses ressources à importer', () => {
+    const definitions = seedLibrary();
+    definitions[0].visual = { kind: 'glb', assetId: 'expanded', fallback: 'radiator' };
+    const bytes = zipSync({
+      'manifest.json': strToU8(
+        JSON.stringify({ format: 'watt-wallet', version: 1, kind: 'library', definitions }),
+      ),
+      'assets/expanded.glb': oversizedGeometryGlb(),
+    });
+    expect(() => decodePack(bytes)).toThrow('64 Mio');
+  });
 });

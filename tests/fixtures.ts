@@ -40,3 +40,66 @@ export function buildGlb(json: any, binary = new Uint8Array(0)): Uint8Array {
   }
   return result;
 }
+
+// Small sparse/bufferless files that would expand into large geometry arrays.
+export function oversizedGeometryGlb(sparsePosition = true, customAttributes = 2) {
+  const count = 1999998;
+  const binary = new Uint8Array(sparsePosition ? 32 : 0);
+  if (sparsePosition) {
+    new Uint32Array(binary.buffer, 0, 2).set([1, 2]);
+    new Float32Array(binary.buffer, 8, 6).set([1, 0, 0, 0, 1, 1]);
+  }
+  return buildGlb(
+    {
+      asset: { version: '2.0' },
+      scene: 0,
+      scenes: [{ nodes: [0] }],
+      nodes: [{ mesh: 0 }],
+      meshes: [
+        {
+          primitives: [
+            {
+              attributes: {
+                POSITION: 0,
+                NORMAL: 1,
+                ...Object.fromEntries(
+                  Array.from({ length: customAttributes }, (_, i) => ['_CUSTOM_' + i, i + 2]),
+                ),
+              },
+            },
+          ],
+        },
+      ],
+      ...(sparsePosition
+        ? {
+            buffers: [{ byteLength: 32 }],
+            bufferViews: [
+              { buffer: 0, byteOffset: 0, byteLength: 8 },
+              { buffer: 0, byteOffset: 8, byteLength: 24 },
+            ],
+          }
+        : {}),
+      accessors: [
+        {
+          componentType: 5126,
+          count,
+          type: 'VEC3',
+          min: [0, 0, 0],
+          max: [1, 1, 1],
+          ...(sparsePosition
+            ? {
+                sparse: {
+                  count: 2,
+                  indices: { bufferView: 0, componentType: 5125 },
+                  values: { bufferView: 1 },
+                },
+              }
+            : {}),
+        },
+        { componentType: 5126, count, type: 'VEC3' },
+        ...Array.from({ length: customAttributes }, () => ({ componentType: 5126, count, type: 'VEC4' })),
+      ],
+    },
+    binary,
+  );
+}

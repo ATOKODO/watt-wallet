@@ -64,7 +64,7 @@ Identifiants stables : `bulb`, `radiator`, `ac`, `boiler`, `fridge`, `freezer`, 
 
 Modèle personnalisé : `{ "kind": "glb", "assetId": "mon-frigo", "fallback": "fridge" }`, associé à `assets/mon-frigo.glb`. Plusieurs fiches peuvent utiliser la même ressource. Le GLB d’origine est exporté sans conversion ; origine et volume sont normalisés uniquement lors du rendu. Les animations ne sont pas jouées.
 
-GLB 2 autonome exclusivement : un bloc JSON, éventuellement un bloc BIN ; aucune URI dans les images ou buffers. Textures PNG/JPEG embarquées, pas de Draco, Meshopt, KTX2 ni WebP. Toute extension obligatoire non prise en charge est refusée. La géométrie doit être non vide et bornée ; le chargement de test refuse plus d’un million de triangles. Les textures sont limitées à 4 096 pixels par côté, 32 images et 64 mégapixels au total.
+GLB 2 autonome exclusivement : un bloc JSON, éventuellement un bloc BIN ; aucune URI dans les images ou buffers. Textures PNG/JPEG embarquées, pas de Draco, Meshopt, KTX2 ni WebP. Toute extension obligatoire non prise en charge est refusée. La géométrie doit être non vide et bornée ; le chargement de test refuse plus d’un million de triangles. Avant chargement, un budget conservateur de 64 Mio par GLB borne la taille cumulée des vues binaires et des accessors décodés, y compris les tableaux sans buffer, les strides et les copies des accessors sparse. Les textures sont limitées à 4 096 pixels par côté, 32 images et 64 mégapixels au total.
 
 ## Validation et limites
 
