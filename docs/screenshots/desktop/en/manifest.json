@@ -1,0 +1,136 @@
+{
+  "device": "desktop",
+  "language": "en",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "screenshots": [
+    {
+      "file": "01-accueil-clair.png",
+      "title": "Home, quick device library and navigation",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "02-estimation-annuelle.png",
+      "title": "Annual consumption, electricity budget and monthly average",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "03-plateau-consommation.png",
+      "title": "3D diorama and consumption shares",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "04-placement-grille.png",
+      "title": "Uniform placement, grid arrangement and snapping",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "05-repartition-categories.png",
+      "title": "Annual breakdown by category and bill benchmark",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "06-bibliotheque.png",
+      "title": "Library of editable generic device profiles",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "07-fiche-formulaire.png",
+      "title": "Manual creation of a device profile",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "08-fiche-json.png",
+      "title": "Synchronized JSON editor and validation status",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "09-fiche-json-apercu.png",
+      "title": "Complete JSON example, data preview and annual estimate",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "10-usages-appareil.png",
+      "title": "Device settings and quantity",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "10b-puissance-et-duree.png",
+      "title": "Average power, hours, days and device placement",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "11-detail-calcul.png",
+      "title": "Calculation explained with active use and standby separated",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "12-puissance-simulee.png",
+      "title": "Total power of running, standby and switched-off devices",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "13-comparaison-scenario.png",
+      "title": "Independent scenario, savings and simple payback",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "14-tarif-heures-creuses.png",
+      "title": "Peak/off-peak tariff and separate standing charge",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "15-repere-facture.png",
+      "title": "Optional comparison with twelve months of actual consumption",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "16-import-wattpack.png",
+      "title": "Preview before importing a home and its scenarios",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "17-palette-theme.png",
+      "title": "Theme palette and custom accent color",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "18-accueil-sombre.png",
+      "title": "Annual estimate with a dark lavender theme",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "19-plateau-sombre.png",
+      "title": "3D board with a dark lavender theme",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "20-choix-langue.png",
+      "title": "Switch between French and English without reloading",
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}
