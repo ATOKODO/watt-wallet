@@ -1,0 +1,134 @@
+{
+  "viewport": {
+    "width": 402,
+    "height": 874
+  },
+  "screenshots": [
+    {
+      "file": "01-accueil-clair.png",
+      "title": "Accueil mobile, bibliothèque rapide et navigation",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "02-estimation-annuelle.png",
+      "title": "Consommation annuelle, budget et moyenne mensuelle",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "03-plateau-consommation.png",
+      "title": "Diorama 3D et parts de consommation",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "04-placement-grille.png",
+      "title": "Placement uniforme, rangement en grille et accrochage",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "05-repartition-categories.png",
+      "title": "Répartition annuelle par catégorie et repère de facture",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "06-bibliotheque.png",
+      "title": "Bibliothèque de fiches génériques et personnalisables",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "07-fiche-formulaire.png",
+      "title": "Création manuelle d’une fiche d’appareil",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "08-fiche-json.png",
+      "title": "Éditeur JSON synchronisé et statut de validation",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "09-fiche-json-apercu.png",
+      "title": "Prévisualisation des données et estimation annuelle de la fiche",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "10-usages-appareil.png",
+      "title": "Paramètres de l’appareil et quantité",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "10b-puissance-et-duree.png",
+      "title": "Puissance moyenne, heures, jours et placement de l’appareil",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "11-detail-calcul.png",
+      "title": "Explication du calcul et séparation fonctionnement/veille",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "12-puissance-simulee.png",
+      "title": "Total des appareils en marche, en veille ou arrêtés",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "13-comparaison-scenario.png",
+      "title": "Scénario indépendant, économies et retour sur le surcoût",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "14-tarif-heures-creuses.png",
+      "title": "Tarif heures pleines/heures creuses et abonnement séparé",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "15-repere-facture.png",
+      "title": "Comparaison facultative avec les kWh de douze mois de factures",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "16-import-wattpack.png",
+      "title": "Aperçu avant import d’un logement et de ses scénarios",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "17-palette-theme.png",
+      "title": "Palette et couleur personnalisée appliquées à l’interface",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "18-accueil-sombre.png",
+      "title": "Estimation annuelle en thème sombre lavande",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "19-plateau-sombre.png",
+      "title": "Plateau 3D en thème sombre lavande",
+      "width": 402,
+      "height": 874
+    },
+    {
+      "file": "20-interface-anglaise.png",
+      "title": "Interface anglaise et formats numériques localisés",
+      "width": 402,
+      "height": 874
+    }
+  ]
+}
