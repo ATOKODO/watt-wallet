@@ -14,7 +14,11 @@
     "tauri": "tauri",
     "desktop": "tauri dev",
     "desktop:build": "tauri build --bundles nsis",
-    "examples": "tsx scripts/examples.ts"
+    "examples": "tsx scripts/examples.ts",
+    "docs:dev": "node scripts/docs-assets.mjs && vitepress dev docs --host 127.0.0.1 --port 5173",
+    "docs:build": "node scripts/docs-assets.mjs && vitepress build docs",
+    "docs:preview": "vitepress preview docs --host 127.0.0.1 --port 4173",
+    "test:docs": "node scripts/docs-smoke.mjs"
   },
   "dependencies": {
     "@angular/common": "22.1.7",
@@ -42,6 +46,7 @@
     "prettier": "^3.9.7",
     "tsx": "^4.21.0",
     "typescript": "~6.0.0",
+    "vitepress": "2.0.0-alpha.20",
     "vitest": "^4.1.0"
   }
 }

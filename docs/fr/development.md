@@ -149,3 +149,43 @@ node scripts/screenshots-devices.mjs ipad-pro-11 en
 La fonction de capture partagée utilise des contextes de démonstration isolés, un ratio de pixels de 1 et 21 captures de fonctionnalités par série. Les PNG, galerie, README et manifeste sont écrits dans `docs/screenshots`. Les identifiants d’appareil facultatifs sont `ipad-pro-11`, `macbook-pro-14` et `desktop` ; la langue facultative est `fr` ou `en`. `WATT_WALLET_URL` change l’URL cible. `WATT_WALLET_SOFTWARE_GPU=1` active l’option WebGL logiciel du script des grands formats si nécessaire.
 
 Les scripts attendent les polices et la stabilisation de l’interface, contrôlent les dimensions PNG et les débordements horizontaux ; la fonction partagée refuse les captures avec repli sans WebGL. Ils écrivent des images et documents suivis dans Git. Examiner les [galeries](../screenshots/README.md) après régénération. Les noms de viewport décrivent des dispositions, pas une couverture native Safari, iOS ou macOS.
+
+## Site de documentation
+
+La documentation est un site statique VitePress séparé ; elle ne lit pas les données de l’application et n’a pas besoin de lancer Angular ou Tauri. Les mêmes fichiers Markdown de `docs/en/` et `docs/fr/` fonctionnent sur GitHub et dans le site. Le rendu adapte les liens du dépôt vers les ressources téléchargeables et les routes du navigateur sans modifier les guides sources. La navigation, la recherche et l’apparence sont configurées dans `docs/.vitepress/config.mts` et `docs/.vitepress/theme/`. La version de VitePress est fixée dans `package.json` ; vérifier la compilation et la navigation lors d’une mise à jour.
+
+```powershell
+npm run docs:dev
+```
+
+Ouvrir [Français](http://127.0.0.1:5173/fr/) ou [English](http://127.0.0.1:5173/en/). Le serveur recharge les pages après modification du Markdown. Il peut fonctionner en parallèle de l’application sur le port 4200. La barre latérale donne accès à chaque fonctionnalité ; l’en-tête propose langue, recherche locale et thème. Ces préférences documentaires sont indépendantes de l’application.
+
+```powershell
+npm run docs:build
+npm run test:docs -- --static
+npm run test:docs
+npm run docs:preview
+```
+
+La compilation produit `docs/.vitepress/dist` ; l’aperçu écoute sur [http://127.0.0.1:4173](http://127.0.0.1:4173). `scripts/docs-assets.mjs` copie captures, galeries HTML, exemples, schéma JSON et favicon avant le développement/la compilation dans un dossier public ignoré par Git. Aucune copie des ressources sources n’est à maintenir. Publier le dossier de sortie complet. La documentation n’installe pas le service worker hors connexion de l’application.
+
+Le contrôle statique vérifie liens internes, ancres et ressources générés. Le contrôle complet utilise en plus un contexte Chromium isolé pour vérifier navigation française/anglaise, recherche, changement de langue, thèmes, téléchargement des paquets et menu mobile. Installer son runtime avec `npm exec playwright install chromium` si nécessaire. Les captures de contrôle sont écrites dans le dossier ignoré `.cache/docs-review/`. Vérifier le formatage avec :
+
+```powershell
+npx prettier --check README*.md docs/en docs/fr docs/index.md docs/.vitepress/config.mts docs/.vitepress/theme scripts/docs-*.mjs .github/workflows/docs-pages.yml
+```
+
+### GitHub Pages
+
+Le workflow fourni `.github/workflows/docs-pages.yml` compile, vérifie les liens et publie la documentation après les changements concernés poussés sur `master`, ou sur lancement manuel depuis Actions. Dans **Settings → Pages → Build and deployment → Source** du dépôt, sélectionner **GitHub Actions** avant de l’exécuter. Ajouter le workflow localement ne publie pas de site et ne modifie pas les paramètres du dépôt. Consulter les [instructions GitHub pour un workflow Pages personnalisé](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) et le [guide de publication VitePress](https://vitepress.dev/guide/deploy).
+
+Le workflow fournit le chemin de base réel de Pages via `DOCS_BASE_PATH`, qu’il s’agisse d’un sous-chemin de dépôt ou de la racine d’un domaine personnalisé. Le site utilise des routes explicites en `.html` : les liens directs vers les guides ne nécessitent pas de repli SPA. Pour vérifier un sous-chemin localement, garder la même base pour la compilation, les tests et l’aperçu :
+
+```powershell
+$env:DOCS_BASE_PATH = '/watt-wallet/'
+npm run docs:build
+npm run test:docs
+npm run docs:preview
+```
+
+Ouvrir `http://127.0.0.1:4173/watt-wallet/fr/` ou son équivalent anglais. Après arrêt de l’aperçu, utiliser `Remove-Item Env:DOCS_BASE_PATH` puis recompiler pour revenir à un hébergement à la racine. La base par défaut est `/`. Ce site publie la documentation et les exemples téléchargeables ; l’application Angular conserve sa compilation et ses besoins d’hébergement propres.

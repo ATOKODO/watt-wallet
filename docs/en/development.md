@@ -149,3 +149,43 @@ node scripts/screenshots-devices.mjs ipad-pro-11 en
 The shared capture helper uses isolated demonstration contexts, a pixel ratio of 1 and 21 feature captures per series. Outputs are PNGs plus a gallery, README and manifest under `docs/screenshots`. Optional device identifiers are `ipad-pro-11`, `macbook-pro-14` and `desktop`; optional language is `fr` or `en`. `WATT_WALLET_URL` changes the target URL. `WATT_WALLET_SOFTWARE_GPU=1` enables the larger-series script's software WebGL option when needed.
 
 The scripts wait for fonts and UI settling, check PNG dimensions and horizontal overflow, and the shared helper rejects WebGL fallback captures. They write tracked image/documentation files. Inspect the [galleries](../screenshots/README.md) after regeneration. Viewport names describe layouts, not native Safari, iOS or macOS test coverage.
+
+## Documentation website
+
+The documentation is a separate static VitePress site; it does not read application data or require Angular or Tauri to run. The same Markdown files in `docs/en/` and `docs/fr/` work on GitHub and in the site. The renderer adapts repository links to downloadable assets and browser routes without changing the source guides. Navigation, search and appearance are configured in `docs/.vitepress/config.mts` and `docs/.vitepress/theme/`. The VitePress version is pinned in `package.json`; check the build and navigation when upgrading it.
+
+```powershell
+npm run docs:dev
+```
+
+Open [English](http://127.0.0.1:5173/en/) or [Français](http://127.0.0.1:5173/fr/). The development server reloads after Markdown changes. It can run alongside the application on port 4200. The sidebar links directly to each feature; the header provides language selection, local search and a theme switch. These documentation preferences are independent of the application.
+
+```powershell
+npm run docs:build
+npm run test:docs -- --static
+npm run test:docs
+npm run docs:preview
+```
+
+The build produces `docs/.vitepress/dist`; preview listens on [http://127.0.0.1:4173](http://127.0.0.1:4173). `scripts/docs-assets.mjs` copies the screenshots, HTML galleries, examples, JSON schema and favicon before development/build into an ignored public directory. No duplicate source assets need to be maintained. Deploy the entire output folder. The documentation does not install the application's offline service worker.
+
+The static check verifies generated internal links, anchors and assets. The full check additionally uses an isolated Chromium context to verify French/English navigation, search, language switching, themes, package downloads and mobile navigation. Install its runtime with `npm exec playwright install chromium` if needed. Inspection screenshots go into the ignored `.cache/docs-review/` folder. Check formatting with:
+
+```powershell
+npx prettier --check README*.md docs/en docs/fr docs/index.md docs/.vitepress/config.mts docs/.vitepress/theme scripts/docs-*.mjs .github/workflows/docs-pages.yml
+```
+
+### GitHub Pages
+
+The included `.github/workflows/docs-pages.yml` builds, checks links and publishes the documentation after relevant changes are pushed to `master`, or when started manually from Actions. In the repository's **Settings → Pages → Build and deployment → Source**, select **GitHub Actions** before running it. Adding the workflow locally does not publish a site or change repository settings. See [GitHub's custom Pages workflow instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) and the [VitePress deployment guide](https://vitepress.dev/guide/deploy).
+
+The workflow supplies the actual Pages base path through `DOCS_BASE_PATH`, including a repository subpath or a custom domain's root. The site uses explicit `.html` routes so direct guide links do not need an SPA fallback. To check a repository subpath locally, use the same base for build, tests and preview:
+
+```powershell
+$env:DOCS_BASE_PATH = '/watt-wallet/'
+npm run docs:build
+npm run test:docs
+npm run docs:preview
+```
+
+Open `http://127.0.0.1:4173/watt-wallet/fr/` or its English counterpart. After stopping preview, use `Remove-Item Env:DOCS_BASE_PATH` and rebuild to return to root-path hosting. The default base is `/`. This site publishes documentation and downloadable examples; the Angular application has its own build and hosting requirements.

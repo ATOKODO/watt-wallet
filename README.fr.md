@@ -57,6 +57,14 @@ L’application Windows fonctionne hors connexion. L’installateur télécharge
 
 ## Documentation
 
+Commencer par l’[introduction de la documentation](docs/fr/index.md). La documentation dans le navigateur propose une barre latérale par fonctionnalité, un sommaire, une recherche locale, le choix de langue et les thèmes clair/sombre.
+
+```powershell
+npm run docs:dev
+```
+
+Ouvrir [http://127.0.0.1:5173/fr/](http://127.0.0.1:5173/fr/). Compiler le site autonome avec `npm run docs:build` ; consulter les [instructions de publication](docs/fr/development.md#site-de-documentation) pour GitHub Pages.
+
 | Guide                                                       | Contenu                                                                                       |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | [Guide utilisateur](docs/fr/user-guide.md)                  | Parcours courants, commandes 3D, édition JSON, sauvegardes et dépannage.                      |

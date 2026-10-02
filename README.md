@@ -57,6 +57,14 @@ The Windows application runs offline. The installer downloads WebView2 if it is 
 
 ## Documentation
 
+Start with the [documentation introduction](docs/en/index.md). The browser documentation includes a feature sidebar, page contents, local search, language selection and light/dark themes.
+
+```powershell
+npm run docs:dev
+```
+
+Open [http://127.0.0.1:5173/en/](http://127.0.0.1:5173/en/). Build the standalone site with `npm run docs:build`; see the [publishing instructions](docs/en/development.md#documentation-website) for GitHub Pages.
+
 | Guide                                                    | Contents                                                                         |
 | -------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | [User guide](docs/en/user-guide.md)                      | Everyday workflows, 3D controls, JSON editing, backups and troubleshooting.      |

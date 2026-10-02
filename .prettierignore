@@ -8,3 +8,6 @@ test-results
 package-lock.json
 docs/wattpack.schema.json
 examples
+docs/.vitepress/cache
+docs/.vitepress/dist
+docs/.vitepress/public
