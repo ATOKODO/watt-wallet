@@ -10,3 +10,5 @@ playwright-report/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
 docs/.vitepress/public/
+
+storybook-static/

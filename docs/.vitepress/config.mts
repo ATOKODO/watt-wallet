@@ -62,6 +62,7 @@ function sidebar(lang: 'en' | 'fr'): DefaultTheme.SidebarItem[] {
         { text: fr ? 'Format .wattpack' : '.wattpack format', link: prefix + 'wattpack' },
         { text: fr ? 'Exemples et captures' : 'Examples and screenshots', link: prefix + 'examples' },
         { text: fr ? 'Guide développeur' : 'Developer guide', link: prefix + 'development' },
+        { text: 'Design system & Storybook', link: prefix + 'design-system' },
         { text: fr ? 'Vérifications et limites' : 'Verification and limits', link: prefix + 'verification' },
       ],
     },

@@ -189,3 +189,7 @@ npm run docs:preview
 ```
 
 Ouvrir `http://127.0.0.1:4173/watt-wallet/fr/` ou son équivalent anglais. Après arrêt de l’aperçu, utiliser `Remove-Item Env:DOCS_BASE_PATH` puis recompiler pour revenir à un hébergement à la racine. La base par défaut est `/`. Ce site publie la documentation et les exemples téléchargeables ; l’application Angular conserve sa compilation et ses besoins d’hébergement propres.
+
+## Design system et composants
+
+Consulter le [guide Storybook](design-system.md) pour les tokens partagés, le catalogue des composants de production, les providers isolés et les contrôles d’interaction. Lancer le catalogue avec `npm run storybook` sur le port 6007 ; le compiler avec `npm run storybook:build`.

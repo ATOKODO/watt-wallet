@@ -1,3 +1,5 @@
+import { MetricComponent } from './ui/design-system/metric';
+import { ButtonDirective } from './ui/design-system/button';
 import { LanguageService, TranslatePipe } from './ui/language';
 import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -36,7 +38,15 @@ import { validateRenderableGlb } from './scene/models';
 @Component({
   selector: 'ww-app',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, DeviceEditorComponent, DioramaComponent, TranslatePipe],
+  imports: [
+    MetricComponent,
+    ButtonDirective,
+    ReactiveFormsModule,
+    IconComponent,
+    DeviceEditorComponent,
+    DioramaComponent,
+    TranslatePipe,
+  ],
   templateUrl: './app.html',
 })
 export class AppComponent {

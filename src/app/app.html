@@ -53,7 +53,7 @@
   <h1>{{ 'Vos données n’ont pas pu être ouvertes' | t }}</h1>
   <p>{{i18n.error(store.loadError())}}</p>
   <p>{{ 'La sauvegarde existante n’a pas été remplacée.' | t }}</p>
-  <button class="btn primary" (click)="store.initialize()">{{ 'Réessayer' | t }}</button>
+  <button wwButton="primary" (click)="store.initialize()">{{ 'Réessayer' | t }}</button>
 </main>
 } @else if (!store.workspace()) {
 <main class="load-state">
@@ -113,7 +113,7 @@
       }
     </div>
     <div class="library-bottom">
-      <button class="btn secondary full" (click)="newDefinition()">
+      <button wwButton="secondary" class="full" (click)="newDefinition()">
         <ww-icon name="plus" />{{ 'Créer un appareil' | t }}
       </button>
       <div class="library-file-actions">
@@ -166,9 +166,9 @@
         </p>
       </div>
       <div class="heading-actions">
-        <button class="btn secondary" (click)="openImport()" [disabled]="busy()">
+        <button wwButton="secondary" (click)="openImport()" [disabled]="busy()">
           <ww-icon name="upload" />{{ 'Importer' | t }}</button
-        ><button class="btn primary" (click)="exportPack()" [disabled]="busy()">
+        ><button wwButton="primary" (click)="exportPack()" [disabled]="busy()">
           <ww-icon name="download" />{{ 'Partager le logement' | t }}
         </button>
       </div>
@@ -177,7 +177,7 @@
     @if(tab() === 'library') {
     <div class="catalog-heading">
       <span>{{ '{0} fiches · estimations modifiables' | t:[((filteredLibrary().length) | t)] }}</span
-      ><button class="btn primary" (click)="newDefinition()">
+      ><button wwButton="primary" (click)="newDefinition()">
         <ww-icon name="plus" />{{ 'Nouvelle fiche' | t }}
       </button>
     </div>
@@ -195,7 +195,8 @@
           {{(d.visual.kind === 'glb' ? 'Modèle 3D personnalisé' : 'Silhouette intégrée') | t}}
         </p>
         <div class="catalog-actions">
-          <button class="btn secondary small" (click)="editDefinition(d)">{{ 'Modifier' | t }}</button
+          <button wwButton="secondary" wwButtonSize="small" class="small" (click)="editDefinition(d)">
+            {{ 'Modifier' | t }}</button
           ><button
             class="icon-button"
             [attr.aria-label]="'Exporter {0}' | t:[i18n.deviceName(d)]"
@@ -222,35 +223,34 @@
     </div>
     } @else {
     <section class="metrics" [attr.aria-label]="'Estimation annuelle' | t">
-      <article class="metric">
-        <div class="metric-label">
-          <span class="metric-symbol peach"><ww-icon name="bolt" /></span>{{ 'Consommation estimée' | t
-          }}<span class="estimate-tag">{{ 'ANNUELLE' | t }}</span>
-        </div>
-        <div class="metric-value">
-          {{(number(store.result().kwh)) | t}}
-          <span>{{ 'kWh' | t }}<span class="metric-suffix"> {{ '/ an' | t }}</span></span>
-        </div>
-        <p>{{ '{0} appareils, un seul regard sur votre énergie.' | t:[((count()) | t)] }}</p>
-      </article>
-      <article class="metric">
-        <div class="metric-label">
-          <span class="metric-symbol sage"><ww-icon name="chart" /></span>{{ 'Budget électricité' | t }}
-        </div>
-        <div class="metric-value">
-          {{(money(store.result().totalCost)) | t}}<span class="metric-suffix"> {{ '/ an' | t }}</span>
-        </div>
-        <p>{{ 'Dont {0} d’abonnement.' | t:[((money(store.result().subscription)) | t)] }}</p>
-      </article>
-      <article class="metric metric-monthly">
-        <div class="metric-label">
-          <span class="metric-symbol cream"><ww-icon name="leaf" /></span>{{ 'Chaque mois, en moyenne' | t }}
-        </div>
-        <div class="metric-value">
-          {{(money(store.result().monthlyCost)) | t}}<span class="metric-suffix"> {{ '/ mois' | t }}</span>
-        </div>
-        <p>{{ 'Une estimation, pas une facture.' | t }}</p>
-      </article>
+      <article
+        wwMetric
+        [label]="'Consommation estimée' | t"
+        [value]="number(store.result().kwh)"
+        [unit]="'kWh' | t"
+        [suffix]="'/ an' | t"
+        [tag]="'ANNUELLE' | t"
+        [hint]="'{0} appareils, un seul regard sur votre énergie.' | t:[number(count())]"
+      ></article>
+      <article
+        wwMetric
+        [label]="'Budget électricité' | t"
+        [value]="money(store.result().totalCost)"
+        [suffix]="'/ an' | t"
+        [hint]="'Dont {0} d’abonnement.' | t:[money(store.result().subscription)]"
+        icon="chart"
+        tone="sage"
+      ></article>
+      <article
+        wwMetric
+        [label]="'Chaque mois, en moyenne' | t"
+        [value]="money(store.result().monthlyCost)"
+        [suffix]="'/ mois' | t"
+        [hint]="'Une estimation, pas une facture.' | t"
+        icon="leaf"
+        tone="cream"
+        [highlighted]="true"
+      ></article>
     </section>
     <a class="power-preview" href="#power-simulator">
       <span
@@ -268,7 +268,7 @@
           <h2>{{ 'Vos futurs possibles' | t }}</h2>
           <p>{{ 'Modifiez une copie et comparez-la à votre logement de référence.' | t }}</p>
         </div>
-        <button class="btn secondary small" (click)="openName('new-scenario')">
+        <button wwButton="secondary" wwButtonSize="small" class="small" (click)="openName('new-scenario')">
           <ww-icon name="plus" />{{ 'Créer un scénario' | t }}
         </button>
       </div>
@@ -310,7 +310,7 @@
             type="number"
             min="0"
             step="any" /></label
-        ><button class="btn secondary small">{{ 'Enregistrer' | t }}</button
+        ><button wwButton="secondary" wwButtonSize="small" class="small">{{ 'Enregistrer' | t }}</button
         ><button type="button" class="text-button danger" (click)="store.removeScenario()">
           {{ 'Supprimer ce scénario' | t }}
         </button>
@@ -589,7 +589,12 @@
         </details>
         }
         <div class="inspector-actions">
-          <button class="btn secondary small" (click)="store.duplicateDevice(selected.id)">
+          <button
+            wwButton="secondary"
+            wwButtonSize="small"
+            class="small"
+            (click)="store.duplicateDevice(selected.id)"
+          >
             <ww-icon name="copy" />{{ 'Dupliquer' | t }}</button
           ><button
             class="icon-button danger"
@@ -681,7 +686,7 @@
           t),((money(store.snapshot()!.tariff.subscription)) | t)] }}</span
         >
       </div>
-      <button class="btn secondary small" (click)="openTariff()">
+      <button wwButton="secondary" wwButtonSize="small" class="small" (click)="openTariff()">
         {{ 'Ajuster mon tarif' | t }} <ww-icon name="chevron" />
       </button>
     </section>
@@ -701,7 +706,9 @@
 } @if(store.error()){
 <div class="error-banner" role="alert">
   <ww-icon name="info" /><span>{{i18n.error(store.error())}}</span>@if(store.saveConflict()) {
-  <button class="btn secondary small" (click)="reloadWorkspace()">{{'Recharger les données' | t}}</button>
+  <button wwButton="secondary" wwButtonSize="small" class="small" (click)="reloadWorkspace()">
+    {{'Recharger les données' | t}}
+  </button>
   }<button
     class="icon-button"
     [attr.aria-label]="'Fermer le message d’erreur' | t"
@@ -745,7 +752,7 @@
         [placeholder]="'Ex. Appartement à Lyon' | t" /></label
     >@if(modalError()){
     <p class="inline-error">{{i18n.error(modalError())}}</p>
-    }<button class="btn primary full" type="submit">
+    }<button wwButton="primary" class="full" type="submit">
       {{(modal() === 'rename-home' ? 'Enregistrer' : 'Créer') | t}}
     </button>
   </form>
@@ -883,7 +890,7 @@
     </p>
     @if(modalError()){
     <p role="alert" class="inline-error">{{i18n.error(modalError())}}</p>
-    }<button class="btn primary full" type="submit">{{ 'Enregistrer mon tarif' | t }}</button>
+    }<button wwButton="primary" class="full" type="submit">{{ 'Enregistrer mon tarif' | t }}</button>
   </form>
   } @if(modal() === 'device' && editingDefinition(); as definition){
   <h2>{{definition.name ? i18n.deviceName(definition) : ('Un nouvel appareil, à votre façon.' | t)}}</h2>
@@ -911,7 +918,7 @@
   </p>
   @if(modalError()){
   <p role="alert" class="inline-error">{{i18n.error(modalError())}}</p>
-  }<button class="btn primary full" (click)="confirmImport()" [disabled]="busy()">
+  }<button wwButton="primary" class="full" (click)="confirmImport()" [disabled]="busy()">
     {{(busy() ? 'Import en cours…' : 'Importer ces données') | t}}</button
   >}
 </dialog>

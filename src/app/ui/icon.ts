@@ -44,6 +44,9 @@ const paths: Record<string, string> = {
   edit: 'm16 3 5 5L8 21H3v-5L16 3ZM13 6l5 5',
   save: 'M3 3h15l3 3v15H3V3ZM7 3v6h10V3M7 21v-8h10v8',
 };
+/** Names available to the app and to the Storybook icon catalogue. */
+export const iconNames = Object.keys(paths);
+
 @Component({
   selector: 'ww-icon',
   standalone: true,

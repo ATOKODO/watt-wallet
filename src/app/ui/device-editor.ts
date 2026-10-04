@@ -1,3 +1,4 @@
+import { ButtonDirective } from './design-system/button';
 import { LanguageService, TranslatePipe } from './language';
 import { Component, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -22,7 +23,7 @@ import { IconComponent } from './icon';
 @Component({
   selector: 'ww-device-editor',
   standalone: true,
-  imports: [ReactiveFormsModule, IconComponent, TranslatePipe],
+  imports: [ButtonDirective, ReactiveFormsModule, IconComponent, TranslatePipe],
   template: `
     @if (!instance()) {
       <div class="definition-tabs" role="tablist" [attr.aria-label]="'Mode d’édition de la fiche' | t">
@@ -173,7 +174,9 @@ import { IconComponent } from './icon';
         >
         <div class="upload-row">
           <button
-            class="btn secondary small"
+            wwButton="secondary"
+            wwButtonSize="small"
+            class="small"
             type="button"
             (click)="importGlb()"
             [disabled]="saving() || importing()"
@@ -226,7 +229,8 @@ import { IconComponent } from './icon';
           </p>
         }
         <button
-          class="btn primary full"
+          wwButton="primary"
+          class="full"
           type="submit"
           [disabled]="saving() || importing() || jsonDirtyInvalid()"
         >
@@ -240,7 +244,13 @@ import { IconComponent } from './icon';
           <details class="json-example">
             <summary>{{ 'Voir un exemple JSON complet' | t }}</summary>
             <pre>{{ jsonExample() }}</pre>
-            <button class="btn secondary small" type="button" (click)="loadExample()">
+            <button
+              wwButton="secondary"
+              wwButtonSize="small"
+              class="small"
+              type="button"
+              (click)="loadExample()"
+            >
               {{ 'Charger cet exemple' | t }}
             </button>
           </details>
@@ -324,7 +334,8 @@ import { IconComponent } from './icon';
         <p role="alert" class="inline-error">{{ i18n.error(error()) }}</p>
       }
       <button
-        class="btn primary full"
+        wwButton="primary"
+        class="full"
         type="button"
         (click)="submit()"
         [disabled]="saving() || importing() || jsonStatus() !== 'valid' || jsonDirtyInvalid()"

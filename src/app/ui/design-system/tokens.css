@@ -1,0 +1,33 @@
+:root {
+  font-family: var(--font-ui);
+  color: oklch(from #2d3c32 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  background: oklch(from #f7f8f3 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  font-synthesis: none;
+  font-size: var(--text-base);
+  --font-ui: 'Segoe UI', Inter, Arial, sans-serif;
+  --text-base: 14px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --green: oklch(from #315b43 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --deep: oklch(from #264933 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --muted: oklch(from #839080 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --border: oklch(from #e3e7dc l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --cream: oklch(from #f7f8f3 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  color: oklch(from #e7eee4 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  background: oklch(from #18211c l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --green: oklch(from #4a7957 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --deep: oklch(from #b9d7ae l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --muted: oklch(from #a6b6a2 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --border: oklch(from #3a4a3e l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+  --cream: oklch(from #18211c l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
+}
