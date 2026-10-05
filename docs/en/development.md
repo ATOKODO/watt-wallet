@@ -193,3 +193,7 @@ Open `http://127.0.0.1:4173/watt-wallet/fr/` or its English counterpart. After s
 ## Design system and components
 
 See the [Storybook guide](design-system.md) for the shared tokens, production component catalogue, isolated data providers and interaction checks. Start the catalogue with `npm run storybook` on port 6007; build it with `npm run storybook:build`.
+
+## Visual regression
+
+Run `npm run test:visual` to compare the application and Storybook against committed PNG references. Inspect differences with `npm run test:visual:report`; intentionally approve changes using `npm run test:visual:update`. See the [visual regression guide](visual-testing.md) for viewports, themes, fixture isolation, Windows references and GitHub Actions.

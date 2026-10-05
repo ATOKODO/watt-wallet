@@ -10,7 +10,7 @@
     "test:e2e": "playwright test",
     "test:offline": "node scripts/offline-smoke.mjs",
     "test:native": "node scripts/native-smoke.mjs",
-    "format:check": "prettier --check src tests e2e scripts *.json *.ts docs/*.md README.md src-tauri/*.json src-tauri/capabilities/*.json .storybook",
+    "format:check": "prettier --check src tests e2e scripts *.json *.ts docs/*.md README.md src-tauri/*.json src-tauri/capabilities/*.json .storybook visual",
     "tauri": "tauri",
     "desktop": "tauri dev",
     "desktop:build": "tauri build --bundles nsis",
@@ -22,7 +22,11 @@
     "storybook": "storybook dev --host 127.0.0.1 -p 6007 --no-open",
     "storybook:build": "storybook build -o storybook-static",
     "test:storybook": "node scripts/storybook-smoke.mjs",
-    "storybook:typecheck": "tsc --noEmit -p .storybook/tsconfig.json"
+    "storybook:typecheck": "tsc --noEmit -p .storybook/tsconfig.json",
+    "test:visual": "npm run build && npm run storybook:build && playwright test -c playwright.visual.config.ts",
+    "test:visual:update": "npm run test:visual -- --update-snapshots=all",
+    "test:visual:report": "playwright show-report playwright-report/visual",
+    "visual:typecheck": "tsc --noEmit -p visual/tsconfig.json"
   },
   "dependencies": {
     "@angular/common": "22.1.7",

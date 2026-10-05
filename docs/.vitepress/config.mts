@@ -63,6 +63,7 @@ function sidebar(lang: 'en' | 'fr'): DefaultTheme.SidebarItem[] {
         { text: fr ? 'Exemples et captures' : 'Examples and screenshots', link: prefix + 'examples' },
         { text: fr ? 'Guide développeur' : 'Developer guide', link: prefix + 'development' },
         { text: 'Design system & Storybook', link: prefix + 'design-system' },
+        { text: fr ? 'Régression visuelle' : 'Visual regression', link: prefix + 'visual-testing' },
         { text: fr ? 'Vérifications et limites' : 'Verification and limits', link: prefix + 'verification' },
       ],
     },

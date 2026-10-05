@@ -193,3 +193,7 @@ Ouvrir `http://127.0.0.1:4173/watt-wallet/fr/` ou son équivalent anglais. Aprè
 ## Design system et composants
 
 Consulter le [guide Storybook](design-system.md) pour les tokens partagés, le catalogue des composants de production, les providers isolés et les contrôles d’interaction. Lancer le catalogue avec `npm run storybook` sur le port 6007 ; le compiler avec `npm run storybook:build`.
+
+## Régression visuelle
+
+Lancer `npm run test:visual` pour comparer l’application et Storybook à des références PNG suivies. Examiner les différences avec `npm run test:visual:report` ; approuver volontairement les changements avec `npm run test:visual:update`. Consulter le [guide de régression visuelle](visual-testing.md) pour les formats, thèmes, données isolées, références Windows et GitHub Actions.

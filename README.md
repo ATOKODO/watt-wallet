@@ -71,6 +71,7 @@ Open [http://127.0.0.1:5173/en/](http://127.0.0.1:5173/en/). Build the standalon
 | [Calculations and estimates](docs/en/calculations.md)    | Units, formulas, standby, tariffs, standing charges and scenario examples.       |
 | [Developer guide](docs/en/development.md)                | Setup, architecture, storage, translation, builds, tests and screenshot scripts. |
 | [Design system & Storybook](docs/en/design-system.md)    | Interactive design system, components, themes and isolated fixtures.             |
+| [Visual regression](docs/en/visual-testing.md)           | Screenshot comparisons, approved references and difference reports.              |
 | [`.wattpack` format](docs/en/wattpack.md)                | Version 1 contract, complete JSON examples, GLB requirements and import limits.  |
 | [Verification and known limits](docs/en/verification.md) | Historical local validation results and what has not been tested.                |
 

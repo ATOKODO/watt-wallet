@@ -1,0 +1,49 @@
+name: Visual regression
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - '.storybook/**'
+      - 'visual/**'
+      - 'scripts/visual-server.mjs'
+      - 'playwright.visual.config.ts'
+      - 'angular.json'
+      - 'tsconfig*.json'
+      - 'package*.json'
+      - '.github/workflows/visual-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    # References are generated on Windows; do not compare them to Linux/macOS fonts.
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm exec playwright install chromium
+      - run: npm run visual:typecheck
+      - run: npm run test:visual
+      - name: Upload comparison report and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-report
+          path: |
+            playwright-report/visual
+            test-results/visual
+          retention-days: 14
+          if-no-files-found: ignore

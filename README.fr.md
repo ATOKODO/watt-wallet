@@ -71,6 +71,7 @@ Ouvrir [http://127.0.0.1:5173/fr/](http://127.0.0.1:5173/fr/). Compiler le site 
 | [Calculs et estimations](docs/fr/calculations.md)           | Unités, formules, veille, tarifs, abonnement et exemples de scénarios.                        |
 | [Guide développeur](docs/fr/development.md)                 | Installation, architecture, stockage, traduction, compilations, tests et scripts de captures. |
 | [Design system & Storybook](docs/fr/design-system.md)       | Design system interactif, composants, thèmes et données isolées.                              |
+| [Régression visuelle](docs/fr/visual-testing.md)            | Comparaisons de captures, références approuvées et rapports de différences.                   |
 | [Format `.wattpack`](docs/fr/wattpack.md)                   | Contrat version 1, exemples JSON complets, exigences GLB et limites d’import.                 |
 | [Vérifications et limites connues](docs/fr/verification.md) | Résultats historiques des validations locales et parcours non testés.                         |
 
