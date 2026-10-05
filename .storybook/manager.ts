@@ -10,6 +10,6 @@ addons.setConfig({
     colorSecondary: '#315b43',
     appBg: '#f7f8f3',
     appContentBg: '#fffefa',
-    fontBase: 'Segoe UI, Arial, sans-serif',
+    fontBase: 'Inter, Arial, sans-serif',
   }),
 });

@@ -10,6 +10,7 @@ const types = {
   '.json': 'application/json',
   '.svg': 'image/svg+xml',
   '.webmanifest': 'application/manifest+json',
+  '.woff2': 'font/woff2',
 };
 const server = createServer(async (req, res) => {
   try {
@@ -86,6 +87,39 @@ try {
     throw e;
   }
   await expect(page.locator('.object-label')).toHaveCount(7);
+  const fontStatus = await page.evaluate(async () => {
+    await document.fonts.ready;
+    const faces = [
+      ['Inter', 400],
+      ['Inter', 500],
+      ['Inter', 600],
+      ['Inter', 700],
+      ['Lora', 400],
+      ['Roboto Mono', 400],
+      ['Roboto Mono', 600],
+    ];
+    const loaded = await Promise.all(
+      faces.map(async ([family, weight]) => {
+        const fonts = await document.fonts.load(weight + ' 14px "' + family + '"', 'Électricité œ Ā');
+        return {
+          family,
+          weight,
+          loaded: fonts.length > 0 && fonts.every((font) => font.status === 'loaded'),
+        };
+      }),
+    );
+    return {
+      loaded,
+      ui: getComputedStyle(document.body).fontFamily,
+      heading: getComputedStyle(document.querySelector('h1')).fontFamily,
+    };
+  });
+  expect(
+    fontStatus.loaded.every((font) => font.loaded),
+    JSON.stringify(fontStatus),
+  ).toBe(true);
+  expect(fontStatus.ui).toContain('Inter');
+  expect(fontStatus.heading).toContain('Lora');
   expect(requests).toEqual([]);
   console.log(
     'SPA production : cache complet, rechargement hors connexion, langue anglaise persistante, persistance et absence de requêtes externes OK.',

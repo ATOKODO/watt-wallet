@@ -15,6 +15,16 @@ for (const language of ['fr', 'en'] as const) {
       const t = (source: string) => translate(language, source);
       await openHome(page, language, theme);
       await sceneReady(page, 6);
+      const sceneBounds = await page.locator('ww-diorama').boundingBox();
+      const stageBounds = await page.locator('.stage').boundingBox();
+      const navigationBounds = await page.locator('.scene-navigation').boundingBox();
+      expect(sceneBounds).not.toBeNull();
+      expect(stageBounds).not.toBeNull();
+      expect(navigationBounds).not.toBeNull();
+      expect(sceneBounds!.height).toBeLessThanOrEqual(stageBounds!.height + 0.5);
+      expect(navigationBounds!.y + navigationBounds!.height).toBeLessThanOrEqual(
+        stageBounds!.y + stageBounds!.height,
+      );
       await capture(page, 'home-' + language + '-' + theme + '.png');
       await capture(page, 'diorama-' + language + '-' + theme + '.png', page.locator('.diorama-card'));
       await page.getByRole('button', { name: t('Bibliothèque'), exact: true }).click();

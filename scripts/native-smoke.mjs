@@ -40,7 +40,13 @@ async function launch() {
     child.kill();
     throw new Error('WebView2 ne répond pas au débogage local.');
   }
-  const browser = await chromium.connectOverCDP(endpoint);
+  let browser;
+  try {
+    browser = await chromium.connectOverCDP(endpoint);
+  } catch (error) {
+    child.kill();
+    throw error;
+  }
   let page;
   for (let n = 0; n < 100; n++) {
     page = browser
@@ -69,6 +75,32 @@ try {
   await expect(page.getByRole('heading', { name: 'Un petit monde. Une énergie plus claire.' })).toBeVisible({
     timeout: 30000,
   });
+  const fonts = await page.evaluate(async () => {
+    await document.fonts.ready;
+    const faces = [
+      ['Inter', 400],
+      ['Inter', 500],
+      ['Inter', 600],
+      ['Inter', 700],
+      ['Lora', 400],
+      ['Roboto Mono', 400],
+      ['Roboto Mono', 600],
+    ];
+    return Promise.all(
+      faces.map(async ([family, weight]) => {
+        const loaded = await document.fonts.load(weight + ' 14px "' + family + '"', 'Électricité œ Ā');
+        return {
+          family,
+          weight,
+          loaded: loaded.length > 0 && loaded.every((face) => face.status === 'loaded'),
+        };
+      }),
+    );
+  });
+  expect(
+    fonts.every((font) => font.loaded),
+    JSON.stringify(fonts),
+  ).toBe(true);
   await expect(page.locator('ww-diorama canvas')).toBeAttached();
   await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
   await page.evaluate(async () => {

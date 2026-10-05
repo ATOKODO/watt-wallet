@@ -5,6 +5,12 @@
 body {
   margin: 0;
 }
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
+}
 button,
 input,
 select,
@@ -81,7 +87,7 @@ h3 {
   gap: 11px;
   text-decoration: none;
   font-size: 26px;
-  font-weight: 750;
+  font-weight: 700;
   letter-spacing: -1.1px;
   line-height: 1;
 }
@@ -402,7 +408,7 @@ h3 {
   cursor: pointer;
 }
 .page-heading h1 {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-heading);
   font-weight: 400;
   letter-spacing: -0.9px;
   font-size: clamp(22px, 2.05vw, 31px);
@@ -570,7 +576,7 @@ h3 {
 .metric-value {
   font-size: 36px;
   letter-spacing: -1.8px;
-  font-weight: 650;
+  font-weight: 600;
   margin-top: 13px;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
@@ -739,7 +745,7 @@ h3 {
   pointer-events: none;
 }
 .empty-stage h3 {
-  font-family: Georgia, serif;
+  font-family: var(--font-heading);
   font-size: 24px;
   font-weight: 400;
   color: oklch(from #668053 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
@@ -803,7 +809,7 @@ h3 {
 .donut strong {
   font-size: 25px;
   letter-spacing: -1px;
-  font-weight: 550;
+  font-weight: 500;
   color: oklch(from #4d6241 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
 }
 .donut span {
@@ -824,7 +830,7 @@ h3 {
 }
 .category-legend strong {
   margin-left: auto;
-  font-weight: 550;
+  font-weight: 500;
   color: oklch(from #667b55 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
   white-space: nowrap;
 }
@@ -979,7 +985,7 @@ h3 {
 .table-device strong {
   display: block;
   font-size: 10px;
-  font-weight: 550;
+  font-weight: 500;
   color: oklch(from #586d49 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1033,7 +1039,7 @@ h3 {
   display: block;
   font-size: 11px;
   color: oklch(from #6a7f56 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
-  font-weight: 550;
+  font-weight: 500;
 }
 .tariff-strip div span {
   display: block;
@@ -1089,7 +1095,7 @@ h3 {
 }
 .selected-stats strong {
   font-size: 24px;
-  font-weight: 550;
+  font-weight: 500;
   color: oklch(from #68814f l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
   letter-spacing: -0.7px;
 }
@@ -1156,10 +1162,7 @@ h3 {
 .definition-json-input textarea {
   min-height: 340px;
   width: 100%;
-  font:
-    12px/1.55 Consolas,
-    'Courier New',
-    monospace;
+  font: 12px/1.55 var(--font-mono);
   resize: vertical;
   tab-size: 2;
 }
@@ -1181,10 +1184,7 @@ h3 {
   padding: 10px;
   background: oklch(from #fffefb l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
   border-radius: 6px;
-  font:
-    11px/1.5 Consolas,
-    'Courier New',
-    monospace;
+  font: 11px/1.5 var(--font-mono);
   color: oklch(from #4d614c l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
 }
 .json-validation {
@@ -1214,9 +1214,7 @@ h3 {
 }
 .definition-json-preview h3 {
   margin: 13px 0 3px;
-  font:
-    22px/1.2 Georgia,
-    serif;
+  font: 22px/1.2 var(--font-heading);
   color: oklch(from #355641 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
 }
 .definition-json-preview > p {
@@ -1417,7 +1415,7 @@ textarea {
 }
 .comparison-grid strong {
   font-size: 23px;
-  font-weight: 550;
+  font-weight: 500;
   letter-spacing: -0.8px;
   color: oklch(from #65814b l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
 }
@@ -1553,7 +1551,7 @@ textarea {
   padding: 25px;
 }
 .load-state h1 {
-  font-family: Georgia, serif;
+  font-family: var(--font-heading);
   font-weight: 400;
 }
 .load-state p {
@@ -1586,7 +1584,7 @@ textarea {
   margin-bottom: 15px;
 }
 .modal h2 {
-  font-family: Georgia, serif;
+  font-family: var(--font-heading);
   font-weight: 400;
   font-size: 27px;
   letter-spacing: -0.7px;

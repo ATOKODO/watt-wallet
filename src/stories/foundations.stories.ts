@@ -72,7 +72,10 @@ import { accentPresets } from '../app/ui/palette';
     }
     @if (section() === 'typography') {
       <h1>Typography</h1>
-      <p>Segoe UI, Inter, Arial, sans-serif; system fonts, no external font request.</p>
+      <p>
+        Inter for the UI, Lora for headings and Roboto Mono for code. Bundled locally for offline use and
+        shared with Figma.
+      </p>
       <h1>Un petit monde. Une énergie plus claire.</h1>
       <h2>Votre logement en miniature</h2>
       <h3>Consommation &amp; usage</h3>

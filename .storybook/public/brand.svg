@@ -1,1 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 52" role="img" aria-label="Watt Wallet design system"><rect x="0" y="2" width="48" height="48" rx="14" fill="#245b46"/><path transform="translate(0 2)" d="M27 8 13 27h10l-2 13 15-21H25z" fill="#ddeb9f"/><text x="61" y="25" fill="#2d3c32" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="650">Watt Wallet</text><text x="62" y="43" fill="#617754" font-family="Segoe UI,Arial,sans-serif" font-size="11" letter-spacing="1.2">DESIGN SYSTEM</text></svg>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 260 52"
+  role="img"
+  aria-label="Watt Wallet design system"
+>
+  <rect x="0" y="2" width="48" height="48" rx="14" fill="#245b46" />
+  <path transform="translate(0 2)" d="M27 8 13 27h10l-2 13 15-21H25z" fill="#ddeb9f" />
+  <text x="61" y="25" fill="#2d3c32" font-family="Inter,Arial,sans-serif" font-size="23" font-weight="600">
+    Watt Wallet
+  </text>
+  <text x="62" y="43" fill="#617754" font-family="Inter,Arial,sans-serif" font-size="11" letter-spacing="1.2">
+    DESIGN SYSTEM
+  </text>
+</svg>

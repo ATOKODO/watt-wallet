@@ -40,6 +40,10 @@ The app and Storybook share components and styles. Avoid maintaining a second vi
 
 Storybook 10.6.1 uses `@storybook/angular-vite` with Angular 22's zoneless rendering. This framework is currently a preview; versions are pinned and should be upgraded together, with build, type and browser checks. See the [official framework documentation](https://storybook.js.org/docs/get-started/frameworks/angular-vite).
 
+## Shared typography
+
+The app, Storybook and Figma use **Inter** for the UI, **Lora** for display headings and **Roboto Mono** for JSON/code. The tokens are `--font-ui`, `--font-heading` and `--font-mono`. WOFF2 files and their SIL Open Font License notices are bundled under `public/fonts/`. The app service worker prefetches them for offline use; Storybook serves the same files. No remote font service is contacted at runtime.
+
 ## Isolated data
 
 `.storybook/environment.ts` replaces `WalletStore` with a small fixture provider. It supplies an in-memory asset repository and a demonstration home. It never constructs the real store or opens its IndexedDB workspace. Language and theme services reuse production formatting/palette behavior with session-only Signals; they do not overwrite application preferences.

@@ -5,7 +5,9 @@
     {
       "name": "application",
       "installMode": "prefetch",
-      "resources": { "files": ["/index.html", "/*.css", "/*.js", "/favicon.svg", "/manifest.webmanifest"] }
+      "resources": {
+        "files": ["/index.html", "/*.css", "/*.js", "/favicon.svg", "/manifest.webmanifest", "/fonts/**"]
+      }
     }
   ]
 }

@@ -4,7 +4,9 @@
   background: oklch(from #f7f8f3 l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
   font-synthesis: none;
   font-size: var(--text-base);
-  --font-ui: 'Segoe UI', Inter, Arial, sans-serif;
+  --font-ui: Inter, Arial, sans-serif;
+  --font-heading: Lora, Georgia, serif;
+  --font-mono: 'Roboto Mono', Consolas, monospace;
   --text-base: 14px;
   --space-1: 4px;
   --space-2: 8px;
