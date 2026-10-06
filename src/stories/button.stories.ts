@@ -1,3 +1,4 @@
+import { figmaParameters } from './figma';
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { ButtonDirective } from '../app/ui/design-system/button';
@@ -47,6 +48,7 @@ const meta: Meta<ButtonArgs> = {
     onPress: { description: 'Native click handler, logged in Actions.', action: 'pressed', control: false },
   },
   parameters: {
+    ...figmaParameters('buttonPrimary'),
     docs: {
       description: {
         component:
@@ -62,6 +64,7 @@ const meta: Meta<ButtonArgs> = {
 export default meta;
 type Story = StoryObj<ButtonArgs>;
 export const Primary: Story = {
+  parameters: figmaParameters('buttonPrimary'),
   play: async ({ canvasElement, args }) => {
     const button = within(canvasElement).getByRole('button');
     await userEvent.click(button);
@@ -72,10 +75,15 @@ export const Primary: Story = {
   },
 };
 export const Secondary: Story = {
+  parameters: figmaParameters('buttonSecondary'),
   args: { wwButton: 'secondary', label: 'Ajuster mon tarif', icon: 'settings' },
 };
-export const Small: Story = { args: { wwButton: 'secondary', wwButtonSize: 'small' } };
+export const Small: Story = {
+  parameters: figmaParameters('buttonSmall'),
+  args: { wwButton: 'secondary', wwButtonSize: 'small' },
+};
 export const Disabled: Story = {
+  parameters: figmaParameters('buttonDisabled'),
   args: { disabled: true },
   play: async ({ canvasElement, args }) => {
     const button = within(canvasElement).getByRole('button');
@@ -84,4 +92,4 @@ export const Disabled: Story = {
     await expect(args.onPress).not.toHaveBeenCalled();
   },
 };
-export const TextOnly: Story = { args: { icon: '' } };
+export const TextOnly: Story = { parameters: figmaParameters('buttonTextOnly'), args: { icon: '' } };

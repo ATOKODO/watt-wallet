@@ -23,6 +23,25 @@ Use **Theme**, **Palette** and **Language** in the toolbar to inspect light/dark
 
 The Accessibility panel uses axe to inspect rendered markup. Findings are advisory (`a11y.test: 'todo'`), not an assertion that every existing color/text combination passes WCAG. Check keyboard access, contrast and full application context as well.
 
+## Figma references
+
+Select a story, then open the **Design** panel below the preview. The `@storybook/addon-designs` addon embeds an existing node from the [Watt Wallet Figma file](https://www.figma.com/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet). All 29 stories have named references, centralized in `src/stories/figma.ts` and selected through `parameters.design`.
+
+| Stories                                   | Figma reference                                                             |
+| ----------------------------------------- | --------------------------------------------------------------------------- |
+| Introduction, Colors, Typography, Spacing | Screen index, theme palette, font notes and a control using spacing tokens. |
+| Button                                    | Primary, secondary, compact and text-only production buttons.               |
+| Metric                                    | Annual energy, annual budget and monthly average cards.                     |
+| Icon                                      | Bolt, fallback box and the reusable component library.                      |
+| Device editor                             | Profile form, installed-device power/usage form and JSON editor.            |
+| Diorama                                   | Consumption, placement and the scene with a selected device.                |
+
+These are design references, without automatic visual comparisons or live synchronization. Sample values and labels can differ. Stories without a dedicated Figma state (disabled, zero/large metric values, cycle/annual inputs, invalid JSON, saving, empty/zero scenes) explicitly describe that limitation in their story documentation and link to the relevant component. The spacing scale and complete current icon registry remain in Storybook. Toolbar theme/language changes do not switch the linked Figma node.
+
+The Angular preview still runs locally. The embedded design needs an internet connection and permission to view the Figma file; sign in if requested. No access token is stored and the integration does not change file sharing permissions. The smoke check verifies every story's URL and the addon's embedded target with a local network fixture; it does not test Figma authentication or remote availability.
+
+When a design changes, keep existing node IDs where possible. Update the corresponding entry in `src/stories/figma.ts` if a node is replaced, and verify the **Design** panel for the affected story.
+
 ## Shared sources
 
 | Source                                | Purpose                                                                                |

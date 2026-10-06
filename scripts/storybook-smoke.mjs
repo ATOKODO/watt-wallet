@@ -120,6 +120,20 @@ try {
   for (const story of stories) {
     console.log('Render ' + story.id);
     await openStory(story.id);
+    const references = await page.evaluate(
+      (id) =>
+        window.__STORYBOOK_PREVIEW__.storyRenders.find((render) => render.id === id).storyContext().parameters
+          .design,
+      story.id,
+    );
+    assert.equal(references.length, 1, story.id + ' must have one named reference');
+    const design = references[0];
+    assert.equal(design?.type, 'figma', story.id + ' must have a Figma reference');
+    const designUrl = new URL(design.url);
+    assert.equal(designUrl.origin, 'https://www.figma.com');
+    assert.equal(designUrl.pathname, '/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet');
+    assert.match(designUrl.searchParams.get('node-id') ?? '', /^\d+-\d+$/, story.id);
+    assert.ok(design.name, story.id + ' must name its reference');
     if (story.id === 'features-device-editor--json-invalid')
       await expect(page.locator('.json-validation')).toHaveClass(/invalid/);
     if (story.title === 'Features/Diorama') {
@@ -182,6 +196,10 @@ try {
   );
   assert.deepEqual(errors, []);
   await resetBrowser();
+  // Exercise the real addon without depending on Figma access or network in CI.
+  await page.route(/^https:\/\/(?:embed\.|www\.)?figma\.com\//, (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<p>Figma embed test fixture</p>' }),
+  );
   await page.goto(serverUrl + '/?path=/story/components-button--secondary');
   const preview = page.frameLocator('#storybook-preview-iframe');
   await expect(preview.getByRole('button', { name: 'Ajuster mon tarif', exact: true })).toBeVisible({
@@ -201,11 +219,18 @@ try {
   await label.blur();
   await expect(preview.getByRole('button', { name: 'A custom action', exact: true })).toBeVisible();
   await page.screenshot({ path: path.join(captures, 'manager-controls.png') });
+  await page.getByRole('tab', { name: 'Design (1)', exact: true }).click();
+  const figmaEmbed = page.locator('iframe[src^="https://embed.figma.com/"]');
+  await expect(figmaEmbed).toBeVisible();
+  const embedUrl = new URL(await figmaEmbed.getAttribute('src'));
+  assert.equal(embedUrl.searchParams.get('node-id'), '122-31008');
+  assert.ok(embedUrl.searchParams.get('embed-host'));
+  await page.screenshot({ path: path.join(captures, 'manager-designs.png') });
   assert.deepEqual(errors, []);
   console.log(
     'Storybook: ' +
       stories.length +
-      ' stories, play functions, autodocs, themes, language, palette, WebGL, mobile and isolated storage passed.',
+      ' stories, play functions, autodocs, themes, language, palette, WebGL, mobile, isolated storage and Figma design references passed.',
   );
   await context.close();
 } catch (error) {

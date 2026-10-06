@@ -1,3 +1,4 @@
+import { figmaParameters } from './figma';
 import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular-vite';
 import { IconComponent, iconNames } from '../app/ui/icon';
 const meta: Meta<IconComponent> = {
@@ -6,6 +7,7 @@ const meta: Meta<IconComponent> = {
   args: { name: 'bolt' },
   argTypes: { name: { control: 'select', options: iconNames } },
   parameters: {
+    ...figmaParameters('iconSingle'),
     docs: {
       description: {
         component:
@@ -16,9 +18,13 @@ const meta: Meta<IconComponent> = {
 };
 export default meta;
 type Story = StoryObj<IconComponent>;
-export const Single: Story = {};
-export const Fallback: Story = { args: { name: 'unknown-icon' } };
+export const Single: Story = { parameters: figmaParameters('iconSingle') };
+export const Fallback: Story = {
+  parameters: figmaParameters('iconFallback'),
+  args: { name: 'unknown-icon' },
+};
 export const Catalogue: Story = {
+  parameters: figmaParameters('iconCatalogue'),
   decorators: [moduleMetadata({ imports: [IconComponent] })],
   render: () => ({
     props: { names: iconNames },

@@ -23,6 +23,25 @@ Les commandes **Theme**, **Palette** et **Language** permettent d’inspecter cl
 
 Le panneau Accessibility utilise axe pour inspecter le rendu. Les résultats sont indicatifs (`a11y.test: 'todo'`) et ne signifient pas que toutes les combinaisons existantes de couleurs/textes satisfont WCAG. Vérifier aussi le clavier, le contraste et le contexte de l’application complète.
 
+## Références Figma
+
+Sélectionner une story, puis ouvrir le panneau **Design** sous la prévisualisation. L’addon `@storybook/addon-designs` affiche un calque existant du [fichier Figma Watt Wallet](https://www.figma.com/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet). Les 29 stories disposent de références nommées, centralisées dans `src/stories/figma.ts` et choisies via `parameters.design`.
+
+| Stories                                   | Référence Figma                                                                             |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Introduction, Colors, Typography, Spacing | Index des écrans, palette de thème, notes de polices et contrôle utilisant les espacements. |
+| Button                                    | Boutons de production principal, secondaire, compact et sans icône.                         |
+| Metric                                    | Cartes d’énergie annuelle, de budget annuel et de moyenne mensuelle.                        |
+| Icon                                      | Éclair, cube de repli et bibliothèque de composants réutilisables.                          |
+| Device editor                             | Formulaire de fiche, formulaire puissance/usages d’un appareil installé et éditeur JSON.    |
+| Diorama                                   | Consommation, placement et scène avec appareil sélectionné.                                 |
+
+Ce sont des références de conception, sans comparaison visuelle automatique ni synchronisation en direct. Les valeurs et libellés d’exemple peuvent différer. Les stories sans état Figma dédié (désactivation, cartes à zéro/grande valeur, entrées cycle/annuelle, JSON invalide, sauvegarde, scènes vide/nulle) indiquent cette limite dans leur documentation et renvoient au composant correspondant. L’échelle des espacements et le registre complet actuel des icônes restent dans Storybook. Changer le thème ou la langue dans la barre d’outils ne change pas le calque Figma lié.
+
+La prévisualisation Angular fonctionne toujours localement. Le design intégré nécessite une connexion Internet et les droits de consultation du fichier Figma ; se connecter si demandé. Aucun jeton d’accès n’est enregistré et l’intégration ne modifie pas les permissions de partage. Le contrôle navigateur vérifie l’URL de chaque story et la cible intégrée par l’addon avec une réponse réseau locale ; il ne teste pas l’authentification Figma ni sa disponibilité distante.
+
+Lors d’une évolution du design, conserver les identifiants de calque existants si possible. Mettre à jour l’entrée correspondante dans `src/stories/figma.ts` si un calque est remplacé, puis vérifier le panneau **Design** de la story concernée.
+
 ## Sources partagées
 
 | Source                                | Rôle                                                                                         |

@@ -1,3 +1,4 @@
+import { figmaParameters } from './figma';
 import { type Meta, type StoryObj } from '@storybook/angular-vite';
 import { MetricComponent } from '../app/ui/design-system/metric';
 import { storyLanguage } from '../../.storybook/environment';
@@ -30,6 +31,7 @@ const meta: Meta<MetricComponent> = {
     template: `<article wwMetric style="max-width:430px" [label]="label" [value]="value" [unit]="unit" [suffix]="suffix" [hint]="hint" [tag]="tag" [icon]="icon" [tone]="tone" [highlighted]="highlighted"></article>`,
   }),
   parameters: {
+    ...figmaParameters('metricEnergy'),
     docs: {
       description: {
         component:
@@ -40,8 +42,9 @@ const meta: Meta<MetricComponent> = {
 };
 export default meta;
 type Story = StoryObj<MetricComponent>;
-export const AnnualEnergy: Story = {};
+export const AnnualEnergy: Story = { parameters: figmaParameters('metricEnergy') };
 export const AnnualBudget: Story = {
+  parameters: figmaParameters('metricBudget'),
   args: {
     label: 'Budget électricité',
     value: '1 950 €',
@@ -53,6 +56,7 @@ export const AnnualBudget: Story = {
   },
 };
 export const MonthlyAverage: Story = {
+  parameters: figmaParameters('metricMonthly'),
   args: {
     label: 'Chaque mois, en moyenne',
     value: '162,50 €',
@@ -64,5 +68,5 @@ export const MonthlyAverage: Story = {
     highlighted: true,
   },
 };
-export const ZeroConsumption: Story = { args: { value: '0' } };
-export const LargeValue: Story = { args: { value: '123 456' } };
+export const ZeroConsumption: Story = { parameters: figmaParameters('metricZero'), args: { value: '0' } };
+export const LargeValue: Story = { parameters: figmaParameters('metricLarge'), args: { value: '123 456' } };

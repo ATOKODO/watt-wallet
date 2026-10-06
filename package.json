@@ -50,6 +50,7 @@
     "@angular/compiler-cli": "22.1.7",
     "@playwright/test": "^1.58.2",
     "@storybook/addon-a11y": "10.6.1",
+    "@storybook/addon-designs": "11.1.4",
     "@storybook/addon-docs": "10.6.1",
     "@storybook/angular-vite": "10.6.1",
     "@tauri-apps/cli": "2.11.4",

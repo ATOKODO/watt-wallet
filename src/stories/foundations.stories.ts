@@ -1,3 +1,4 @@
+import { figmaParameters } from './figma';
 import { Component, input } from '@angular/core';
 import type { Meta, StoryObj } from '@storybook/angular-vite';
 import { accentPresets } from '../app/ui/palette';
@@ -135,11 +136,18 @@ const meta: Meta<FoundationsComponent> = {
   title: 'Design system',
   component: FoundationsComponent,
   tags: ['!autodocs'],
+  parameters: figmaParameters('introduction'),
   render: (args) => ({ props: args }),
 };
 export default meta;
 type Story = StoryObj<FoundationsComponent>;
-export const Introduction: Story = { args: { section: 'introduction' } };
-export const Colors: Story = { args: { section: 'colors' } };
-export const Typography: Story = { args: { section: 'typography' } };
-export const Spacing: Story = { args: { section: 'spacing' } };
+export const Introduction: Story = {
+  parameters: figmaParameters('introduction'),
+  args: { section: 'introduction' },
+};
+export const Colors: Story = { parameters: figmaParameters('colors'), args: { section: 'colors' } };
+export const Typography: Story = {
+  parameters: figmaParameters('typography'),
+  args: { section: 'typography' },
+};
+export const Spacing: Story = { parameters: figmaParameters('spacing'), args: { section: 'spacing' } };

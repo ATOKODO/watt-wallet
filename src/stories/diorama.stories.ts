@@ -1,3 +1,4 @@
+import { figmaParameters } from './figma';
 import { type Meta, type StoryObj } from '@storybook/angular-vite';
 import { fn } from 'storybook/test';
 import { DioramaComponent } from '../app/scene/diorama';
@@ -39,6 +40,7 @@ const meta: Meta<DioramaComponent> = {
     template: `<div class="ww-diorama-frame"><ww-diorama [devices]="devices" [results]="results" [mode]="mode" [theme]="theme" [accent]="accent" [selectedId]="selectedId" (selected)="selected($event)" (moved)="moved($event)" (arranged)="arranged($event)" (added)="added($event)"/></div>`,
   }),
   parameters: {
+    ...figmaParameters('dioramaConsumption'),
     docs: {
       description: {
         component:
@@ -49,10 +51,14 @@ const meta: Meta<DioramaComponent> = {
 };
 export default meta;
 type Story = StoryObj<DioramaComponent>;
-export const Consumption: Story = {};
-export const Placement: Story = { args: { mode: 'placement' } };
-export const Empty: Story = { args: { devices: [] } };
+export const Consumption: Story = { parameters: figmaParameters('dioramaConsumption') };
+export const Placement: Story = {
+  parameters: figmaParameters('dioramaPlacement'),
+  args: { mode: 'placement' },
+};
+export const Empty: Story = { parameters: figmaParameters('dioramaEmpty'), args: { devices: [] } };
 export const ZeroConsumption: Story = {
+  parameters: figmaParameters('dioramaZero'),
   args: {
     devices: devices.map((d) => ({
       ...copy(d),
@@ -60,4 +66,7 @@ export const ZeroConsumption: Story = {
     })),
   },
 };
-export const Selected: Story = { args: { selectedId: devices[0].id } };
+export const Selected: Story = {
+  parameters: figmaParameters('dioramaSelected'),
+  args: { selectedId: devices[0].id },
+};

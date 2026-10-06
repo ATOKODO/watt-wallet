@@ -1,3 +1,4 @@
+import { figmaParameters } from './figma';
 import { type Meta, type StoryObj } from '@storybook/angular-vite';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { DeviceEditorComponent } from '../app/ui/device-editor';
@@ -20,6 +21,7 @@ const meta: Meta<DeviceEditorComponent> = {
     template: `<section class="ww-editor-frame"><ww-device-editor [definition]="definition" [instance]="instance" [saving]="saving" (committed)="committed($event)"/></section>`,
   }),
   parameters: {
+    ...figmaParameters('editorPower'),
     docs: {
       description: {
         component:
@@ -31,6 +33,7 @@ const meta: Meta<DeviceEditorComponent> = {
 export default meta;
 type Story = StoryObj<DeviceEditorComponent>;
 export const PowerProfile: Story = {
+  parameters: figmaParameters('editorPower'),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const input = canvasElement.querySelector<HTMLInputElement>('input[formcontrolname="name"]')!;
@@ -43,15 +46,23 @@ export const PowerProfile: Story = {
     await expect(args.committed).toHaveBeenCalled();
   },
 };
-export const CycleProfile: Story = { args: { definition: definition('cycle') } };
-export const AnnualProfile: Story = { args: { definition: definition('annual') } };
+export const CycleProfile: Story = {
+  parameters: figmaParameters('editorCycle'),
+  args: { definition: definition('cycle') },
+};
+export const AnnualProfile: Story = {
+  parameters: figmaParameters('editorAnnual'),
+  args: { definition: definition('annual') },
+};
 export const InstalledDevice: Story = {
+  parameters: figmaParameters('editorInstalled'),
   args: { definition: definition('power'), instance: { ...makeInstance(definition('power')), quantity: 6 } },
   play: async ({ canvasElement }) => {
     await expect(within(canvasElement).queryByRole('tab', { name: 'JSON' })).toBeNull();
   },
 };
 export const JsonValid: Story = {
+  parameters: figmaParameters('editorJson'),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('tab', { name: 'JSON' }));
@@ -60,6 +71,7 @@ export const JsonValid: Story = {
   },
 };
 export const JsonInvalid: Story = {
+  parameters: figmaParameters('editorJsonInvalid'),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('tab', { name: 'JSON' }));
@@ -73,4 +85,4 @@ export const JsonInvalid: Story = {
     await expect(save).toBeDisabled();
   },
 };
-export const Saving: Story = { args: { saving: true } };
+export const Saving: Story = { parameters: figmaParameters('editorSaving'), args: { saving: true } };
