@@ -117,7 +117,7 @@ The globe button switches French/English without reloading and updates numeric f
 | ------------------------ | --------------------------------------------------------------------------------------------------------- |
 | Export a library profile | That profile and its referenced custom model.                                                             |
 | Export the library       | All library profiles and their referenced models.                                                         |
-| **Share this home**      | The reference, all its scenarios, tariffs, positions, bill benchmark and embedded device profiles/models. |
+| **Export this home**     | The reference, all its scenarios, tariffs, positions, bill benchmark and embedded device profiles/models. |
 
 A home export does not include unused library profiles, other homes or interface preferences. To back up the full workspace, export every home and the library. Keep files outside the application profile or browser storage.
 

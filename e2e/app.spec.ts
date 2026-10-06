@@ -92,7 +92,7 @@ test('logement, fiche, scénario, persistance et partage sur profil vierge', asy
   await page.getByRole('button', { name: 'Lampes économes', exact: true }).click();
   await expect(page.locator('.comparison-grid')).toContainText('328,5');
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Partager le logement' }).click();
+  await page.getByRole('button', { name: 'Exporter le logement' }).click();
   const download = await downloadPromise;
   const buffer = await readFile((await download.path())!);
   const context = await browser.newContext({ viewport: { width: 1480, height: 1000 } });
@@ -210,7 +210,7 @@ test('GLB personnalisé partagé avec sa fiche et placement sans glisser-dépose
   await page.getByRole('button', { name: 'Dupliquer', exact: true }).click();
   await expect(page.locator('.device-row').filter({ hasText: 'Mon appareil GLB' })).toHaveCount(2);
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Partager le logement' }).click();
+  await page.getByRole('button', { name: 'Exporter le logement' }).click();
   const download = await downloadPromise;
   const buffer = await readFile((await download.path())!);
   const context = await browser.newContext({ viewport: { width: 1480, height: 1000 } });
@@ -349,7 +349,7 @@ test('puissance simulee, detail annuel et repere de facture partageable', async 
   await expect(page.locator('.power-total')).toContainText('0 W');
 
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Partager le logement' }).click();
+  await page.getByRole('button', { name: 'Exporter le logement' }).click();
   const download = await downloadPromise;
   const buffer = await readFile((await download.path())!);
   const context = await browser.newContext();
@@ -367,20 +367,20 @@ test('palette globale, couleur personnalisée et persistance clair sombre', asyn
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
   const accentButton = page.getByRole('button', { name: 'Choisir la couleur du thème' });
-  const primary = page.getByRole('button', { name: 'Partager le logement' });
+  const exportButton = page.getByRole('button', { name: 'Exporter le logement' });
   const color = (selector: string) =>
     page
       .locator(selector)
       .first()
       .evaluate((element) => getComputedStyle(element).backgroundColor);
-  const originalButton = await primary.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const originalButton = await exportButton.evaluate((element) => getComputedStyle(element).backgroundColor);
   const originalHeader = await color('.app-header');
   await accentButton.click();
   const dialog = page.getByRole('dialog');
   await dialog.getByRole('button', { name: 'Couleur Lavande' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-accent', '#7050a1');
   expect(await color('.app-header')).not.toBe(originalHeader);
-  expect(await primary.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(
+  expect(await exportButton.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(
     originalButton,
   );
   await expect(dialog.getByRole('button', { name: 'Couleur Lavande' })).toHaveAttribute(
@@ -401,7 +401,7 @@ test('palette globale, couleur personnalisée et persistance clair sombre', asyn
       input.dispatchEvent(new Event('input', { bubbles: true }));
     }, accent);
     await expect(page.locator('html')).toHaveAttribute('data-accent', accent);
-    const contrast = await primary.evaluate((element) => {
+    const contrast = await exportButton.evaluate((element) => {
       const context = document.createElement('canvas').getContext('2d')!;
       const luminance = (css: string) => {
         context.clearRect(0, 0, 1, 1);
@@ -464,7 +464,7 @@ test('plateau adaptatif, grande grille et positions sauvegardées', async ({ pag
   await expect(page.locator('.scene-grid-message')).toHaveCount(0);
   await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Partager le logement' }).click();
+  await page.getByRole('button', { name: 'Exporter le logement' }).click();
   const downloaded = await downloadPromise;
   const prepared = decodePack(new Uint8Array(await readFile((await downloaded.path())!)));
   if (prepared.manifest.kind !== 'home') throw new Error('Logement attendu');

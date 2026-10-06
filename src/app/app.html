@@ -97,10 +97,15 @@
         </p>
       </div>
       <div class="heading-actions">
-        <button wwButton="secondary" (click)="openImport()" [disabled]="busy()">
+        <button wwButton="secondary" class="home-import" (click)="openImport()" [disabled]="busy()">
           <ww-icon name="upload" />{{ 'Importer' | t }}</button
-        ><button wwButton="primary" (click)="exportPack()" [disabled]="busy()">
-          <ww-icon name="download" />{{ 'Partager le logement' | t }}
+        ><button
+          wwButton="secondary"
+          [title]="'Télécharger votre logement et ses scénarios au format .wattpack' | t"
+          (click)="exportPack()"
+          [disabled]="busy()"
+        >
+          <ww-icon name="download" />{{ 'Exporter le logement' | t }}
         </button>
       </div>
     </div>

@@ -33,7 +33,7 @@ Ouvrir [http://127.0.0.1:4200](http://127.0.0.1:4200). Le premier lancement cré
 2. Renseigner les usages et le tarif avec **Ajuster mon tarif**.
 3. Consulter l’estimation annuelle, le budget et la répartition par catégorie.
 4. Créer un scénario, modifier un paramètre et comparer avec la **Référence**.
-5. Utiliser **Partager le logement** pour créer une sauvegarde transportable.
+5. Utiliser **Exporter le logement** pour créer une sauvegarde transportable.
 
 Pour le développement Windows, installer également Rust stable avec la chaîne MSVC, Visual Studio C++ Build Tools, Windows SDK et WebView2. Exécuter cette commande à la place de `npm start` : Tauri démarre son propre serveur de développement frontend.
 

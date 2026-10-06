@@ -117,7 +117,7 @@ Le bouton globe change la langue sans rechargement et adapte les formats numéri
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Exporter une fiche de bibliothèque | Cette fiche et son modèle personnalisé référencé.                                                              |
 | Exporter la bibliothèque           | Toutes les fiches et leurs modèles référencés.                                                                 |
-| **Partager le logement**           | La référence, tous ses scénarios, tarifs, positions, repère de facture et copies de fiches/modèles embarquées. |
+| **Exporter le logement**           | La référence, tous ses scénarios, tarifs, positions, repère de facture et copies de fiches/modèles embarquées. |
 
 Un export de logement ne contient ni les fiches inutilisées de la bibliothèque, ni les autres logements, ni les préférences d’interface. Pour sauvegarder tout l’espace de travail, exporter chaque logement et la bibliothèque. Conserver les fichiers hors du profil applicatif ou du stockage du navigateur.
 

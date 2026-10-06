@@ -33,7 +33,7 @@ Open [http://127.0.0.1:4200](http://127.0.0.1:4200). The first launch creates a 
 2. Enter usage and your tariff with **Adjust my tariff**.
 3. Check the annual energy estimate, budget and category breakdown.
 4. Create a scenario, make a change and compare it with **Reference**.
-5. Use **Share this home** to make a portable backup.
+5. Use **Export this home** to make a portable backup.
 
 For Windows desktop development, also install Rust stable with the MSVC toolchain, Visual Studio C++ Build Tools, Windows SDK and WebView2. Run the following instead of `npm start`: Tauri starts its own frontend development server.
 

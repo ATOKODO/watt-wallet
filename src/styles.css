@@ -1731,7 +1731,7 @@ textarea {
     padding: 9px 11px;
     font-size: 10px;
   }
-  .heading-actions > .btn.secondary {
+  .heading-actions > .home-import {
     display: none;
   }
   .page-heading h1 {
