@@ -1037,3 +1037,38 @@ test('limite de géométrie GLB : rejet avant stockage, formulaire intact et err
   expect(await snapshot()).toEqual(before);
   expect(await assetKeys()).toHaveLength(1);
 });
+
+for (const width of [402, 996, 1480]) {
+  test('crayon ouvre les paramètres sans changer le clic sur le nom (' + width + 'px)', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: width === 996 ? 'no-preference' : 'reduce' });
+    await page.setViewportSize({ width, height: 892 });
+    await page.goto('/');
+    const row = page.locator('.device-row').filter({ hasText: 'Radiateur électrique' });
+    const name = row.locator('.table-device');
+    const edit = row.getByRole('button', { name: 'Modifier Radiateur électrique', exact: true });
+    const inspector = page.locator('.inspector');
+    await expect(row).toBeVisible();
+    await name.scrollIntoViewIfNeeded();
+    const beforeSelection = await page.evaluate(() => scrollY);
+    await name.click();
+    await expect(inspector.locator('h2')).toHaveText('Radiateur électrique');
+    expect(await page.evaluate(() => scrollY)).toBeCloseTo(beforeSelection, 0);
+    await expect(inspector).not.toBeFocused();
+    await expect(edit.locator('ww-icon')).toHaveAttribute('name', 'edit');
+    // Activate the edit action even when the same device is already selected.
+    await edit.focus();
+    await page.keyboard.press('Enter');
+    await expect(inspector).toBeFocused();
+    await expect(inspector.locator('h2')).toBeInViewport();
+    await expect.poll(async () => (await inspector.boundingBox())!.y).toBeLessThan(100);
+    const bounds = await inspector.boundingBox();
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.y).toBeLessThan(100);
+    await page.getByRole('button', { name: 'Fermer les paramètres de l’appareil', exact: true }).click();
+    await name.click();
+    await edit.click();
+    await expect(inspector).toBeFocused();
+    await expect(inspector.locator('h2')).toHaveText('Radiateur électrique');
+    await expect(inspector.locator('h2')).toBeInViewport();
+  });
+}

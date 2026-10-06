@@ -1,7 +1,17 @@
 import { MetricComponent } from './ui/design-system/metric';
 import { ButtonDirective } from './ui/design-system/button';
 import { LanguageService, TranslatePipe } from './ui/language';
-import { Component, DestroyRef, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  Injector,
+  ViewChild,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconComponent } from './ui/icon';
@@ -56,6 +66,8 @@ export class AppComponent {
   store = inject(WalletStore);
   theme = inject(ThemeService);
   private fb = inject(FormBuilder);
+  private readonly injector = inject(Injector);
+  @ViewChild('deviceInspector') private deviceInspector?: ElementRef<HTMLElement>;
   private readonly compactQuery = window.matchMedia('(max-width: 760px)');
   readonly compactLayout = signal(this.compactQuery.matches);
   tab = signal<'home' | 'scenarios' | 'library'>('home');
@@ -158,6 +170,21 @@ export class AppComponent {
     this.compactQuery.addEventListener('change', updateLayout);
     inject(DestroyRef).onDestroy(() => this.compactQuery.removeEventListener('change', updateLayout));
     void this.store.initialize();
+  }
+  editInstalledDevice(id: string) {
+    this.store.selectedId.set(id);
+    afterNextRender(
+      () => {
+        const panel = this.deviceInspector?.nativeElement;
+        if (!panel || this.store.selectedId() !== id) return;
+        panel.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+          block: 'start',
+        });
+        panel.focus({ preventScroll: true });
+      },
+      { injector: this.injector },
+    );
   }
   number(value: number, digits = 0) {
     return this.i18n.number(value, digits);

@@ -756,6 +756,7 @@ h3 {
   margin-top: 10px;
 }
 .inspector {
+  scroll-margin-top: 16px;
   border: 1px solid var(--border);
   background: oklch(from #fffefa l calc(c * var(--accent-chroma, 1)) var(--accent-hue, h));
   border-radius: 12px;

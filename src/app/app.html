@@ -360,9 +360,10 @@
                 <button
                   class="icon-button"
                   [attr.aria-label]="'Modifier {0}' | t:[i18n.deviceName(d.definition)]"
-                  (click)="store.selectedId.set(d.id)"
+                  [title]="'Modifier {0}' | t:[i18n.deviceName(d.definition)]"
+                  (click)="editInstalledDevice(d.id)"
                 >
-                  <ww-icon name="chevron" />
+                  <ww-icon name="edit" />
                 </button>
                 <button
                   class="row-remove danger"
@@ -458,7 +459,7 @@
         </section>
       </div>
 
-      <aside class="inspector">
+      <aside class="inspector" #deviceInspector tabindex="-1">
         @if(store.selected(); as selected){
         <div class="inspector-heading">
           <span class="eyebrow">{{ 'DANS VOTRE LOGEMENT' | t }}</span
