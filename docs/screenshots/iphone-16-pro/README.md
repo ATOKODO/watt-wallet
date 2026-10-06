@@ -1,8 +1,10 @@
-# Captures mobiles Watt Wallet
+# Captures Watt Wallet — iPhone 16 Pro
 
-Captures PNG de 402 × 874 pixels, préparées pour illustrer le README. Chaque image correspond au viewport, sans cadre de téléphone ni capture de page entière.
+21 captures PNG de **402 × 874 pixels**, en français. Captures du viewport, sans cadre d’appareil ni assemblage de page entière.
 
-Dimensions demandées pour iPhone 16 Pro ; rendu Chromium en émulation mobile, échelle 1, sans validation Safari/iOS. Données de démonstration dans un profil navigateur isolé.
+Rendu Chromium à l’échelle 1, avec des données de démonstration isolées. Ces captures montrent les dispositions responsives, sans validation Safari ou appareil Apple natif.
+
+[Ouvrir la galerie](index.html)
 
 | Fichier                                                        | Fonctionnalité                                                  |
 | -------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -30,11 +32,9 @@ Dimensions demandées pour iPhone 16 Pro ; rendu Chromium en émulation mobile, 
 
 ## Régénérer
 
-Depuis la racine du dépôt, avec l’application démarrée :
-
 ```powershell
 npm start
-# Dans un autre terminal :
+# In another terminal / Dans un autre terminal :
 $env:PLAYWRIGHT_BROWSERS_PATH = Join-Path (Get-Location) '.cache/playwright'
 node scripts/screenshots-mobile.mjs
 ```

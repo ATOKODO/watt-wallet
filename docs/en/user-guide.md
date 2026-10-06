@@ -18,7 +18,7 @@ Start with a few devices whose consumption you know. Set their usage, then use *
 
 ## Add, edit and remove devices
 
-Search the library by name, brand or reference, and filter by category. Use the plus button to add a device, or drag its library entry onto the board. Click its object, label or list row to open settings.
+Search the library by name, brand or reference, and filter by category. Use the plus button to add a device, or drag its library entry onto the board. Click its object, label or name in the list to select the device. Use the pencil button on its row to bring the settings panel into view automatically. On mobile, the quick library sits immediately above the 3D board, after the annual estimates and simulated-power shortcut.
 
 An installed device contains a copy of its profile. Set its name, quantity, calculation method, usage, off-peak share and notes, then select **Apply changes**. Editing a library profile later does not update copies already installed in homes or scenarios. To update an existing copy, edit that device's settings explicitly.
 

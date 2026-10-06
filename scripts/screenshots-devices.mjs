@@ -13,7 +13,7 @@ if (!selected.length || languages.some((language) => !['fr', 'en'].includes(lang
 const browser = await chromium.launch({
   headless: true,
   args: process.env.WATT_WALLET_SOFTWARE_GPU
-    ? ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--disable-gpu-watchdog']
+    ? ['--disable-gpu', '--use-angle=swiftshader', '--enable-unsafe-swiftshader']
     : [],
 });
 try {

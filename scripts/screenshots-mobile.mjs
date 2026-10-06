@@ -2,7 +2,7 @@ import { chromium } from '@playwright/test';
 import { captureFeatureScreenshots } from './capture-features.mjs';
 const browser = await chromium.launch({
   headless: true,
-  args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+  args: ['--disable-gpu', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
 try {
   await captureFeatureScreenshots(

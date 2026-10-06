@@ -87,6 +87,7 @@ export async function captureFeatureScreenshots(
     isMobile: touch,
     hasTouch: touch,
     colorScheme: 'light',
+    reducedMotion: 'reduce',
     locale: language === 'en' ? 'en-GB' : 'fr-FR',
   });
   try {

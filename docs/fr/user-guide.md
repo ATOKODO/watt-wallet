@@ -18,7 +18,7 @@ Commencer par quelques appareils dont vous connaissez la consommation. Régler l
 
 ## Ajouter, modifier et retirer des appareils
 
-Rechercher une fiche par nom, marque ou référence et filtrer par catégorie. Utiliser le bouton plus pour ajouter un appareil, ou glisser sa fiche sur le plateau. Cliquer sur l’objet, son étiquette ou sa ligne pour ouvrir les paramètres.
+Rechercher une fiche par nom, marque ou référence et filtrer par catégorie. Utiliser le bouton plus pour ajouter un appareil, ou glisser sa fiche sur le plateau. Cliquer sur l’objet, son étiquette ou son nom dans la liste pour sélectionner l’appareil. Utiliser le bouton crayon de sa ligne pour amener automatiquement le panneau de paramètres à l’écran. Sur mobile, la bibliothèque rapide se trouve juste au-dessus du plateau 3D, après les estimations annuelles et le raccourci de puissance simulée.
 
 Un appareil installé contient une copie de sa fiche. Renseigner son nom, sa quantité, sa méthode de calcul, ses usages, sa part en heures creuses et ses notes, puis choisir **Appliquer les modifications**. Modifier ensuite la fiche de bibliothèque ne met pas à jour les copies déjà installées dans les logements ou scénarios. Pour actualiser une copie existante, modifier explicitement les paramètres de cet appareil.
 
