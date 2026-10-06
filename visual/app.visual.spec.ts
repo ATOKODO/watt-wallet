@@ -117,3 +117,46 @@ test('without WebGL', async ({ visualPage: page }, info) => {
   await capture(page, 'webgl-fallback.png', page.locator('.diorama-card'));
   await capture(page, 'fallback-device-list.png', page.locator('.device-list'));
 });
+
+test('library follows the summary on narrow screens', async ({ visualPage: page }, info) => {
+  test.skip(info.project.name !== 'app-iphone', 'Responsive relocation across breakpoints');
+  await page.setViewportSize({ width: 685, height: 892 });
+  await openHome(page, 'en', 'light');
+  const library = page.locator('.library-panel');
+  const search = library.getByRole('textbox', { name: 'Search for a device' });
+  const assertMobileOrder = async () => {
+    await expect(library).toHaveCount(1);
+    await expect(page.locator('.main-content > .library-panel + .diorama-card')).toHaveCount(1);
+    const bounds = await library.boundingBox();
+    const scene = await page.locator('.diorama-card').boundingBox();
+    const summary = await page.locator('.power-preview').boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(scene).not.toBeNull();
+    expect(summary).not.toBeNull();
+    expect(bounds!.y).toBeGreaterThanOrEqual(summary!.y + summary!.height);
+    expect(scene!.y - bounds!.y - bounds!.height).toBeCloseTo(17, 0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  };
+  await assertMobileOrder();
+  await capture(page, 'mobile-library-en-light.png', library);
+  await search.fill('Television');
+  await expect(library.locator('.library-item')).toHaveCount(1);
+  for (const width of [834, 1512, 1920]) {
+    await page.setViewportSize({ width, height: 1080 });
+    await expect(page.locator('.workspace > .library-panel')).toHaveCount(1);
+    await expect(library).toHaveCount(1);
+    await expect(search).toHaveValue('Television');
+  }
+  for (const width of [760, 402]) {
+    await page.setViewportSize({ width, height: 874 });
+    await assertMobileOrder();
+    await expect(search).toHaveValue('Television');
+  }
+  await page.getByRole('button', { name: 'My scenarios', exact: true }).click();
+  await assertMobileOrder();
+  await page.getByRole('button', { name: 'Library', exact: true }).click();
+  await expect(page.locator('.main-panel > .library-panel + .catalog-heading')).toHaveCount(1);
+  await library.getByRole('button', { name: 'Add Television', exact: true }).click();
+  await expect(page.locator('.device-row')).toHaveCount(7);
+  await assertMobileOrder();
+});

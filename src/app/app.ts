@@ -1,7 +1,8 @@
 import { MetricComponent } from './ui/design-system/metric';
 import { ButtonDirective } from './ui/design-system/button';
 import { LanguageService, TranslatePipe } from './ui/language';
-import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IconComponent } from './ui/icon';
 import { ThemeService } from './ui/theme';
@@ -39,6 +40,7 @@ import { validateRenderableGlb } from './scene/models';
   selector: 'ww-app',
   standalone: true,
   imports: [
+    NgTemplateOutlet,
     MetricComponent,
     ButtonDirective,
     ReactiveFormsModule,
@@ -54,6 +56,8 @@ export class AppComponent {
   store = inject(WalletStore);
   theme = inject(ThemeService);
   private fb = inject(FormBuilder);
+  private readonly compactQuery = window.matchMedia('(max-width: 760px)');
+  readonly compactLayout = signal(this.compactQuery.matches);
   tab = signal<'home' | 'scenarios' | 'library'>('home');
   mode = signal<'consumption' | 'placement'>('consumption');
   search = signal('');
@@ -150,6 +154,9 @@ export class AppComponent {
       });
   }
   constructor() {
+    const updateLayout = (event: MediaQueryListEvent) => this.compactLayout.set(event.matches);
+    this.compactQuery.addEventListener('change', updateLayout);
+    inject(DestroyRef).onDestroy(() => this.compactQuery.removeEventListener('change', updateLayout));
     void this.store.initialize();
   }
   number(value: number, digits = 0) {

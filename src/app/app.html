@@ -62,78 +62,9 @@
 </main>
 } @else {
 <main class="workspace">
-  <aside class="library-panel">
-    <div class="library-title">
-      <div>
-        <span class="eyebrow">{{ 'À CHAQUE APPAREIL' | t }}</span>
-        <h2>{{ 'Sa place chez vous.' | t }}</h2>
-      </div>
-      <span class="count-pill">{{(store.workspace()!.library.length) | t}}</span>
-    </div>
-    <p class="subtle library-description">
-      {{ 'Glissez un appareil sur le plateau' | t }}<br />{{ 'ou cliquez sur + pour l’ajouter.' | t }}
-    </p>
-    <label class="search-box"
-      ><ww-icon name="search" /><input
-        [attr.aria-label]="'Rechercher un appareil' | t"
-        [placeholder]="'Rechercher un appareil…' | t"
-        [value]="search()"
-        (input)="search.set(inputValue($event))"
-      /><kbd>⌕</kbd></label
-    >
-    <div class="category-filter">
-      <select
-        [attr.aria-label]="'Filtrer par catégorie' | t"
-        [value]="category()"
-        (change)="category.set(inputValue($event))"
-      >
-        <option value="Tous">{{ 'Tous' | t }}</option>
-        @for(c of categories; track c){
-        <option [value]="c">{{(c) | t}}</option>
-        }</select
-      ><span>{{ '{0} fiches' | t:[((filteredLibrary().length) | t)] }}</span>
-    </div>
-    <div class="library-items">
-      @for(d of filteredLibrary(); track d.id) {
-      <div class="library-item" draggable="true" (dragstart)="drag($event, d)">
-        <span class="device-icon" [style.--device-color]="colors[d.category]"
-          ><ww-icon [name]="visualId(d)" /></span
-        ><button class="library-item-info" (click)="editDefinition(d)">
-          <strong>{{i18n.deviceName(d)}}</strong><span>{{(energyLabel(d)) | t}}</span></button
-        ><button
-          class="add-device"
-          [attr.aria-label]="'Ajouter {0}' | t:[i18n.deviceName(d)]"
-          (click)="add(d)"
-        >
-          <ww-icon name="plus" />
-        </button>
-      </div>
-      } @empty {
-      <p class="empty-small">{{'Aucun appareil trouvé.' | t}}<br />{{'Créez votre propre fiche.' | t}}</p>
-      }
-    </div>
-    <div class="library-bottom">
-      <button wwButton="secondary" class="full" (click)="newDefinition()">
-        <ww-icon name="plus" />{{ 'Créer un appareil' | t }}
-      </button>
-      <div class="library-file-actions">
-        <button class="text-button" (click)="openImport()" [disabled]="busy()">
-          <ww-icon name="upload" />{{ 'Importer' | t }}</button
-        ><button
-          class="text-button"
-          (click)="exportPack(undefined, true)"
-          [disabled]="busy() || !store.workspace()!.library.length"
-        >
-          <ww-icon name="download" />{{ 'Exporter' | t }}
-        </button>
-      </div>
-      <div class="local-note">
-        <ww-icon name="leaf" /><span
-          >{{ 'Vos données restent chez vous.' | t }}<br />{{ 'Aucun compte. Aucun cloud.' | t }}</span
-        >
-      </div>
-    </div>
-  </aside>
+  @if (!compactLayout()) {
+  <ng-container [ngTemplateOutlet]="deviceLibrary" />
+  }
 
   <section class="main-panel">
     <div class="page-heading">
@@ -174,7 +105,9 @@
       </div>
     </div>
 
-    @if(tab() === 'library') {
+    @if(tab() === 'library') { @if (compactLayout()) {
+    <ng-container [ngTemplateOutlet]="deviceLibrary" />
+    }
     <div class="catalog-heading">
       <span>{{ '{0} fiches · estimations modifiables' | t:[((filteredLibrary().length) | t)] }}</span
       ><button wwButton="primary" (click)="newDefinition()">
@@ -338,6 +271,9 @@
 
     <div class="content-columns">
       <div class="main-content">
+        @if (compactLayout()) {
+        <ng-container [ngTemplateOutlet]="deviceLibrary" />
+        }
         <section class="diorama-card">
           <header class="diorama-header">
             <div>
@@ -923,3 +859,78 @@
   >}
 </dialog>
 }
+
+<ng-template #deviceLibrary>
+  <aside class="library-panel">
+    <div class="library-title">
+      <div>
+        <span class="eyebrow">{{ 'À CHAQUE APPAREIL' | t }}</span>
+        <h2>{{ 'Sa place chez vous.' | t }}</h2>
+      </div>
+      <span class="count-pill">{{(store.workspace()!.library.length) | t}}</span>
+    </div>
+    <p class="subtle library-description">
+      {{ 'Glissez un appareil sur le plateau' | t }}<br />{{ 'ou cliquez sur + pour l’ajouter.' | t }}
+    </p>
+    <label class="search-box"
+      ><ww-icon name="search" /><input
+        [attr.aria-label]="'Rechercher un appareil' | t"
+        [placeholder]="'Rechercher un appareil…' | t"
+        [value]="search()"
+        (input)="search.set(inputValue($event))"
+      /><kbd>⌕</kbd></label
+    >
+    <div class="category-filter">
+      <select
+        [attr.aria-label]="'Filtrer par catégorie' | t"
+        [value]="category()"
+        (change)="category.set(inputValue($event))"
+      >
+        <option value="Tous">{{ 'Tous' | t }}</option>
+        @for(c of categories; track c){
+        <option [value]="c">{{(c) | t}}</option>
+        }</select
+      ><span>{{ '{0} fiches' | t:[((filteredLibrary().length) | t)] }}</span>
+    </div>
+    <div class="library-items">
+      @for(d of filteredLibrary(); track d.id) {
+      <div class="library-item" draggable="true" (dragstart)="drag($event, d)">
+        <span class="device-icon" [style.--device-color]="colors[d.category]"
+          ><ww-icon [name]="visualId(d)" /></span
+        ><button class="library-item-info" (click)="editDefinition(d)">
+          <strong>{{i18n.deviceName(d)}}</strong><span>{{(energyLabel(d)) | t}}</span></button
+        ><button
+          class="add-device"
+          [attr.aria-label]="'Ajouter {0}' | t:[i18n.deviceName(d)]"
+          (click)="add(d)"
+        >
+          <ww-icon name="plus" />
+        </button>
+      </div>
+      } @empty {
+      <p class="empty-small">{{'Aucun appareil trouvé.' | t}}<br />{{'Créez votre propre fiche.' | t}}</p>
+      }
+    </div>
+    <div class="library-bottom">
+      <button wwButton="secondary" class="full" (click)="newDefinition()">
+        <ww-icon name="plus" />{{ 'Créer un appareil' | t }}
+      </button>
+      <div class="library-file-actions">
+        <button class="text-button" (click)="openImport()" [disabled]="busy()">
+          <ww-icon name="upload" />{{ 'Importer' | t }}</button
+        ><button
+          class="text-button"
+          (click)="exportPack(undefined, true)"
+          [disabled]="busy() || !store.workspace()!.library.length"
+        >
+          <ww-icon name="download" />{{ 'Exporter' | t }}
+        </button>
+      </div>
+      <div class="local-note">
+        <ww-icon name="leaf" /><span
+          >{{ 'Vos données restent chez vous.' | t }}<br />{{ 'Aucun compte. Aucun cloud.' | t }}</span
+        >
+      </div>
+    </div>
+  </aside>
+</ng-template>
