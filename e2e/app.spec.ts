@@ -1072,3 +1072,67 @@ for (const width of [402, 996, 1480]) {
     await expect(inspector.locator('h2')).toBeInViewport();
   });
 }
+
+test('devise EUR USD persistante, sans conversion, indépendante de la langue', async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type: string, ...args: any[]) {
+      if (type.startsWith('webgl')) return null;
+      return original.apply(this, [type, ...args] as any);
+    } as any;
+  });
+  await page.goto('/');
+  const metrics = page.locator('.metric-value');
+  await expect(metrics).toHaveCount(3);
+  const energy = await metrics.nth(0).innerText();
+  const budget = await metrics.nth(1).innerText();
+  const rowCost = page.locator('.device-row').first().locator(':scope > span').nth(2);
+  const deviceCost = await rowCost.innerText();
+  const chooser = page.getByRole('button', { name: 'Choisir la devise', exact: true });
+  await expect(chooser).toContainText('EUR');
+  await chooser.focus();
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toContainText('Aucune conversion de change');
+  await dialog.getByRole('button', { name: 'Dollar américain ($) USD', exact: true }).click();
+  await expect(dialog.getByRole('button', { name: 'Dollar américain ($) USD', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await dialog.getByRole('button', { name: 'Terminer', exact: true }).click();
+  await expect(chooser).toContainText('USD');
+  await expect(metrics.nth(0)).toHaveText(energy);
+  await expect(metrics.nth(1)).toHaveText(budget.replace('€', '$'));
+  await expect(metrics.nth(2)).toContainText('$');
+  await expect(rowCost).toHaveText(deviceCost.replace('€', '$'));
+  await expect(page.locator('.table-heading')).toContainText('$ / AN');
+  await expect(page.locator('.tariff-strip')).toContainText('$');
+  await page.getByRole('button', { name: 'Ajuster mon tarif', exact: true }).click();
+  await expect(dialog.getByLabel('Prix du kWh TTC ($)', { exact: true })).toHaveValue('0.25');
+  await expect(dialog.getByLabel('Abonnement annuel TTC ($)', { exact: true })).toHaveValue('180');
+  await dialog.getByLabel('Option tarifaire').selectOption('hp-hc');
+  await expect(dialog.getByLabel('Heures pleines ($/kWh)', { exact: true })).toHaveValue('0.27');
+  await expect(dialog.getByLabel('Heures creuses ($/kWh)', { exact: true })).toHaveValue('0.2');
+  await dialog.getByRole('button', { name: 'Fermer la fenêtre', exact: true }).click();
+  await page.reload();
+  await expect(chooser).toContainText('USD');
+  await expect(metrics.nth(1)).toHaveText(budget.replace('€', '$'));
+  await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
+  await dialog.getByRole('button', { name: 'English', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Choose currency', exact: true })).toContainText('USD');
+  await expect(metrics.nth(1)).toContainText('$');
+  await expect(page.locator('.table-heading')).toContainText('$ / YEAR');
+  await page.getByRole('button', { name: 'Enable dark mode', exact: true }).click();
+  await page.setViewportSize({ width: 402, height: 874 });
+  await page.getByRole('button', { name: 'Choose currency', exact: true }).click();
+  await expect(dialog).toContainText('No exchange-rate conversion');
+  const bounds = await dialog.boundingBox();
+  expect(bounds!.x).toBeGreaterThanOrEqual(0);
+  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(402);
+  await page.screenshot({ path: 'test-results/watt-wallet-currency-mobile.png' });
+  await dialog.getByRole('button', { name: 'Euro (€) EUR', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(metrics.nth(1)).toContainText('€');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(402);
+});

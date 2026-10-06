@@ -75,7 +75,7 @@ Imported GLB bytes are retained unchanged and exported only when referenced by t
 
 ## Translation and appearance
 
-The app starts in French unless English was saved locally. `LanguageService` exposes a language Signal, `en-GB`/`fr-FR` number formatting and EUR formatting. The English catalogue is `src/app/ui/i18n/en.json`, keyed by the French source messages. The standalone `t` pipe handles visible text, accessible attributes and parameterized messages such as `{0}`.
+The app starts in French unless English was saved locally. `LanguageService` exposes language and currency Signals, `en-GB`/`fr-FR` number formatting and EUR/USD money formatting. The English catalogue is `src/app/ui/i18n/en.json`, keyed by the French source messages. The standalone `t` pipe handles visible text, accessible attributes and parameterized messages such as `{0}`.
 
 When adding user-facing text, use the French source string and add its English catalogue entry. Include accessible names, validation errors and notifications. Do not translate identifiers, JSON fields, category enum values or user-entered names and notes. Unmodified built-in profile names are localized for display while custom content is preserved. Language tests check catalogue coverage and behavior.
 

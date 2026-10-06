@@ -16,7 +16,7 @@ Build a virtual home, understand your electricity use and compare changes before
 - Create device profiles through a form or synchronized JSON editor. Share profiles, libraries and homes with scenarios in standalone `.wattpack` files, including supported custom GLB models.
 - Choose French or English, light or dark mode, and a preset or custom accent color. Compare the reference estimate with twelve months of consumption entered from your bills.
 
-The supplied devices and prices are **editable examples**, not official manufacturer specifications or current supplier tariffs. Enter your own equipment, usage and prices. All costs remain in euros in both languages.
+The supplied devices and prices are **editable examples**, not official manufacturer specifications or current supplier tariffs. Enter your own equipment, usage and prices. Choose euros (EUR) or US dollars (USD) independently from the interface language; entered amounts are not converted.
 
 ## Quick start
 

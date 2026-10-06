@@ -69,7 +69,7 @@ Les champs **Position X** et **Position Z** permettent aussi le placement dans l
 
 ## Renseigner votre tarif
 
-Utiliser **Ajuster mon tarif** pour la référence ou le scénario actif. Tous les prix sont saisis manuellement en euros TTC.
+Utiliser **Ajuster mon tarif** pour la référence ou le scénario actif. Tous les prix sont saisis manuellement TTC dans la devise choisie (EUR ou USD).
 
 - **Base :** un prix par kWh.
 - **Heures pleines / creuses :** deux prix distincts. Régler **Consommation en heures creuses** sur chaque appareil entre 0 et 100 % ; la valeur initiale est 0 %.
@@ -109,7 +109,9 @@ Le repère est sauvegardé et exporté avec le logement. Il ne corrige pas autom
 
 Le bouton lune/soleil change le mode clair ou sombre. Le premier affichage suit le thème système ; le choix explicite est ensuite conservé localement. La palette propose six couleurs et un sélecteur personnalisé, appliqués à l’interface et au plateau dans les deux modes. Elle permet aussi de revenir au vert d’origine.
 
-Le bouton globe change la langue sans rechargement et adapte les formats numériques. Vos noms et notes restent inchangés. La langue initiale est le français, puis votre choix est conservé localement. Les préférences de thème, couleur et langue ne font pas partie des exports `.wattpack`.
+Le bouton globe change la langue sans rechargement et adapte les formats numériques. Vos noms et notes restent inchangés. La langue initiale est le français, puis votre choix est conservé localement. Les préférences de thème, couleur, langue et devise ne font pas partie des exports `.wattpack`.
+
+Le bouton de devise à côté du sélecteur de langue propose **Euro (€), EUR** et **Dollar américain ($), USD**. Le choix s’applique immédiatement à tous les logements, scénarios, prix, budgets estimés, économies et surcoûts, puis reste enregistré localement. Il est indépendant de la langue et du thème. Aucun taux de change n’est appliqué : passer en dollars conserve les montants numériques saisis. Vérifier les tarifs et coûts avant d’interpréter les estimations dans la nouvelle devise. En partageant un `.wattpack`, préciser au destinataire la devise à sélectionner ; l’archive V1 conserve les montants sans code de devise.
 
 ## Partager et sauvegarder
 

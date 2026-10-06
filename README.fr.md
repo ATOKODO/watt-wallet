@@ -16,7 +16,7 @@ Composez votre logement virtuel, comprenez sa consommation électrique et compar
 - Créer des fiches par formulaire ou éditeur JSON synchronisé. Partager des fiches, bibliothèques et logements avec scénarios dans des fichiers `.wattpack` autonomes, modèles GLB personnalisés compatibles inclus.
 - Choisir le français ou l’anglais, le mode clair ou sombre et une couleur prédéfinie ou personnalisée. Comparer l’estimation de référence à douze mois de consommation saisis depuis vos factures.
 
-Les fiches et les prix fournis sont des **exemples modifiables**, pas des caractéristiques constructeur officielles ni les tarifs actuels d’un fournisseur. Renseignez vos équipements, usages et prix. Les montants restent en euros dans les deux langues.
+Les fiches et les prix fournis sont des **exemples modifiables**, pas des caractéristiques constructeur officielles ni les tarifs actuels d’un fournisseur. Renseignez vos équipements, usages et prix. Choisissez l’euro (EUR) ou le dollar américain (USD) indépendamment de la langue ; les montants saisis ne sont pas convertis.
 
 ## Prise en main
 

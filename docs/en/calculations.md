@@ -15,7 +15,7 @@ Watt Wallet calculates from the values you enter. It does not obtain live meter 
 
 Rated power (`nominalW`) is indicative and is not automatically used in the annual calculation or power simulator. Average running power can be lower than the rated maximum, particularly for cycling or thermostatically controlled equipment. Use a measured or justified average where possible and document its source.
 
-The conventional year is **365 days / 8,760 hours**. Cycle calculations use **52 weeks**, rather than 365/7. No intermediate rounding is applied; interface formatting rounds only the displayed result, using the selected language. Currency is always EUR.
+The conventional year is **365 days / 8,760 hours**. Cycle calculations use **52 weeks**, rather than 365/7. No intermediate rounding is applied; interface formatting rounds only the displayed result, using the selected language. Choose EUR (euro, the default) or USD (US dollar) independently from the language. This changes the currency unit, without converting entered values or changing any calculation. Enter your tariffs and upfront costs in the selected currency. The examples below use euros.
 
 ## Three exclusive calculation methods
 

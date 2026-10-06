@@ -15,7 +15,7 @@ Watt Wallet calcule à partir des valeurs saisies. Il ne récupère pas de donn�
 
 La puissance nominale (`nominalW`) est indicative et n’est pas utilisée automatiquement dans le calcul annuel ou le simulateur de puissance. La moyenne en marche peut être inférieure au maximum nominal, notamment pour un appareil à cycles ou thermostat. Utiliser si possible une moyenne mesurée ou justifiée et indiquer sa source.
 
-L’année conventionnelle vaut **365 jours / 8 760 heures**. Les cycles utilisent **52 semaines**, et non 365/7. Aucun arrondi intermédiaire n’est appliqué ; seul l’affichage est arrondi selon la langue choisie. La devise reste l’euro.
+L’année conventionnelle vaut **365 jours / 8 760 heures**. Les cycles utilisent **52 semaines**, et non 365/7. Aucun arrondi intermédiaire n’est appliqué ; seul l’affichage est arrondi selon la langue choisie. Choisir EUR (euro, par défaut) ou USD (dollar américain) indépendamment de la langue. Ce choix change l’unité monétaire, sans convertir les valeurs saisies ni modifier les calculs. Saisir les tarifs et surcoûts dans la devise choisie. Les exemples ci-dessous utilisent l’euro.
 
 ## Trois méthodes exclusives
 

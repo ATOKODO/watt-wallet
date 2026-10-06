@@ -1,7 +1,13 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parseTemplate } from '@angular/compiler';
-import { LanguageService, initialLanguage, translate } from '../src/app/ui/language';
+import {
+  LanguageService,
+  initialLanguage,
+  initialCurrency,
+  currencyKey,
+  translate,
+} from '../src/app/ui/language';
 import { seedLibrary } from '../src/app/domain/seed';
 import english from '../src/app/ui/i18n/en.json';
 
@@ -50,6 +56,38 @@ describe('languages', () => {
     expect(service.number(182.5, 1)).toBe('182,5');
     expect(service.deviceName(device)).toBe('Radiateur électrique');
   });
+  it('persists currency independently from language and formats USD without conversion', () => {
+    const saved = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => saved.get(key),
+      setItem: (key: string, value: string) => saved.set(key, value),
+    });
+    vi.stubGlobal('document', { documentElement: { lang: 'fr' }, title: '' });
+    expect(initialCurrency()).toBe('EUR');
+    saved.set(currencyKey, 'CAD');
+    expect(initialCurrency()).toBe('EUR');
+    const service = new LanguageService();
+    service.setCurrency('USD');
+    expect(service.currencySymbol()).toBe('$');
+    expect(service.money(182.5, 1)).toBe(
+      new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: 'USD',
+        currencyDisplay: 'narrowSymbol',
+        maximumFractionDigits: 1,
+        minimumFractionDigits: 0,
+      }).format(182.5),
+    );
+    service.setLanguage('en');
+    expect(service.money(182.5, 1)).toBe('$182.5');
+    expect(initialCurrency()).toBe('USD');
+    expect(new LanguageService().currency()).toBe('USD');
+    service.setCurrency('CAD' as never);
+    expect(service.currency()).toBe('USD');
+    service.setCurrency('EUR');
+    expect(service.currencySymbol()).toBe('€');
+    expect(service.money(182.5, 1)).toBe('€182.5');
+  });
   it('works when local preferences cannot be stored', () => {
     vi.stubGlobal('localStorage', {
       getItem() {
@@ -63,6 +101,9 @@ describe('languages', () => {
     const service = new LanguageService();
     expect(() => service.setLanguage('en')).not.toThrow();
     expect(service.language()).toBe('en');
+    expect(initialCurrency()).toBe('EUR');
+    expect(() => service.setCurrency('USD')).not.toThrow();
+    expect(service.money(20)).toBe('$20');
   });
   it('covers template messages, accessible labels, categories and all built-in silhouettes', () => {
     const dictionary: Record<string, string> = english;
@@ -85,7 +126,7 @@ describe('languages', () => {
     const walk = (nodes: any[]) => {
       for (const node of nodes) {
         if (node.constructor.name === 'Text' && /[A-Za-zÀ-ÿ]/.test(node.value))
-          expect(['Français', 'English']).toContain(node.value.trim());
+          expect(['Français', 'English', 'EUR', 'USD']).toContain(node.value.trim());
         visitExpression(node.value);
         for (const a of [...(node.inputs ?? []), ...(node.attributes ?? [])]) {
           if (['aria-label', 'title', 'placeholder'].includes(a.name) && typeof a.value === 'string')

@@ -124,9 +124,9 @@ This complete manifest contains one cycle-based device. Zip this as `manifest.js
 
 A `DeviceInstance` contains `id`, a complete profile in `definition`, all usage fields in `usage`, an integer `quantity` and `position: { x, z }`. Editing the source library profile does not modify this embedded copy. Usage on the instance drives its estimate; `defaultUsage` stays part of the profile snapshot.
 
-A `Tariff` requires `mode` (`base` or `hp-hc`), `basePrice`, `peakPrice`, `offPeakPrice` and `subscription`. Price fields are euros per kWh; subscription is euros per year. The inactive price fields remain required. All amounts are entered including taxes.
+A `Tariff` requires `mode` (`base` or `hp-hc`), `basePrice`, `peakPrice`, `offPeakPrice` and `subscription`. Price fields are amounts per kWh; subscription is an amount per year, interpreted in the selected application currency (EUR by default, or USD). The V1 manifest stores no currency code and exports no currency preference; tell recipients which currency to select. No exchange conversion is performed. The inactive price fields remain required. All amounts are entered including taxes.
 
-A `Home` contains `id`, `name`, `tariff`, `devices` and `scenarios`, plus optional `observedAnnualKwh`. A `Scenario` contains `id`, `name`, `initialCost`, `tariff` and `devices`. It compares to the current parent reference, without a scenario dependency graph. `initialCost` is the upfront extra cost in euros.
+A `Home` contains `id`, `name`, `tariff`, `devices` and `scenarios`, plus optional `observedAnnualKwh`. A `Scenario` contains `id`, `name`, `initialCost`, `tariff` and `devices`. It compares to the current parent reference, without a scenario dependency graph. `initialCost` is the upfront extra cost in the same currency as the tariffs.
 
 Here is a valid minimal home package with an empty reference and scenario. It illustrates the nesting; the downloadable examples below include installed devices.
 

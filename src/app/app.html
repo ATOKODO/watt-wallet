@@ -44,6 +44,16 @@
       (click)="modal.set('language')"
     >
       <ww-icon name="globe" /><span>{{i18n.language().toUpperCase()}}</span></button
+    ><button
+      type="button"
+      class="theme-toggle language-toggle currency-toggle"
+      [attr.aria-label]="'Choisir la devise' | t"
+      [title]="'Choisir la devise' | t"
+      aria-haspopup="dialog"
+      (click)="modal.set('currency')"
+    >
+      <span class="currency-symbol" aria-hidden="true">{{i18n.currencySymbol()}}</span>
+      <span>{{i18n.currency()}}</span></button
     ><span class="status-dot"></span>{{ '100 % local' | t }}<span class="version">{{ 'BÊTA 0.1' | t }}</span>
   </div>
 </header>
@@ -242,9 +252,9 @@
       </div>
       <form [formGroup]="costForm" (ngSubmit)="saveCost()" class="scenario-cost">
         <label
-          >{{ 'Surcoût initial (€)' | t }}<input
+          >{{ 'Surcoût initial ({0})' | t:[i18n.currencySymbol()] }}<input
             formControlName="initialCost"
-            [attr.aria-label]="'Surcoût initial en euros' | t"
+            [attr.aria-label]="(i18n.currency() === 'USD' ? 'Surcoût initial en dollars' : 'Surcoût initial en euros') | t"
             type="number"
             min="0"
             step="any" /></label
@@ -347,7 +357,8 @@
           <div class="device-table">
             <div class="table-heading">
               <span>{{ 'APPAREIL' | t }}</span><span>{{ 'QUANTITÉ' | t }}</span
-              ><span>{{ 'KWH / AN' | t }}</span><span>{{ '€ / AN' | t }}</span><span></span>
+              ><span>{{ 'KWH / AN' | t }}</span><span>{{ '{0} / AN' | t:[i18n.currencySymbol()] }}</span
+              ><span></span>
             </div>
             @for(d of store.devices(); track d.id; let i = $index){
             <div class="device-row" [class.selected]="store.selectedId() === d.id">
@@ -722,6 +733,36 @@
     </button>
   </div>
   <button type="button" class="btn primary full" (click)="closeModal()">{{'Terminer' | t}}</button>
+  } @if(modal() === 'currency') {
+  <h2>{{ 'Devise de l’application' | t }}</h2>
+  <p class="subtle">
+    {{ 'Les prix et les montants sont exprimés dans la devise choisie. Aucune conversion de change n’est
+    effectuée : les valeurs saisies restent identiques.' | t }}
+  </p>
+  <div class="language-options currency-options" role="group" [attr.aria-label]="'Choisir la devise' | t">
+    <button
+      type="button"
+      class="btn secondary"
+      [attr.aria-pressed]="i18n.currency() === 'EUR'"
+      (click)="i18n.setCurrency('EUR')"
+    >
+      <span>{{ 'Euro (€)' | t }} <small>EUR</small></span>
+      @if(i18n.currency() === 'EUR') { <ww-icon name="check" /> }
+    </button>
+    <button
+      type="button"
+      class="btn secondary"
+      [attr.aria-pressed]="i18n.currency() === 'USD'"
+      (click)="i18n.setCurrency('USD')"
+    >
+      <span>{{ 'Dollar américain ($)' | t }} <small>USD</small></span>
+      @if(i18n.currency() === 'USD') { <ww-icon name="check" /> }
+    </button>
+  </div>
+  <p class="field-hint">
+    {{ 'Ce choix est enregistré sur cet appareil et s’applique à tous les logements et scénarios.' | t }}
+  </p>
+  <button type="button" class="btn primary full" (click)="closeModal()">{{ 'Terminer' | t }}</button>
   } @if(modal() === 'palette') {
   <h2>{{ 'Les couleurs de votre chez-vous.' | t }}</h2>
   <p class="subtle palette-description">
@@ -795,7 +836,7 @@
         <option value="hp-hc">{{ 'Heures pleines / heures creuses' | t }}</option>
       </select></label
     >@if(tariffForm.controls.mode.value === 'base'){<label
-      >{{ 'Prix du kWh TTC (€)' | t }}<input
+      >{{ 'Prix du kWh TTC ({0})' | t:[i18n.currencySymbol()] }}<input
         formControlName="basePrice"
         type="number"
         min="0"
@@ -803,13 +844,13 @@
     >} @else {
     <div class="form-row">
       <label
-        >{{ 'Heures pleines (€/kWh)' | t }}<input
+        >{{ 'Heures pleines ({0}/kWh)' | t:[i18n.currencySymbol()] }}<input
           formControlName="peakPrice"
           type="number"
           min="0"
           step="any" /></label
       ><label
-        >{{ 'Heures creuses (€/kWh)' | t }}<input
+        >{{ 'Heures creuses ({0}/kWh)' | t:[i18n.currencySymbol()] }}<input
           formControlName="offPeakPrice"
           type="number"
           min="0"
@@ -821,7 +862,7 @@
       automatiquement.' | t }}
     </p>
     }<label
-      >{{ 'Abonnement annuel TTC (€)' | t }}<input
+      >{{ 'Abonnement annuel TTC ({0})' | t:[i18n.currencySymbol()] }}<input
         formControlName="subscription"
         type="number"
         min="0"

@@ -4,6 +4,8 @@ import { seedLibrary } from '../domain/seed';
 import english from './i18n/en.json';
 
 export type Language = 'fr' | 'en';
+export type Currency = 'EUR' | 'USD';
+export const currencyKey = 'watt-wallet-currency';
 export const languageKey = 'watt-wallet-language';
 const dictionary: Record<string, string> = english;
 const normalize = (text: string) => text.replace(/\s+/g, ' ').trim();
@@ -55,6 +57,14 @@ export function initialLanguage(): Language {
   }
   return 'fr';
 }
+export function initialCurrency(): Currency {
+  try {
+    if (localStorage.getItem(currencyKey) === 'USD') return 'USD';
+  } catch {
+    /* Storage can be unavailable. */
+  }
+  return 'EUR';
+}
 export function applyLanguage(language: Language) {
   document.documentElement.lang = language;
   document.title =
@@ -64,6 +74,7 @@ const seedNames = new Map(seedLibrary().map((device) => [device.id, device.name]
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   readonly language = signal<Language>(initialLanguage());
+  readonly currency = signal<Currency>(initialCurrency());
   constructor() {
     applyLanguage(this.language());
   }
@@ -77,6 +88,18 @@ export class LanguageService {
       /* Keep the in-session choice. */
     }
   }
+  setCurrency(currency: Currency) {
+    if (currency !== 'EUR' && currency !== 'USD') return;
+    this.currency.set(currency);
+    try {
+      localStorage.setItem(currencyKey, currency);
+    } catch {
+      /* Keep the in-session choice. */
+    }
+  }
+  currencySymbol() {
+    return this.currency() === 'USD' ? '$' : '€';
+  }
   locale() {
     return this.language() === 'en' ? 'en-GB' : 'fr-FR';
   }
@@ -86,7 +109,8 @@ export class LanguageService {
   money(value: number, digits = 0) {
     return new Intl.NumberFormat(this.locale(), {
       style: 'currency',
-      currency: 'EUR',
+      currency: this.currency(),
+      currencyDisplay: 'narrowSymbol',
       maximumFractionDigits: digits,
       minimumFractionDigits: 0,
     }).format(value);

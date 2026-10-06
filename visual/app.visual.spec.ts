@@ -160,3 +160,25 @@ test('library follows the summary on narrow screens', async ({ visualPage: page 
   await expect(page.locator('.device-row')).toHaveCount(7);
   await assertMobileOrder();
 });
+
+for (const [language, theme] of [
+  ['fr', 'light'],
+  ['en', 'dark'],
+] as [Language, Theme][]) {
+  test('currency ' + language + ' ' + theme, async ({ visualPage: page }, info) => {
+    test.skip(
+      !['app-iphone', 'app-desktop'].includes(info.project.name),
+      'Currency chooser on mobile and desktop',
+    );
+    await openHome(page, language, theme);
+    const t = (source: string) => translate(language, source);
+    await page.getByRole('button', { name: t('Choisir la devise'), exact: true }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: t('Dollar américain ($)') + ' USD', exact: true })
+      .click();
+    await expect(page.locator('.metrics')).toContainText('$');
+    await sceneReady(page, 6);
+    await capture(page, 'currency-' + language + '-' + theme + '.png');
+  });
+}

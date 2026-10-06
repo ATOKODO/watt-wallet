@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { LanguageService, type Language, applyLanguage } from '../src/app/ui/language';
+import { LanguageService, type Language, type Currency, applyLanguage } from '../src/app/ui/language';
 import { ThemeService, type Theme, applyTheme } from '../src/app/ui/theme';
 import { accentPresets, defaultAccent, validAccent } from '../src/app/ui/palette';
 import { seedWorkspace } from '../src/app/domain/seed';
@@ -9,6 +9,10 @@ import { WalletStore } from '../src/app/state';
 // Never instantiate WalletStore: that would open the user's real IndexedDB workspace.
 export const storyLanguage = Object.assign(Object.create(LanguageService.prototype) as LanguageService, {
   language: signal<Language>('fr'),
+  currency: signal<Currency>('EUR'),
+  setCurrency(currency: Currency) {
+    if (currency === 'EUR' || currency === 'USD') this.currency.set(currency);
+  },
   setLanguage(language: Language) {
     this.language.set(language);
     applyLanguage(language);

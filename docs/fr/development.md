@@ -75,7 +75,7 @@ Les octets GLB importés restent inchangés et ne sont exportés que si le paque
 
 ## Traduction et apparence
 
-L’application démarre en français sauf si l’anglais a été conservé localement. `LanguageService` expose un Signal de langue, les formats numériques `en-GB`/`fr-FR` et les montants EUR. Le catalogue anglais est `src/app/ui/i18n/en.json`, avec les messages sources français comme clés. Le pipe standalone `t` traite les textes visibles, attributs accessibles et messages paramétrés tels que `{0}`.
+L’application démarre en français sauf si l’anglais a été conservé localement. `LanguageService` expose des Signals de langue et de devise, les formats numériques `en-GB`/`fr-FR` et les montants EUR/USD. Le catalogue anglais est `src/app/ui/i18n/en.json`, avec les messages sources français comme clés. Le pipe standalone `t` traite les textes visibles, attributs accessibles et messages paramétrés tels que `{0}`.
 
 Pour un nouveau texte utilisateur, utiliser le message français et ajouter sa traduction anglaise. Inclure noms accessibles, erreurs et notifications. Ne pas traduire identifiants, champs JSON, catégories du contrat ni noms et notes personnels. Les noms intégrés inchangés sont localisés à l’affichage et les contenus personnalisés sont conservés. Les tests de langue vérifient la couverture et les comportements.
 

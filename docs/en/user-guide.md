@@ -69,7 +69,7 @@ You can also enter **Position X** and **Position Z** in the settings form. The l
 
 ## Enter your tariff
 
-Use **Adjust my tariff** for the active reference or scenario. All prices are entered manually in euros, including taxes.
+Use **Adjust my tariff** for the active reference or scenario. Enter prices manually, including taxes, in the selected currency (EUR or USD).
 
 - **Base:** one price per kWh.
 - **Peak/off-peak:** separate peak and off-peak prices. Set **Off-peak consumption** on each device from 0 to 100%; its default is 0%.
@@ -85,7 +85,7 @@ Every scenario is compared with the **current reference** of its parent home. It
 
 ![Scenario savings, category comparison and initial cost](../screenshots/macbook-pro-14/en/13-comparaison-scenario.png)
 
-Review savings in kWh/year and euros/year, then expand **View savings by category**. Add an **Upfront extra cost (€)** and save it to estimate simple payback. Payback is shown only when annual savings are positive. There is no financing, depreciation or future tariff forecast in this calculation. A more expensive scenario can show negative savings. **Delete this scenario** removes the scenario without changing the reference.
+Review savings in kWh/year and the selected currency per year, then expand **View savings by category**. Add an **Upfront extra cost (€)** and save it to estimate simple payback. Payback is shown only when annual savings are positive. There is no financing, depreciation or future tariff forecast in this calculation. A more expensive scenario can show negative savings. **Delete this scenario** removes the scenario without changing the reference.
 
 For a heater, changing equivalent hours is an explicit usage assumption. The app cannot infer savings from a change in thermostat temperature, insulation or floor area.
 
@@ -109,7 +109,9 @@ The benchmark is saved and exported with the home. It does not automatically adj
 
 The moon/sun button changes light and dark mode. The first display follows the system theme; your explicit choice is saved locally. The palette button offers six colors and a custom selector, applied to the interface and 3D board in both modes. It also offers a return to the original green.
 
-The globe button switches French/English without reloading and updates numeric formatting. Names and notes you wrote remain unchanged. The initial language is French, and your later choice is saved locally. Theme, color and language preferences are not part of `.wattpack` exports.
+The globe button switches French/English without reloading and updates numeric formatting. Names and notes you wrote remain unchanged. The initial language is French, and your later choice is saved locally. Theme, color, language and currency preferences are not part of `.wattpack` exports.
+
+The currency button next to the language selector offers **Euro (€), EUR** and **US dollar ($), USD**. Its choice applies immediately to all homes, scenarios, prices, estimated bills, savings and upfront costs, and is saved locally. It is independent from the language and theme. There is no exchange-rate conversion: choosing dollars keeps the entered numeric amounts unchanged. Review tariffs and costs before interpreting estimates in the new currency. When sharing a `.wattpack`, tell the recipient which currency to select; the V1 archive stores amounts without a currency code.
 
 ## Share and back up
 

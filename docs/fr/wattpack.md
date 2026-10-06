@@ -124,9 +124,9 @@ Ce manifeste complet contient une fiche par cycles. Le placer dans une archive Z
 
 Une `DeviceInstance` contient `id`, une fiche complète dans `definition`, tous les champs d’usage dans `usage`, une `quantity` entière et `position: { x, z }`. Modifier la fiche de bibliothèque ne change pas cette copie embarquée. L’usage de l’instance pilote son estimation ; `defaultUsage` reste dans la copie de fiche.
 
-Un `Tariff` exige `mode` (`base` ou `hp-hc`), `basePrice`, `peakPrice`, `offPeakPrice` et `subscription`. Les prix sont en euros par kWh ; l’abonnement en euros par an. Les champs tarifaires inactifs restent requis. Tous les montants sont saisis TTC.
+Un `Tariff` exige `mode` (`base` ou `hp-hc`), `basePrice`, `peakPrice`, `offPeakPrice` et `subscription`. Les prix sont des montants par kWh ; l’abonnement est un montant par an, interprétés dans la devise choisie dans l’application (EUR par défaut, ou USD). Le manifeste V1 ne stocke aucun code de devise et n’exporte pas cette préférence ; indiquer aux destinataires la devise à sélectionner. Aucune conversion de change n’est effectuée. Les champs tarifaires inactifs restent requis. Tous les montants sont saisis TTC.
 
-Un `Home` contient `id`, `name`, `tariff`, `devices` et `scenarios`, ainsi que `observedAnnualKwh` facultatif. Un `Scenario` contient `id`, `name`, `initialCost`, `tariff` et `devices`. Il se compare à la référence actuelle du parent, sans graphe de dépendances entre scénarios. `initialCost` est le surcoût initial en euros.
+Un `Home` contient `id`, `name`, `tariff`, `devices` et `scenarios`, ainsi que `observedAnnualKwh` facultatif. Un `Scenario` contient `id`, `name`, `initialCost`, `tariff` et `devices`. Il se compare à la référence actuelle du parent, sans graphe de dépendances entre scénarios. `initialCost` est le surcoût initial dans la même devise que les tarifs.
 
 Voici un paquet minimal valide avec référence et scénario vides. Il illustre l’imbrication ; les exemples téléchargeables plus bas incluent des appareils installés.
 

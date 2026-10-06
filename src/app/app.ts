@@ -87,6 +87,7 @@ export class AppComponent {
     | 'import'
     | 'palette'
     | 'language'
+    | 'currency'
     | null
   >(null);
   editingDefinition = signal<DeviceDefinition | null>(null);
