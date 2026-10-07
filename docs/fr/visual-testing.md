@@ -22,16 +22,21 @@ Une référence absente ou une différence excessive de pixels fait échouer le 
 
 ## Couverture
 
-| Zone                        | Couverture                                                                                                                                                                                                                              |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Application responsive      | 402 × 874, 834 × 1194, 1512 × 982 et 1920 × 1080 ; chaque format en français/anglais et clair/sombre. Accueil, véritable diorama WebGL et éditeur JSON valide.                                                                          |
-| Détails des fonctionnalités | Mobile et desktop en français/clair et anglais/sombre : comparaison de scénario et catégories, paramètres d’appareil, puissance simulée, tarif HP/HC, palette et bibliothèque complète.                                                 |
-| États particuliers          | Logement vide sur desktop ; WebGL indisponible et liste accessible des appareils sur mobile.                                                                                                                                            |
-| Storybook                   | Toutes les stories actuelles à 1200 × 900 en français/clair/forêt et anglais/sombre/lavande, après la fin des assertions play. Fondations, boutons, icônes, cartes, formulaires, erreurs JSON, sauvegarde et tous les états du diorama. |
+| Zone                          | Couverture                                                                                                                                                                                                                              |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Application responsive        | 402 × 874, 834 × 1194, 1512 × 982 et 1920 × 1080 ; chaque format en français/anglais et clair/sombre. Accueil, véritable diorama WebGL et éditeur JSON valide.                                                                          |
+| Détails des fonctionnalités   | Mobile et desktop en français/clair et anglais/sombre : comparaison de scénario et catégories, paramètres d’appareil, puissance simulée, tarif HP/HC, palette et bibliothèque complète.                                                 |
+| États particuliers            | Logement vide sur desktop ; WebGL indisponible et liste accessible des appareils sur mobile.                                                                                                                                            |
+| Devise et bibliothèque mobile | Commandes euro/dollar sur mobile et desktop en français/clair et anglais/sombre ; ordre de la bibliothèque, recherche conservée et absence de débordement aux différents seuils responsives.                                            |
+| Storybook                     | Toutes les stories actuelles à 1200 × 900 en français/clair/forêt et anglais/sombre/lavande, après la fin des assertions play. Fondations, boutons, icônes, cartes, formulaires, erreurs JSON, sauvegarde et tous les états du diorama. |
 
 Le test d’inventaire Storybook échoue si une story est ajoutée ou retirée sans mettre à jour `visual/storybook.visual.spec.ts`. Certains tests détaillés sont volontairement ignorés aux formats intermédiaires ; les cas responsives couvrent toujours les quatre dimensions.
 
 Les captures d’accueil prennent le viewport. Les captures détaillées prennent le composant entier (qui peut dépasser la hauteur du viewport), et celles du JSON, de la palette ou du tarif incluent la vraie fenêtre modale et son arrière-plan. Le canvas WebGL est comparé, sans masque ni remplacement. Ce sont des vérifications Chromium, pas des tests sur appareils Apple physiques, Safari ou WebView2 natif.
+
+## Dernière vérification locale
+
+Le **7 octobre 2026**, `npm run test:visual` a recompilé les deux cibles et terminé sous Windows : **86 tests réussis, 17 volontairement ignorés**, avec les 138 références PNG existantes inchangées. Les 147 captures de documentation ont également été comparées à de nouvelles captures ; 24 ont été actualisées pour inclure le bouton de devise dans l’en-tête et les arrière-plans des fenêtres modales. Cette vérification locale ne valide ni le runner GitHub Actions ni WebView2 natif.
 
 ## Reproductibilité
 

@@ -22,16 +22,21 @@ A missing reference or an excessive pixel difference fails the run. Comparison m
 
 ## Coverage
 
-| Area                   | Coverage                                                                                                                                                                                                              |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Responsive application | 402 × 874, 834 × 1194, 1512 × 982 and 1920 × 1080; each in French/English and light/dark. Home, real WebGL diorama and valid JSON editor.                                                                             |
-| Feature details        | Mobile and desktop in French/light and English/dark: scenario/category comparison, device inspector, simulated power, HP/HC tariff, palette dialog and full device library.                                           |
-| Special states         | Empty home on desktop; WebGL unavailable and accessible device list on mobile.                                                                                                                                        |
-| Storybook              | Every current story at 1200 × 900 in French/light/forest and English/dark/lavender, after its play assertions finish. Includes foundations, buttons, icons, cards, forms, JSON errors, saving and all diorama states. |
+| Area                        | Coverage                                                                                                                                                                                                              |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Responsive application      | 402 × 874, 834 × 1194, 1512 × 982 and 1920 × 1080; each in French/English and light/dark. Home, real WebGL diorama and valid JSON editor.                                                                             |
+| Feature details             | Mobile and desktop in French/light and English/dark: scenario/category comparison, device inspector, simulated power, HP/HC tariff, palette dialog and full device library.                                           |
+| Special states              | Empty home on desktop; WebGL unavailable and accessible device list on mobile.                                                                                                                                        |
+| Currency and mobile library | Euro/dollar controls on mobile and desktop in French/light and English/dark; library order, search state and overflow across responsive breakpoints.                                                                  |
+| Storybook                   | Every current story at 1200 × 900 in French/light/forest and English/dark/lavender, after its play assertions finish. Includes foundations, buttons, icons, cards, forms, JSON errors, saving and all diorama states. |
 
 The Storybook inventory test fails when a story is added or removed without updating `visual/storybook.visual.spec.ts`. Some feature tests intentionally skip intermediate viewports; the responsive cases still run on all four.
 
 Home shots capture the viewport. Detail shots capture the whole selected component (which can be taller than the viewport), and JSON/palette/tariff shots include the real modal and backdrop. The WebGL canvas is compared, not masked or replaced. These are Chromium layout checks, not tests on physical Apple hardware, Safari or native WebView2.
+
+## Latest local verification
+
+On **7 October 2026**, `npm run test:visual` rebuilt both targets and completed on Windows: **86 passed, 17 intentionally skipped**, with the 138 existing PNG references unchanged. The 147 documentation screenshots were also checked against fresh captures; 24 were refreshed to include the currency button in the header and modal backdrops. This local check does not validate the GitHub Actions runner or native WebView2.
 
 ## Reproducibility
 

@@ -40,6 +40,7 @@ let page;
 const captures = path.join(project, '.cache/storybook-review');
 await mkdir(captures, { recursive: true });
 const errors = [];
+let secondaryDesignUrl;
 let context;
 // Each story gets its own browser process and storage fixture.
 // Reusing compositor/WebGL resources across pages can crash Windows headless Chromium.
@@ -128,6 +129,7 @@ try {
     );
     assert.equal(references.length, 1, story.id + ' must have one named reference');
     const design = references[0];
+    if (story.id === 'components-button--secondary') secondaryDesignUrl = design.url;
     assert.equal(design?.type, 'figma', story.id + ' must have a Figma reference');
     const designUrl = new URL(design.url);
     assert.equal(designUrl.origin, 'https://www.figma.com');
@@ -223,7 +225,8 @@ try {
   const figmaEmbed = page.locator('iframe[src^="https://embed.figma.com/"]');
   await expect(figmaEmbed).toBeVisible();
   const embedUrl = new URL(await figmaEmbed.getAttribute('src'));
-  assert.equal(embedUrl.searchParams.get('node-id'), '122-31008');
+  assert.ok(secondaryDesignUrl);
+  assert.equal(embedUrl.searchParams.get('node-id'), new URL(secondaryDesignUrl).searchParams.get('node-id'));
   assert.ok(embedUrl.searchParams.get('embed-host'));
   await page.screenshot({ path: path.join(captures, 'manager-designs.png') });
   assert.deepEqual(errors, []);

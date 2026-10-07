@@ -25,22 +25,45 @@ The Accessibility panel uses axe to inspect rendered markup. Findings are adviso
 
 ## Figma references
 
-Select a story, then open the **Design** panel below the preview. The `@storybook/addon-designs` addon embeds an existing node from the [Watt Wallet Figma file](https://www.figma.com/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet). All 29 stories have named references, centralized in `src/stories/figma.ts` and selected through `parameters.design`.
+Select a story, then open **Design (1)** below the preview. `@storybook/addon-designs` embeds a named node from [05 · Components in the Watt Wallet Figma file](https://www.figma.com/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet?node-id=5-7). All 29 story references are centralized in `src/stories/figma.ts`.
 
-| Stories                                   | Figma reference                                                             |
-| ----------------------------------------- | --------------------------------------------------------------------------- |
-| Introduction, Colors, Typography, Spacing | Screen index, theme palette, font notes and a control using spacing tokens. |
-| Button                                    | Primary, secondary, compact and text-only production buttons.               |
-| Metric                                    | Annual energy, annual budget and monthly average cards.                     |
-| Icon                                      | Bolt, fallback box and the reusable component library.                      |
-| Device editor                             | Profile form, installed-device power/usage form and JSON editor.            |
-| Diorama                                   | Consumption, placement and the scene with a selected device.                |
+The Figma page contains a review catalogue and a separate master area. It has **25 native component sets, 129 variants and 42 production SVG icons**:
 
-These are design references, without automatic visual comparisons or live synchronization. Sample values and labels can differ. Stories without a dedicated Figma state (disabled, zero/large metric values, cycle/annual inputs, invalid JSON, saving, empty/zero scenes) explicitly describe that limitation in their story documentation and link to the relevant component. The spacing scale and complete current icon registry remain in Storybook. Toolbar theme/language changes do not switch the linked Figma node.
+| Family               | Contents                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| Foundations          | Semantic Light/Dark colors, six shared text styles, spacing and radii.                     |
+| Buttons              | Action, Text, Icon, Add device, Header, Navigation, Segment, Power state and Scenario tab. |
+| Fields and selection | Input, Select, Search, JSON, validation messages and six accent choices.                   |
+| Cards and rows       | Metrics, library items, device rows, simulated power rows and scene annotations.           |
+| Product patterns     | Device editor, diorama, tariff summary, library and scenario comparison.                   |
 
-The Angular preview still runs locally. The embedded design needs an internet connection and permission to view the Figma file; sign in if requested. No access token is stored and the integration does not change file sharing permissions. The smoke check verifies every story's URL and the addon's embedded target with a local network fixture; it does not test Figma authentication or remote availability.
+Variants describe appearance and state: size, style, hover, keyboard focus, disabled, selection or calculation method. Labels, metric values, device names and icons are instance properties, rather than duplicate variants for each piece of content. Icons use instance swaps; visibility properties can hide optional icons and hints. The review catalogue shows native instances in both variable modes. The static Three.js scene is a captured visual asset; its energy data and geometry are still owned by the application.
 
-When a design changes, keep existing node IDs where possible. Update the corresponding entry in `src/stories/figma.ts` if a node is replaced, and verify the **Design** panel for the affected story.
+The **5,821 original imported masters** retain their IDs on **99 · Import archive**, under hidden `.Legacy/` names. Existing screen and animation dependencies remain intact. Use the canonical families on 05 · Components for new work.
+
+| Stories                                   | Figma reference                                                              |
+| ----------------------------------------- | ---------------------------------------------------------------------------- |
+| Introduction, Colors, Typography, Spacing | Dedicated foundation boards.                                                 |
+| Button                                    | Exact primary, secondary, compact, disabled and text-only examples.          |
+| Metric                                    | Energy, budget, monthly, zero and large-value examples.                      |
+| Icon                                      | Bolt, fallback box and the full 42-icon catalogue.                           |
+| Device editor                             | Power, cycle, annual, installed, valid/invalid JSON and saving compositions. |
+| Diorama                                   | Consumption, placement and selected-device compositions.                     |
+
+These references do not provide automatic comparisons or live synchronization. Demonstration values and composition widths can differ from a story. Empty and zero-consumption **scenes** still link to the populated diorama reference; their story descriptions explain this. Zero-consumption **annotations** have a dedicated `Scene/Object label` variant. Changing the Storybook theme, language or palette does not change the linked Figma node.
+
+### Embedded Figma login in Brave
+
+The Angular preview remains local. The Figma panel needs an Internet connection and permission to view the file. A successful login in a separate popup does not guarantee the embedded frame can use that session: blocked third-party cookies can prevent it from recognizing the login.
+
+1. Open Storybook at `http://127.0.0.1:6007`.
+2. In Brave's lion icon (Shields), allow third-party cookies for this site.
+3. Reload Storybook and reopen **Design (1)**.
+4. If Figma asks to **Allow access**, allow the embedded content to use the session. You can also open the design in a separate tab to check file permissions.
+
+See [Figma's embed help](https://help.figma.com/hc/en-us/articles/360051741274-Interact-with-embeds) and [Brave's site-specific cookie controls](https://support.brave.com/hc/en-us/articles/360022806212-How-do-I-use-Shields-while-browsing). No access token is stored and the integration does not change sharing permissions. The browser smoke check verifies every reference and the addon's actual embed target using a local network fixture; it does not verify remote Figma authentication.
+
+Preserve canonical node IDs when refining a design. If a node is replaced, update `src/stories/figma.ts` and check the affected story's Design panel.
 
 ## Shared sources
 

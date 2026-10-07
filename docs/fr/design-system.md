@@ -25,22 +25,45 @@ Le panneau Accessibility utilise axe pour inspecter le rendu. Les résultats son
 
 ## Références Figma
 
-Sélectionner une story, puis ouvrir le panneau **Design** sous la prévisualisation. L’addon `@storybook/addon-designs` affiche un calque existant du [fichier Figma Watt Wallet](https://www.figma.com/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet). Les 29 stories disposent de références nommées, centralisées dans `src/stories/figma.ts` et choisies via `parameters.design`.
+Sélectionner une story, puis ouvrir **Design (1)** sous la prévisualisation. `@storybook/addon-designs` affiche un calque nommé de [05 · Components dans le fichier Figma Watt Wallet](https://www.figma.com/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet?node-id=5-7). Les 29 références de stories sont centralisées dans `src/stories/figma.ts`.
 
-| Stories                                   | Référence Figma                                                                             |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Introduction, Colors, Typography, Spacing | Index des écrans, palette de thème, notes de polices et contrôle utilisant les espacements. |
-| Button                                    | Boutons de production principal, secondaire, compact et sans icône.                         |
-| Metric                                    | Cartes d’énergie annuelle, de budget annuel et de moyenne mensuelle.                        |
-| Icon                                      | Éclair, cube de repli et bibliothèque de composants réutilisables.                          |
-| Device editor                             | Formulaire de fiche, formulaire puissance/usages d’un appareil installé et éditeur JSON.    |
-| Diorama                                   | Consommation, placement et scène avec appareil sélectionné.                                 |
+La page Figma contient un catalogue de présentation et une zone séparée pour les masters. Elle comprend **25 ensembles de composants natifs, 129 variants et 42 icônes SVG de production** :
 
-Ce sont des références de conception, sans comparaison visuelle automatique ni synchronisation en direct. Les valeurs et libellés d’exemple peuvent différer. Les stories sans état Figma dédié (désactivation, cartes à zéro/grande valeur, entrées cycle/annuelle, JSON invalide, sauvegarde, scènes vide/nulle) indiquent cette limite dans leur documentation et renvoient au composant correspondant. L’échelle des espacements et le registre complet actuel des icônes restent dans Storybook. Changer le thème ou la langue dans la barre d’outils ne change pas le calque Figma lié.
+| Famille             | Contenu                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------ |
+| Fondations          | Couleurs sémantiques Light/Dark, six styles de texte partagés, espacements et rayons.                  |
+| Boutons             | Action, Text, Icon, Add device, Header, Navigation, Segment, Power state et Scenario tab.              |
+| Champs et sélection | Input, Select, Search, JSON, messages de validation et six choix de couleur.                           |
+| Cartes et lignes    | Estimations, appareils de bibliothèque, lignes d’appareils, puissance simulée et annotations de scène. |
+| Panneaux composés   | Éditeur d’appareil, diorama, résumé du tarif, bibliothèque et comparaison de scénarios.                |
 
-La prévisualisation Angular fonctionne toujours localement. Le design intégré nécessite une connexion Internet et les droits de consultation du fichier Figma ; se connecter si demandé. Aucun jeton d’accès n’est enregistré et l’intégration ne modifie pas les permissions de partage. Le contrôle navigateur vérifie l’URL de chaque story et la cible intégrée par l’addon avec une réponse réseau locale ; il ne teste pas l’authentification Figma ni sa disponibilité distante.
+Les variants décrivent l’apparence et l’état : taille, style, survol, focus clavier, désactivation, sélection ou méthode de calcul. Les libellés, valeurs des cartes, noms d’appareils et icônes sont des propriétés d’instance ; ils ne créent pas de variants dupliqués pour chaque contenu. Les icônes utilisent des échanges d’instance ; les propriétés de visibilité masquent les icônes et indications facultatives. Le catalogue présente des instances natives dans les deux modes de variables. La scène Three.js statique est une ressource visuelle capturée ; ses données énergétiques et sa géométrie restent gérées par l’application.
 
-Lors d’une évolution du design, conserver les identifiants de calque existants si possible. Mettre à jour l’entrée correspondante dans `src/stories/figma.ts` si un calque est remplacé, puis vérifier le panneau **Design** de la story concernée.
+Les **5 821 masters importés d’origine** conservent leurs identifiants dans **99 · Import archive**, sous des noms masqués `.Legacy/`. Les dépendances des écrans et animations existants sont préservées. Utiliser les familles canoniques de 05 · Components pour les nouveaux travaux.
+
+| Stories                                   | Référence Figma                                                                                  |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Introduction, Colors, Typography, Spacing | Planches de fondations dédiées.                                                                  |
+| Button                                    | Exemples principal, secondaire, compact, désactivé et sans icône.                                |
+| Metric                                    | Exemples énergie, budget, moyenne mensuelle, zéro et grande valeur.                              |
+| Icon                                      | Éclair, cube de repli et catalogue complet des 42 icônes.                                        |
+| Device editor                             | Compositions puissance, cycle, annuelle, instance installée, JSON valide/invalide et sauvegarde. |
+| Diorama                                   | Compositions consommation, placement et appareil sélectionné.                                    |
+
+Ces références n’effectuent ni comparaison automatique ni synchronisation en direct. Les valeurs d’exemple et largeurs des compositions peuvent différer de la story. Les **scènes** vide et de consommation nulle renvoient encore au diorama rempli ; leur description de story précise cette limite. Les **annotations** de consommation nulle disposent d’un variant `Scene/Object label` dédié. Changer le thème, la langue ou la palette dans Storybook ne change pas le calque Figma lié.
+
+### Connexion Figma intégrée dans Brave
+
+La prévisualisation Angular fonctionne localement. Le panneau Figma nécessite une connexion Internet et les droits de consultation du fichier. Une connexion réussie dans une fenêtre séparée ne garantit pas que le cadre intégré puisse utiliser cette session : le blocage des cookies tiers peut l’empêcher de reconnaître la connexion.
+
+1. Ouvrir Storybook sur `http://127.0.0.1:6007`.
+2. Dans l’icône du lion de Brave (Shields), autoriser les cookies tiers pour ce site.
+3. Recharger Storybook et rouvrir **Design (1)**.
+4. Si Figma demande **Allow access**, autoriser le contenu intégré à utiliser la session. Ouvrir aussi le design dans un onglet séparé permet de vérifier les droits du fichier.
+
+Consulter [l’aide Figma sur les contenus intégrés](https://help.figma.com/hc/en-us/articles/360051741274-Interact-with-embeds) et [les contrôles de cookies par site de Brave](https://support.brave.com/hc/en-us/articles/360022806212-How-do-I-use-Shields-while-browsing). Aucun jeton d’accès n’est enregistré et l’intégration ne modifie pas les permissions de partage. Le contrôle navigateur vérifie chaque référence et la cible réellement intégrée par l’addon avec une réponse réseau locale ; il ne vérifie pas l’authentification Figma distante.
+
+Conserver les identifiants canoniques lors d’une évolution du design. Si un calque est remplacé, mettre à jour `src/stories/figma.ts` et vérifier le panneau Design de la story concernée.
 
 ## Sources partagées
 
