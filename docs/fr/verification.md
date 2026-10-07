@@ -6,6 +6,34 @@ Validation locale terminée le 1er octobre 2026 sous Windows x64, avec Node 24.2
 
 Ce rapport conserve les résultats historiques de cette validation. La mise à jour de la documentation ne constitue pas une nouvelle exécution des tests ni une validation d’un autre binaire.
 
+## Revue avant les essais humains — 7 octobre 2026 {#revue-avant-les-essais-humains-7-octobre-2026}
+
+La version actuelle peut servir à une première session d’essais humains : aucun échec bloquant n’a été trouvé dans les vérifications locales suivantes. Il s’agit d’une revue Windows/Chromium locale, pas d’une certification de toutes les plateformes ni du runner CI hébergé. Suivre le [parcours d’essais humains](human-testing.md) pour les vérifications manuelles restantes.
+
+| Vérification                      | Résultat local actuel                                                                                                                                                                                                                                                                             |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tests unitaires                   | 84 réussis dans 8 fichiers.                                                                                                                                                                                                                                                                       |
+| Parcours Chromium de bout en bout | 27 réussis, dont retrait en scénario, disposition mobile, conflits de sauvegarde, échange GLB et choix EUR/USD persistant.                                                                                                                                                                        |
+| Tests Rust de sauvegarde          | 3 réussis ; formatage Rust conforme.                                                                                                                                                                                                                                                              |
+| Régression visuelle               | 86 réussis, 17 volontairement ignorés selon le viewport ; les 138 références PNG suivies restent inchangées. Le WebGL réel est comparé dans les cas 3D.                                                                                                                                           |
+| Storybook                         | Vérification des types et 29 vérifications des stories réussies.                                                                                                                                                                                                                                  |
+| Compilation web et hors connexion | Production compilée ; application en anglais, IndexedDB et vraie scène 3D relus depuis le cache sans requête externe.                                                                                                                                                                             |
+| Livraison Windows                 | Nouvelle compilation NSIS, installation isolée, vérification WebView2 de l’application installée, redémarrage et désinstallation réussis. La persistance de la devise après redémarrage est maintenant testée explicitement, sans changer les montants numériques enregistrés ni les kWh annuels. |
+| Site documentaire                 | 39 pages HTML et 1 606 liens, ressources et ancres locales vérifiés ; navigation dans le navigateur validée à `/` et sous le chemin GitHub Pages `/watt-wallet/`.                                                                                                                                 |
+| Exemples d’échange                | Les trois paquets d’exemple sont validés, importés et conservés après export/réouverture ; octets GLB d’origine préservés. Six exemples JSON de documentation validés et schéma public conforme à la validation d’exécution.                                                                      |
+
+La documentation contient **147 PNG de présentation** répartis en sept séries et quatre tailles de viewport. Ils ont été comparés à de nouvelles captures de l’interface actuelle ; 24 images d’en-tête/fond de fenêtre ont été actualisées pour le bouton de devise. Les empreintes des ressources de production restent `main-BSCQTZQP.js` et `styles-J6DM3ODP.css`. Les galeries sont distinctes des références de régression visuelle. Voir le [guide de régression visuelle](visual-testing.md) et l’[index des captures](../screenshots/README.md).
+
+Figma a été vérifié par rapport au code et aux correspondances Storybook. Les **84 écrans de présentation** héritent maintenant du contrôle de devise grâce à 24 en-têtes partagés mis à jour. Le design system contient 25 ensembles de composants, 129 variantes et 42 composants d’icônes. Les 29 références Storybook pointent vers des nœuds existants. Les stories de plateau vide ou à consommation nulle renvoient volontairement à une référence de design peuplée et annotée ; elles restent des cas exécutables dans le code, sans écran Figma distinct identique. L’authentification Figma intégrée dans Brave dépend encore des permissions du navigateur et n’est pas couverte par ces vérifications.
+
+Artefacts compilés actuels, remplaçant la livraison historique ci-dessous :
+
+- Installateur : `src-tauri/target/release/bundle/nsis/Watt Wallet_0.1.0_x64-setup.exe`, **2 806 521 octets**.
+- SHA-256 de l’installateur : `FB6479FD9B1BFBE6D9C222215C56C838479586064A6F8CB685C54357BB05530E`.
+- SHA-256 normalisé du binaire installé : `de728f599b29bb77f6043ce83ffebc55bde4679c845424650726fb805c119154`.
+
+Restent à vérifier avec des personnes : sélecteurs natifs d’import/export et annulation, appareils mobiles physiques et Safari, compréhension des parcours et confort au clavier. L’installateur reste non signé ; le téléchargement du bootstrapper sur une machine sans WebView2 n’a pas été exercé. Les contrôles d’accessibilité Storybook sont indicatifs, pas un audit WCAG. Les résultats locaux ne prouvent pas une exécution GitHub Actions réussie. Les résultats et empreintes du 1er octobre ci-dessous sont conservés comme historique.
+
 ## Résultats enregistrés
 
 | Vérification                            | Résultat                                                                                                                                                                      |

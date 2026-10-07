@@ -6,6 +6,34 @@ Local validation completed on **1 October 2026** on Windows x64, using Node 24.2
 
 This report preserves the historical results of that validation. Updating the documentation does not mean these checks were run again or that another binary was validated.
 
+## Review before human testing — 7 October 2026 {#review-before-human-testing-7-october-2026}
+
+The current version is a candidate for a first human testing session: no blocking failure was found in the local checks below. This is a local Windows/Chromium review, not a certification of every platform or the hosted CI runner. Follow the [human testing journey](human-testing.md) for the remaining manual checks.
+
+| Check                        | Current local result                                                                                                                                                                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit tests                   | 84 passed across 8 files.                                                                                                                                                                                           |
+| Chromium end-to-end journeys | 27 passed, including scenario removal, mobile layout, storage conflicts, GLB exchange and persistent EUR/USD selection.                                                                                             |
+| Rust persistence tests       | 3 passed; Rust formatting passed.                                                                                                                                                                                   |
+| Visual regression            | 86 passed, 17 intentionally skipped by viewport; all 138 committed PNG references remain unchanged. Real WebGL is compared in the 3D cases.                                                                         |
+| Storybook                    | Type checking and all 29 story smoke checks passed.                                                                                                                                                                 |
+| Web build and offline smoke  | Production build passed; cached English app, IndexedDB and real 3D reopened without external requests.                                                                                                              |
+| Windows delivery             | Fresh NSIS build, isolated installation, installed WebView2 smoke, restart and uninstall passed. Currency persistence after restart is now explicitly tested, without changing saved numeric amounts or annual kWh. |
+| Documentation site           | 39 HTML pages and 1,606 local links, assets and anchors checked; browser navigation passed both at `/` and under the GitHub Pages path `/watt-wallet/`.                                                             |
+| Exchange examples            | All three example packages validated, imported and survived export/reopen; original GLB bytes preserved. Six documentation JSON examples validated and the public schema matches runtime validation.                |
+
+The documentation contains **147 presentation PNGs** in seven series at four viewport sizes. They were compared against fresh captures on the current UI; 24 header/backdrop images were refreshed for the currency button. The current production asset fingerprints remain `main-BSCQTZQP.js` and `styles-J6DM3ODP.css`. The galleries are separate from visual regression references. See the [visual testing guide](visual-testing.md) and [screenshot index](../screenshots/README.md).
+
+Figma was checked against the code and Storybook mappings. All **84 presentation screens** now inherit the currency control from 24 updated shared header masters. The design system contains 25 component sets, 129 variants and 42 icon components. All 29 Storybook references resolve to existing nodes. Empty and zero-consumption diorama stories intentionally link to an annotated populated design reference; they remain executable code fixtures rather than separate matching Figma screens. Brave's embedded Figma authentication still depends on browser permissions and is not covered by these checks.
+
+Current build artifacts, replacing the historical delivery below:
+
+- Installer: `src-tauri/target/release/bundle/nsis/Watt Wallet_0.1.0_x64-setup.exe`, **2,806,521 bytes**.
+- Installer SHA-256: `FB6479FD9B1BFBE6D9C222215C56C838479586064A6F8CB685C54357BB05530E`.
+- Normalized installed binary SHA-256: `de728f599b29bb77f6043ce83ffebc55bde4679c845424650726fb805c119154`.
+
+Still to check with people: native import/export selectors and cancellation, physical mobile devices and Safari, usability and keyboard comfort. The installer remains unsigned; bootstrapper download on a machine without WebView2 was not exercised. Storybook accessibility checks are advisory, not a WCAG audit. Local results do not establish a successful GitHub Actions run. The dated 1 October results and hashes below are retained as history.
+
 ## Recorded results
 
 | Check                                  | Result                                                                                                                                                  |

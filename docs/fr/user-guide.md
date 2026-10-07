@@ -85,7 +85,7 @@ Chaque scénario est comparé à la **référence actuelle** de son logement par
 
 ![Économies du scénario, comparaison par catégorie et surcoût](../screenshots/macbook-pro-14/fr/13-comparaison-scenario.png)
 
-Consulter les économies en kWh/an et €/an, puis déplier **Voir les économies par catégorie**. Renseigner un **Surcoût initial (€)** et l’enregistrer pour estimer le retour simple. Le retour apparaît uniquement si les économies annuelles sont positives. Le calcul n’intègre ni financement, ni amortissement, ni prévision de tarif. Un scénario plus coûteux peut afficher des économies négatives. **Supprimer ce scénario** retire le scénario sans modifier la référence.
+Consulter les économies en kWh/an et dans la devise choisie par an, puis déplier **Voir les économies par catégorie**. Renseigner un **Surcoût initial (€)** ou **Surcoût initial ($)** selon la devise choisie, puis l’enregistrer pour estimer le retour simple. Le retour apparaît uniquement si les économies annuelles sont positives. Le calcul n’intègre ni financement, ni amortissement, ni prévision de tarif. Un scénario plus coûteux peut afficher des économies négatives. **Supprimer ce scénario** retire le scénario sans modifier la référence.
 
 Pour un radiateur, changer les heures équivalentes constitue une hypothèse d’usage explicite. L’application ne déduit pas les économies d’un changement de température, d’isolation ou de surface.
 

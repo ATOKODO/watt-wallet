@@ -211,6 +211,18 @@ try {
   await page.getByRole('dialog').getByRole('button', { name: 'Done', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('button', { name: 'My home', exact: true })).toBeVisible();
+  const currencyWorkspace = await readFile(path.join(root, 'workspace.json'), 'utf8');
+  const currencyEnergy = await page.locator('.metric-value').first().innerText();
+  await page.getByRole('button', { name: 'Choose currency', exact: true }).click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /US dollar/ })
+    .click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Choose currency', exact: true })).toContainText('USD');
+  await expect(page.locator('.metric-value').nth(1)).toContainText('$');
+  await expect(page.locator('.metric-value').first()).toHaveText(currencyEnergy);
+  expect(await readFile(path.join(root, 'workspace.json'), 'utf8')).toBe(currencyWorkspace);
   await page.screenshot({ path: 'test-results/watt-wallet-native-english.png', fullPage: true });
   await run.browser.close();
   run.child.kill();
@@ -220,6 +232,8 @@ try {
   await expect(run.page.locator('.device-row').last()).toContainText('× 4', { timeout: 30000 });
   await expect(run.page.locator('.error-banner')).toHaveCount(0);
   await expect(run.page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(run.page.getByRole('button', { name: 'Choose currency', exact: true })).toContainText('USD');
+  await expect(run.page.locator('.metric-value').nth(1)).toContainText('$');
   await expect(run.page.locator('.bill-reference')).toContainText('6,000 kWh entered');
   await run.page.getByRole('button', { name: 'Choose language', exact: true }).click();
   await run.page.getByRole('dialog').getByRole('button', { name: 'Français', exact: true }).click();
@@ -287,7 +301,7 @@ try {
   }
   if (errors.length) throw new Error(errors.join('\n'));
   console.log(
-    'WebView2 natif : français/anglais persistants, mode sombre, palette persistante, scène 3D, plateau adaptatif, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde, redémarrage et reprises de création sans doublons OK.',
+    'WebView2 natif : français/anglais et EUR/USD persistants sans conversion, mode sombre, palette persistante, scène 3D, plateau adaptatif, grille, JSON, scénario, puissance simulée, facture, glisser-déposer, sauvegarde, redémarrage et reprises de création sans doublons OK.',
   );
 } finally {
   if (run) {

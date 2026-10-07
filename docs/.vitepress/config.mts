@@ -15,7 +15,7 @@ const features = {
     ['Scenarios and savings', 'compare-a-scenario'],
     ['Simulated power', 'simulate-devices-running-now'],
     ['Bill benchmark', 'compare-with-your-bills'],
-    ['Theme and language', 'personalize-the-interface'],
+    ['Theme, language and currency', 'personalize-the-interface'],
     ['Sharing and backups', 'share-and-back-up'],
     ['Saving and recovery', 'saving-and-recovery'],
     ['Troubleshooting', 'troubleshooting'],
@@ -28,7 +28,7 @@ const features = {
     ['Scénarios et économies', 'comparer-un-scénario'],
     ['Puissance simulée', 'simuler-les-appareils-allumés-maintenant'],
     ['Repère de facture', 'comparer-avec-vos-factures'],
-    ['Thème et langue', 'personnaliser-linterface'],
+    ['Thème, langue et devise', 'personnaliser-linterface'],
     ['Partage et sauvegardes', 'partager-et-sauvegarder'],
     ['Enregistrement et récupération', 'enregistrement-et-récupération'],
     ['Dépannage', 'dépannage'],
@@ -43,6 +43,7 @@ function sidebar(lang: 'en' | 'fr'): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'Introduction', link: prefix },
         { text: fr ? 'Guide utilisateur' : 'User guide', link: prefix + 'user-guide' },
+        { text: fr ? 'Essais humains' : 'Human testing', link: prefix + 'human-testing' },
         {
           text: fr ? 'Premier logement' : 'Your first home',
           link: prefix + 'user-guide#' + (fr ? 'votre-premier-logement' : 'your-first-home'),

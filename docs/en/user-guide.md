@@ -85,7 +85,7 @@ Every scenario is compared with the **current reference** of its parent home. It
 
 ![Scenario savings, category comparison and initial cost](../screenshots/macbook-pro-14/en/13-comparaison-scenario.png)
 
-Review savings in kWh/year and the selected currency per year, then expand **View savings by category**. Add an **Upfront extra cost (€)** and save it to estimate simple payback. Payback is shown only when annual savings are positive. There is no financing, depreciation or future tariff forecast in this calculation. A more expensive scenario can show negative savings. **Delete this scenario** removes the scenario without changing the reference.
+Review savings in kWh/year and the selected currency per year, then expand **View savings by category**. Add an **Upfront extra cost (€)** or **Upfront extra cost ($)**, depending on the selected currency, and save it to estimate simple payback. Payback is shown only when annual savings are positive. There is no financing, depreciation or future tariff forecast in this calculation. A more expensive scenario can show negative savings. **Delete this scenario** removes the scenario without changing the reference.
 
 For a heater, changing equivalent hours is an explicit usage assumption. The app cannot infer savings from a change in thermostat temperature, insulation or floor area.
 
