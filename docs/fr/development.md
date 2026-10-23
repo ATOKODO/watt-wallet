@@ -38,6 +38,26 @@ La commande Windows compile le frontend et crée un installateur NSIS dans `src-
 
 L’inlining du CSS critique Angular est désactivé car le gestionnaire `onload` de sa feuille différée est incompatible avec la CSP de scripts Tauri. Les styles chargent comme feuilles externes et la politique de scripts reste stricte. L’interception native du dépôt de fichiers dans la WebView est désactivée pour permettre le glisser-déposer HTML des appareils sous Windows ; les imports utilisent des sélecteurs dédiés.
 
+## Netlify : application web uniquement
+
+Le fichier racine `netlify.toml` publie uniquement la compilation Angular pour navigateur. Dans Netlify, importer ce dépôt, conserver le répertoire de base à la racine et utiliser la configuration du fichier :
+
+| Paramètre               | Valeur                                        |
+| ----------------------- | --------------------------------------------- |
+| Commande de compilation | `npm run build -- --configuration production` |
+| Dossier publié          | `dist/watt-wallet/browser`                    |
+| Node.js                 | `24.20.0`                                     |
+
+Netlify installe les dépendances npm avant cette commande ; les dépendances de développement restent activées car le compilateur Angular en a besoin. Documentation, Storybook, captures et binaires Windows sont hors du dossier publié. Le déploiement utilise des fichiers statiques, sans serveur, Functions ni base de données à provisionner. Aucun secret applicatif n’est nécessaire.
+
+Le repli SPA conserve les ressources existantes et sert `index.html` pour les adresses de l’application. Le point d’entrée HTML, le manifeste du service worker et le worker doivent être revalidés pour éviter de conserver une ancienne version.
+
+`scripts/netlify-ignore-build.mjs` compare le commit précédemment déployé au commit demandé. Les changements limités à la documentation, aux stories/configurations Storybook, aux tests ou à Tauri ne recompilent pas l’application. Le code applicatif, les ressources publiques, les dépendances npm partagées, les configurations Angular/TypeScript et Netlify déclenchent une compilation. Garder les chemins surveillés conformes aux futures entrées de compilation. Un premier déploiement, un redéploiement explicite du même commit ou une comparaison Git indisponible poursuivent la compilation. Les build hooks Netlify peuvent contourner cette règle d’annulation.
+
+Après déploiement, vérifier l’adresse publique, le rechargement, la vue 3D, la sauvegarde locale et l’import/export `.wattpack`. Les données appartiennent à chaque profil et origine de navigateur ; un Deploy Preview, le domaine de production et un nouveau domaine personnalisé ont des stockages séparés. Exporter/importer pour transférer un logement entre eux. L’ajout de cette configuration ne publie pas encore le site.
+
+Voir la [configuration par fichier](https://docs.netlify.com/build/configure-builds/file-based-configuration/) et les [règles d’annulation de compilation](https://docs.netlify.com/build/configure-builds/ignore-builds/) Netlify.
+
 ## Architecture et flux de données
 
 | Partie             | Responsabilité                                                                                                                       |

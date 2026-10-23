@@ -1,0 +1,31 @@
+# Deploy only the browser application. Netlify installs npm dependencies first.
+[build]
+  command = "npm run build -- --configuration production"
+  publish = "dist/watt-wallet/browser"
+  ignore = "node ./scripts/netlify-ignore-build.mjs"
+
+[build.environment]
+  NODE_VERSION = "24.20.0"
+  NPM_FLAGS = "--include=dev"
+
+# Preserve real static files; route application URLs back to Angular.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Let browsers and the service worker check for new application versions.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/ngsw.json"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/ngsw-worker.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

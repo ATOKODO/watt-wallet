@@ -12,3 +12,5 @@ docs/.vitepress/dist/
 docs/.vitepress/public/
 
 storybook-static/
+
+.netlify/

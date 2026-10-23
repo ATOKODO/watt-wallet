@@ -38,6 +38,26 @@ The Windows command builds the frontend and creates an NSIS installer in `src-ta
 
 Angular critical CSS inlining is disabled because its deferred stylesheet `onload` handler conflicts with Tauri's script CSP. Styles load as external stylesheets while the script policy remains strict. Native WebView file-drop interception is disabled so HTML device drag-and-drop works on Windows; dedicated file selectors handle imports.
 
+## Netlify: web application only
+
+The root `netlify.toml` publishes only the Angular browser build. In Netlify, import this repository, leave the base directory at the repository root and use the configuration from the file:
+
+| Setting           | Value                                         |
+| ----------------- | --------------------------------------------- |
+| Build command     | `npm run build -- --configuration production` |
+| Publish directory | `dist/watt-wallet/browser`                    |
+| Node.js           | `24.20.0`                                     |
+
+Netlify installs npm dependencies before running the command; dev dependencies remain enabled because the Angular compiler requires them. Documentation, Storybook, screenshots and Windows binaries are outside the published directory. The deployment uses static files, with no server, Functions or database to provision. No application secrets are required.
+
+The SPA fallback preserves existing assets and serves `index.html` for application URLs. The HTML entry point, service-worker manifest and worker must revalidate rather than retain a stale version.
+
+`scripts/netlify-ignore-build.mjs` compares the previous deployed commit with the requested commit. Changes confined to documentation, Storybook stories/configuration, tests or Tauri do not rebuild the app. App code, public assets, shared npm dependencies, Angular/TypeScript configuration and Netlify configuration trigger a build. Keep the watched paths aligned with future build inputs. A first deployment, explicit redeployment of the same commit or unavailable Git comparison continues the build. Netlify build hooks can bypass this skip rule.
+
+After deployment, check the public URL, reload, 3D view, local saving and `.wattpack` import/export. Data belongs to each browser profile and origin; a Deploy Preview, the production domain and a new custom domain have separate storage. Export/import is required to transfer a home between them. The site has not been deployed merely by adding this configuration.
+
+See Netlify’s [file-based configuration](https://docs.netlify.com/build/configure-builds/file-based-configuration/) and [ignore-build rules](https://docs.netlify.com/build/configure-builds/ignore-builds/).
+
 ## Architecture and data flow
 
 | Area               | Responsibility                                                                                                             |
