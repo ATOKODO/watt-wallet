@@ -2,7 +2,7 @@
 
 # Calculs et estimations
 
-Watt Wallet calcule à partir des valeurs saisies. Il ne récupère pas de données de compteur en direct, ne certifie pas les caractéristiques constructeur et ne modélise pas les pertes thermiques du logement. Les prix ci-dessous sont des exemples de calcul, pas des tarifs fournisseur.
+Walletricity calcule à partir des valeurs saisies. Il ne récupère pas de données de compteur en direct, ne certifie pas les caractéristiques constructeur et ne modélise pas les pertes thermiques du logement. Les prix ci-dessous sont des exemples de calcul, pas des tarifs fournisseur.
 
 ## Puissance, énergie et coût
 

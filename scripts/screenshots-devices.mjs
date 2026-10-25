@@ -44,7 +44,7 @@ try {
     .join('\n');
   await writeFile(
     'docs/screenshots/README.md',
-    '# Captures Watt Wallet\n\nCaptures de viewport PNG pour le README, avec une galerie HTML et un manifeste par série.\n\n| Appareil | Dimensions | Français | English |\n| --- | --- | --- | --- |\n' +
+    '# Captures Walletricity\n\nCaptures de viewport PNG pour le README, avec une galerie HTML et un manifeste par série.\n\n| Appareil | Dimensions | Français | English |\n| --- | --- | --- | --- |\n' +
       rows +
       '\n\n[Captures iPhone 16 Pro déjà réalisées](iphone-16-pro/README.md) · 402 × 874 px.\n\nChaque nouvelle série contient 21 captures. Pour régénérer les six séries, démarrer l’application puis exécuter \u0060node scripts/screenshots-devices.mjs\u0060. Les arguments facultatifs sélectionnent un appareil et une langue.\n',
   );

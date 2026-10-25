@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Watt Wallet",
+  "productName": "Walletricity",
   "version": "0.1.0",
   "identifier": "app.wattwallet.desktop",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Watt Wallet — Votre énergie, en clair",
+        "title": "Walletricity — Votre énergie, en clair",
         "width": 1480,
         "height": 1000,
         "minWidth": 800,
@@ -31,8 +31,16 @@
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
     "shortDescription": "Votre logement, ses appareils et son énergie, en clair.",
     "windows": {
-      "nsis": { "languages": ["French"], "displayLanguageSelector": false, "installMode": "currentUser" },
-      "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true }
+      "nsis": {
+        "languages": ["French"],
+        "displayLanguageSelector": false,
+        "installMode": "currentUser"
+      },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      }
     }
-  }
+  },
+  "mainBinaryName": "walletricity"
 }

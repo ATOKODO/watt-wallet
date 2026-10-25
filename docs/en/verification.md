@@ -6,6 +6,18 @@ Local validation completed on **1 October 2026** on Windows x64, using Node 24.2
 
 This report preserves the historical results of that validation. Updating the documentation does not mean these checks were run again or that another binary was validated.
 
+## Walletricity branding — 25 October 2026
+
+The public name is now **Walletricity** across the app wordmark, accessible labels, document titles, PWA manifest, Windows installer/executable, Storybook, documentation and Figma screens. The lightning symbol and theme palettes are retained. `watt-wallet` remains a technical project/storage/format identifier. Historical binary names and hashes below continue to describe their original artifacts.
+
+Checks for this change: 84 unit tests passed; the new Chromium branding journey passed in French/English and verified the existing IndexedDB namespace and compatible `.wattpack` export. Visual references were deliberately refreshed (46 of 138 PNGs changed), then comparison mode passed with **86 tests passed and 17 intentional skips**. All 147 documentation screenshots were regenerated; images without visible branding remain identical.
+
+The 84 main Figma presentation screens use the updated shared wordmarks, with no old public name in their text. Desktop and mobile wordmarks were checked for single-line fit. The fresh Windows installer passed isolated installation, installed WebView2 smoke, restart and uninstall. Hosted Netlify deployment and hosted CI were not exercised for this branding change.
+
+- Installer: `src-tauri/target/release/bundle/nsis/Walletricity_0.1.0_x64-setup.exe`, **2,808,362 bytes**.
+- Installer SHA-256: `7DA6FAC3B9BF3DC289FE7E33DF298922297A57E9A759F8BBB1FD13DC55237D20`.
+- Normalized installed binary SHA-256: `7c0147ad80a99f048ce563656fec70ae6d5215840cdf0b2e811b55f2786763d8`.
+
 ## Review before human testing — 7 October 2026 {#review-before-human-testing-7-october-2026}
 
 The current version is a candidate for a first human testing session: no blocking failure was found in the local checks below. This is a local Windows/Chromium review, not a certification of every platform or the hosted CI runner. Follow the [human testing journey](human-testing.md) for the remaining manual checks.

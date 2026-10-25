@@ -2,7 +2,9 @@
 
 # Developer guide
 
-Watt Wallet is an Angular 22 application using standalone components, reactive forms and Signals. Three.js renders the diorama directly. Tauri 2 supplies the Windows shell and native persistence. The domain is independent of Angular and the renderer; there is no backend service or telemetry.
+Walletricity is an Angular 22 application using standalone components, reactive forms and Signals. Three.js renders the diorama directly. Tauri 2 supplies the Windows shell and native persistence. The domain is independent of Angular and the renderer; there is no backend service or telemetry.
+
+The public product name is **Walletricity**. `watt-wallet` remains the internal project/repository name, browser storage namespace and version 1 exchange identifier; keeping these technical identifiers preserves existing saved data and `.wattpack` compatibility.
 
 ## Prerequisites and setup
 
@@ -34,7 +36,7 @@ The web build is produced in `dist/watt-wallet/browser`. Serve it with a static 
 
 The production browser app registers an Angular service worker immediately. Its prefetch group includes the app shell, JavaScript, CSS, favicon and web manifest. After a complete initial load and installation, the same origin can reopen offline. Development mode and Tauri disable the browser service worker. Workspace data remains separate for every browser origin/profile.
 
-The Windows command builds the frontend and creates an NSIS installer in `src-tauri/target/release/bundle/nsis`, currently named `Watt Wallet_0.1.0_x64-setup.exe`. The installer is per-user, in French, and not commercially code-signed. It downloads WebView2 when absent; that path requires internet. Application languages remain French/English.
+The Windows command builds the frontend and creates an NSIS installer in `src-tauri/target/release/bundle/nsis`, currently named `Walletricity_0.1.0_x64-setup.exe`. The installer is per-user, in French, and not commercially code-signed. It downloads WebView2 when absent; that path requires internet. Application languages remain French/English.
 
 Angular critical CSS inlining is disabled because its deferred stylesheet `onload` handler conflicts with Tauri's script CSP. Styles load as external stylesheets while the script policy remains strict. Native WebView file-drop interception is disabled so HTML device drag-and-drop works on Windows; dedicated file selectors handle imports.
 
@@ -131,7 +133,7 @@ For an installed-binary check on Windows:
 powershell -NoProfile -File scripts/installer-smoke.ps1
 ```
 
-This installs the built NSIS package in a unique `.cache/installer-smoke-*` folder without shortcuts, verifies the executable's SHA-256 after normalizing only Tauri's reserved NSIS marker, runs the real WebView2 checks, then uninstalls the temporary package. It refuses to run if Watt Wallet is already installed for the current account.
+This installs the built NSIS package in a unique `.cache/installer-smoke-*` folder without shortcuts, verifies the executable's SHA-256 after normalizing only Tauri's reserved NSIS marker, runs the real WebView2 checks, then uninstalls the temporary package. It refuses to run if Walletricity is already installed for the current account.
 
 If caches must stay in the repository workspace, set these before installing/downloading their dependencies:
 

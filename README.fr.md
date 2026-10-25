@@ -1,10 +1,10 @@
 [English](README.md) · [Français](README.fr.md)
 
-# Watt Wallet
+# Walletricity
 
-Composez votre logement virtuel, comprenez sa consommation électrique et comparez des changements avant d’acheter de nouveaux équipements. Watt Wallet associe une bibliothèque de fiches modifiables, un plateau 3D isométrique et des estimations annuelles. L’application fonctionne localement dans un navigateur ou sous Windows, sans compte, serveur métier ni télémétrie.
+Composez votre logement virtuel, comprenez sa consommation électrique et comparez des changements avant d’acheter de nouveaux équipements. Walletricity associe une bibliothèque de fiches modifiables, un plateau 3D isométrique et des estimations annuelles. L’application fonctionne localement dans un navigateur ou sous Windows, sans compte, serveur métier ni télémétrie.
 
-![Watt Wallet : logement, estimation annuelle et plateau 3D en français](docs/screenshots/desktop/fr/01-accueil-clair.png)
+![Walletricity : logement, estimation annuelle et plateau 3D en français](docs/screenshots/desktop/fr/01-accueil-clair.png)
 
 ## Ce que vous pouvez faire
 

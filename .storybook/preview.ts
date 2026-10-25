@@ -78,7 +78,7 @@ const preview: Preview = {
     docs: {
       description: {
         component:
-          'Watt Wallet production UI. Use the toolbar to inspect both themes, six palettes and French/English. Fixtures stay in memory; no application data is loaded or saved.',
+          'Walletricity production UI. Use the toolbar to inspect both themes, six palettes and French/English. Fixtures stay in memory; no application data is loaded or saved.',
       },
     },
   },

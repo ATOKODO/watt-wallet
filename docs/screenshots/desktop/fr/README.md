@@ -1,4 +1,4 @@
-# Captures Watt Wallet — Desktop
+# Captures Walletricity — Desktop
 
 21 captures PNG de **1920 × 1080 pixels**, en français. Captures du viewport, sans cadre d’appareil ni assemblage de page entière.
 

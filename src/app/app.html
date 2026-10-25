@@ -1,8 +1,8 @@
 <header class="app-header">
-  <a class="brand" href="/" [attr.aria-label]="'Watt Wallet, accueil' | t"
+  <a class="brand" href="/" [attr.aria-label]="'Walletricity, accueil' | t"
     ><span class="brand-mark"><ww-icon name="bolt" /></span
     ><span
-      >{{ 'watt' | t }}<span class="brand-light">{{ 'wallet' | t }}</span
+      >{{ 'Wallet' | t }}<span class="brand-light">{{ 'ricity' | t }}</span
       ><small>{{ 'VOTRE ÉNERGIE, EN CLAIR' | t }}</small></span
     ></a
   >
@@ -677,7 +677,7 @@
 } @if(modal()) {
 <dialog #modalDialog class="modal" [class.wide-modal]="modal() === 'device'" (cancel)="cancelModal($event)">
   <div class="modal-header">
-    <span class="eyebrow">{{ 'WATT WALLET' | t }}</span
+    <span class="eyebrow">{{ 'WALLETRICITY' | t }}</span
     ><button
       class="icon-button"
       [attr.aria-label]="'Fermer la fenêtre' | t"

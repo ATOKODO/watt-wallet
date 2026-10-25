@@ -2,7 +2,7 @@
 
 # Calculations and estimates
 
-Watt Wallet calculates from the values you enter. It does not obtain live meter data, validate manufacturer specifications or model a home's heat loss. Prices below are worked examples, not supplier tariffs.
+Walletricity calculates from the values you enter. It does not obtain live meter data, validate manufacturer specifications or model a home's heat loss. Prices below are worked examples, not supplier tariffs.
 
 ## Power, energy and cost
 

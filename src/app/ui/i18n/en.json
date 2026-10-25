@@ -1,5 +1,5 @@
 {
-  "Watt Wallet, accueil": "Watt Wallet, home",
+  "Walletricity, accueil": "Walletricity, home",
   "VOTRE ÉNERGIE, EN CLAIR": "YOUR ENERGY, MADE CLEAR",
   "Navigation principale": "Main navigation",
   "Mon logement": "My home",
@@ -402,13 +402,11 @@
   "{0} ans": "{0} years",
   "Option Base · {0} / kWh": "Flat rate · {0} / kWh",
   "HP {0} · HC {1} / kWh": "Peak {0} · Off-peak {1} / kWh",
-  "watt": "watt",
-  "wallet": "wallet",
   "kWh": "kWh",
   "W": "W",
   "JSON": "JSON",
-  "WATT WALLET": "WATT WALLET",
-  "Watt Wallet": "Watt Wallet",
+  "WALLETRICITY": "WALLETRICITY",
+  "Walletricity": "Walletricity",
   "Position X": "Position X",
   "Position Z": "Position Z",
   "kWh / cycle": "kWh / cycle",
@@ -447,5 +445,7 @@
   "Prix du kWh TTC ({0})": "Price per kWh including tax ({0})",
   "Heures pleines ({0}/kWh)": "Peak hours ({0}/kWh)",
   "Heures creuses ({0}/kWh)": "Off-peak hours ({0}/kWh)",
-  "Abonnement annuel TTC ({0})": "Annual standing charge including tax ({0})"
+  "Abonnement annuel TTC ({0})": "Annual standing charge including tax ({0})",
+  "Wallet": "Wallet",
+  "ricity": "ricity"
 }

@@ -189,7 +189,7 @@ export async function downloadPack(bytes: Uint8Array, name: string): Promise<boo
     const { writeFile } = await import('@tauri-apps/plugin-fs');
     const path = await save({
       defaultPath: filename,
-      filters: [{ name: 'Watt Wallet', extensions: ['wattpack'] }],
+      filters: [{ name: 'Walletricity', extensions: ['wattpack'] }],
     });
     if (!path) return false;
     await writeFile(path, bytes);

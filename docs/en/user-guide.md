@@ -2,7 +2,7 @@
 
 # User guide
 
-Watt Wallet estimates electricity use from the equipment and usage you enter. No meter, supplier account or online catalogue is needed. The demonstration profiles are starting points: adjust them to match your equipment and record the source of your numbers in the notes.
+Walletricity estimates electricity use from the equipment and usage you enter. No meter, supplier account or online catalogue is needed. The demonstration profiles are starting points: adjust them to match your equipment and record the source of your numbers in the notes.
 
 For formulas, see [Calculations and estimates](calculations.md). For development setup, see the [developer guide](development.md).
 
@@ -12,7 +12,7 @@ On the first launch, a demonstration home and 14 generic device profiles are cre
 
 Use the home selector to switch between saved homes, or its neighboring plus button to create an empty one. Rename the reference home with its pencil button. Each home has its own equipment, tariff and scenarios; the profile library is shared across the local workspace.
 
-If you already have the Windows installer, run it, follow its French installation steps and launch Watt Wallet. WebView2 is downloaded only when missing; the unsigned installer and runtime coverage are described in the verification report.
+If you already have the Windows installer, run it, follow its French installation steps and launch Walletricity. WebView2 is downloaded only when missing; the unsigned installer and runtime coverage are described in the verification report.
 
 Start with a few devices whose consumption you know. Set their usage, then use **Adjust my tariff** to enter your price per kWh and annual standing charge. The top cards show annual energy, the total annual electricity budget and its monthly average. They are estimates, not a supplier bill.
 
@@ -75,7 +75,7 @@ Use **Adjust my tariff** for the active reference or scenario. Enter prices manu
 - **Peak/off-peak:** separate peak and off-peak prices. Set **Off-peak consumption** on each device from 0 to 100%; its default is 0%.
 - **Annual standing charge:** optional in practice; enter zero when excluding it.
 
-The off-peak share applies to the device's full energy, including standby. Watt Wallet does not schedule cycles or detect off-peak hours. Standing charges enter the total budget but never the devices' energy shares. The monthly card is the annual total divided by twelve, not a prediction for a particular month's bill.
+The off-peak share applies to the device's full energy, including standby. Walletricity does not schedule cycles or detect off-peak hours. Standing charges enter the total budget but never the devices' energy shares. The monthly card is the annual total divided by twelve, not a prediction for a particular month's bill.
 
 ## Compare a scenario
 

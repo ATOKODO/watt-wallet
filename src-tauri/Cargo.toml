@@ -2,7 +2,7 @@
 name = "watt-wallet"
 version = "0.1.0"
 description = "Votre énergie, en clair"
-authors = ["Watt Wallet"]
+authors = ["Walletricity"]
 edition = "2021"
 
 [lib]

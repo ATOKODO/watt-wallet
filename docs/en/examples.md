@@ -4,7 +4,7 @@
 
 ## Importable example packages
 
-Download a `.wattpack`, then use **Import** in Watt Wallet to inspect the preview and add new copies. These are demonstration data, not official equipment profiles. Imports do not replace your existing entries.
+Download a `.wattpack`, then use **Import** in Walletricity to inspect the preview and add new copies. These are demonstration data, not official equipment profiles. Imports do not replace your existing entries.
 
 | Package                                                           | Contents                                                                                                                   |
 | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -29,6 +29,6 @@ These captures use Chromium and isolated demonstration data at pixel ratio 1. Th
 
 ## Light and dark
 
-![Watt Wallet in English with a dark lavender theme](../screenshots/desktop/en/18-accueil-sombre.png)
+![Walletricity in English with a dark lavender theme](../screenshots/desktop/en/18-accueil-sombre.png)
 
 Theme preferences belong to the application on your device. The documentation’s appearance switch is separate.

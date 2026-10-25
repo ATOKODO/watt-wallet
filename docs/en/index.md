@@ -1,10 +1,10 @@
 [English](../en/index.md) · [Français](../fr/index.md) · [Home](../../README.md)
 
-# Welcome to Watt Wallet
+# Welcome to Walletricity
 
 **Build your home. Understand what uses electricity. Try changes before making them.**
 
-Watt Wallet is a local electricity estimator built around a miniature 3D home. Add your own devices, enter their usage and tariff, then compare annual energy and cost. No account, supplier connection or live data is needed.
+Walletricity is a local electricity estimator built around a miniature 3D home. Add your own devices, enter their usage and tariff, then compare annual energy and cost. No account, supplier connection or live data is needed.
 
 ![Annual estimate and miniature home](../screenshots/desktop/en/01-accueil-clair.png)
 

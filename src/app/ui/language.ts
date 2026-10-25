@@ -68,7 +68,7 @@ export function initialCurrency(): Currency {
 export function applyLanguage(language: Language) {
   document.documentElement.lang = language;
   document.title =
-    language === 'en' ? 'Watt Wallet · Your energy, made clear' : 'Watt Wallet · Votre énergie, en clair';
+    language === 'en' ? 'Walletricity · Your energy, made clear' : 'Walletricity · Votre énergie, en clair';
 }
 const seedNames = new Map(seedLibrary().map((device) => [device.id, device.name]));
 @Injectable({ providedIn: 'root' })

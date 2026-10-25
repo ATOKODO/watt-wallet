@@ -133,7 +133,7 @@ pub fn run() {
             write_asset
         ])
         .run(context)
-        .expect("Impossible de démarrer Watt Wallet");
+        .expect("Impossible de démarrer Walletricity");
 }
 
 #[cfg(test)]

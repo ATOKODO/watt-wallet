@@ -4,7 +4,7 @@
 
 ## Paquets d’exemple importables
 
-Télécharger un `.wattpack`, puis utiliser **Importer** dans Watt Wallet pour consulter l’aperçu et ajouter de nouvelles copies. Il s’agit de données de démonstration, pas de fiches officielles. Les imports ne remplacent pas les éléments existants.
+Télécharger un `.wattpack`, puis utiliser **Importer** dans Walletricity pour consulter l’aperçu et ajouter de nouvelles copies. Il s’agit de données de démonstration, pas de fiches officielles. Les imports ne remplacent pas les éléments existants.
 
 | Paquet                                                                     | Contenu                                                                                                                        |
 | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
@@ -29,6 +29,6 @@ Ces captures utilisent Chromium et des données de démonstration isolées avec 
 
 ## Clair et sombre
 
-![Watt Wallet en français avec le thème sombre lavande](../screenshots/desktop/fr/18-accueil-sombre.png)
+![Walletricity en français avec le thème sombre lavande](../screenshots/desktop/fr/18-accueil-sombre.png)
 
 Les préférences de thème appartiennent à l’application sur votre appareil. Le changement d’apparence de la documentation est indépendant.

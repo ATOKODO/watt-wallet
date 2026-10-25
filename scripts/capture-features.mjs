@@ -326,7 +326,7 @@ async function writeGallery(output, device, language, shots, legacyEnglishFinal)
   );
   const rows = shots.map((s) => '| [' + s.file + '](' + s.file + ') | ' + s.title + ' |').join('\n');
   const text = english
-    ? '# Watt Wallet screenshots — ' +
+    ? '# Walletricity screenshots — ' +
       device.name +
       '\n\n' +
       shots.length +
@@ -335,7 +335,7 @@ async function writeGallery(output, device, language, shots, legacyEnglishFinal)
       ' × ' +
       height +
       ' pixels**, in English. Viewport captures without a device frame or full-page stitching.\n\nChromium at scale 1 with isolated demo data. These are responsive layout captures, not Safari or native Apple device validation.\n\n[Open the gallery](index.html)\n\n| File | Feature |\n| --- | --- |\n'
-    : '# Captures Watt Wallet — ' +
+    : '# Captures Walletricity — ' +
       device.name +
       '\n\n' +
       shots.length +
@@ -376,11 +376,11 @@ async function writeGallery(output, device, language, shots, legacyEnglishFinal)
     path.join(output, 'index.html'),
     '<!doctype html><html lang="' +
       language +
-      '"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Watt Wallet — ' +
+      '"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Walletricity — ' +
       device.name +
       '</title><style>body{margin:30px;background:#edf0e9;color:#263d30;font:14px system-ui}h1{font-size:24px}main{display:grid;grid-template-columns:repeat(auto-fill,minmax(' +
       (width > 1200 ? '420' : '230') +
-      'px,1fr));gap:24px}figure{margin:0}img{display:block;width:100%;height:auto;border:1px solid #d4ddcd;border-radius:10px}figcaption{margin-top:10px;line-height:1.5}@media(max-width:500px){main{grid-template-columns:1fr}}</style><h1>Watt Wallet · ' +
+      'px,1fr));gap:24px}figure{margin:0}img{display:block;width:100%;height:auto;border:1px solid #d4ddcd;border-radius:10px}figcaption{margin-top:10px;line-height:1.5}@media(max-width:500px){main{grid-template-columns:1fr}}</style><h1>Walletricity · ' +
       device.name +
       ' · ' +
       width +

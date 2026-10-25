@@ -442,7 +442,7 @@ export class AppComponent {
       if (
         await downloadPack(
           bytes,
-          definition?.name ?? (entireLibrary ? 'bibliotheque-watt-wallet' : this.store.home()!.name),
+          definition?.name ?? (entireLibrary ? 'bibliotheque-walletricity' : this.store.home()!.name),
         )
       )
         this.notify('Fichier .wattpack exporté');

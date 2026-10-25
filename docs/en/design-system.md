@@ -2,7 +2,7 @@
 
 # Design system and Storybook
 
-Storybook is the interactive catalogue for Watt Wallet's production Angular UI. It combines visual foundations, editable component examples, automatic API documentation, output logs and accessibility inspection. It runs independently of the app, Tauri and the documentation website.
+Storybook is the interactive catalogue for Walletricity's production Angular UI. It combines visual foundations, editable component examples, automatic API documentation, output logs and accessibility inspection. It runs independently of the app, Tauri and the documentation website.
 
 ## Open the catalogue
 
@@ -25,7 +25,7 @@ The Accessibility panel uses axe to inspect rendered markup. Findings are adviso
 
 ## Figma references
 
-Select a story, then open **Design (1)** below the preview. `@storybook/addon-designs` embeds a named node from [05 · Components in the Watt Wallet Figma file](https://www.figma.com/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet?node-id=5-7). All 29 story references are centralized in `src/stories/figma.ts`.
+Select a story, then open **Design (1)** below the preview. `@storybook/addon-designs` embeds a named node from [05 · Components in the Walletricity Figma file](https://www.figma.com/design/PhlVkNsx0CCQVXAhQIHXss/watt-wallet?node-id=5-7). All 29 story references are centralized in `src/stories/figma.ts`.
 
 The Figma page contains a review catalogue and a separate master area. It has **25 native component sets, 129 variants and 42 production SVG icons**:
 

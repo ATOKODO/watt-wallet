@@ -1,7 +1,7 @@
 export function triangleGlb() {
   const positions = new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 1]);
   const json = {
-    asset: { version: '2.0', generator: 'Watt Wallet test fixture' },
+    asset: { version: '2.0', generator: 'Walletricity test fixture' },
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes: [{ mesh: 0 }],

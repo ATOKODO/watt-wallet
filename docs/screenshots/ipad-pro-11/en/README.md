@@ -1,4 +1,4 @@
-# Watt Wallet screenshots — iPad Pro 11 pouces
+# Walletricity screenshots — iPad Pro 11 pouces
 
 21 PNG screenshots at **834 × 1194 pixels**, in English. Viewport captures without a device frame or full-page stitching.
 

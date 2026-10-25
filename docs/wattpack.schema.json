@@ -1121,6 +1121,6 @@
       "additionalProperties": false
     }
   ],
-  "title": "Watt Wallet exchange manifest v1",
+  "title": "Walletricity exchange manifest v1",
   "$id": "urn:watt-wallet:wattpack:1"
 }

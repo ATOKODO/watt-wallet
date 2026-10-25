@@ -11,7 +11,7 @@ const schema = z.toJSONSchema(packSchema, { target: 'draft-2020-12' });
 await writeFile(
   'docs/wattpack.schema.json',
   JSON.stringify(
-    { ...schema, title: 'Watt Wallet exchange manifest v1', $id: 'urn:watt-wallet:wattpack:1' },
+    { ...schema, title: 'Walletricity exchange manifest v1', $id: 'urn:watt-wallet:wattpack:1' },
     null,
     2,
   ) + '\n',

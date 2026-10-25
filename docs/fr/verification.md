@@ -6,6 +6,18 @@ Validation locale terminée le 1er octobre 2026 sous Windows x64, avec Node 24.2
 
 Ce rapport conserve les résultats historiques de cette validation. La mise à jour de la documentation ne constitue pas une nouvelle exécution des tests ni une validation d’un autre binaire.
 
+## Identité Walletricity — 25 octobre 2026
+
+Le nom public devient **Walletricity** dans le mot-logo, les libellés accessibles, les titres, le manifeste PWA, l’installateur et l’exécutable Windows, Storybook, la documentation et les écrans Figma. Le symbole éclair et les palettes sont conservés. `watt-wallet` reste un identifiant technique de projet/stockage/format. Les noms et empreintes des anciens binaires ci-dessous décrivent toujours leurs artefacts d’origine.
+
+Vérifications de ce changement : 84 tests unitaires réussis ; nouveau parcours Chromium de marque réussi en français/anglais, avec vérification de l’espace IndexedDB existant et d’un export `.wattpack` compatible. Les références visuelles ont été actualisées volontairement (46 PNG modifiés sur 138), puis la comparaison a réussi avec **86 tests réussis et 17 exclusions prévues**. Les 147 captures documentaires ont été régénérées ; celles sans marque visible restent identiques.
+
+Les 84 écrans principaux de présentation Figma utilisent les mots-logos partagés actualisés, sans ancien nom public dans leur texte. Les mots-logos desktop et mobile ont été contrôlés sur une seule ligne. Le nouvel installateur Windows a passé l’installation isolée, les vérifications WebView2 de l’application installée, le redémarrage et la désinstallation. Le déploiement Netlify et la CI hébergée n’ont pas été exercés pour ce changement de marque.
+
+- Installateur : `src-tauri/target/release/bundle/nsis/Walletricity_0.1.0_x64-setup.exe`, **2 808 362 octets**.
+- SHA-256 de l’installateur : `7DA6FAC3B9BF3DC289FE7E33DF298922297A57E9A759F8BBB1FD13DC55237D20`.
+- SHA-256 normalisé du binaire installé : `7c0147ad80a99f048ce563656fec70ae6d5215840cdf0b2e811b55f2786763d8`.
+
 ## Revue avant les essais humains — 7 octobre 2026 {#revue-avant-les-essais-humains-7-octobre-2026}
 
 La version actuelle peut servir à une première session d’essais humains : aucun échec bloquant n’a été trouvé dans les vérifications locales suivantes. Il s’agit d’une revue Windows/Chromium locale, pas d’une certification de toutes les plateformes ni du runner CI hébergé. Suivre le [parcours d’essais humains](human-testing.md) pour les vérifications manuelles restantes.

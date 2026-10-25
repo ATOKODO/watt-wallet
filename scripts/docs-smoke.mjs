@@ -102,7 +102,7 @@ try {
   for (const lang of ['fr', 'en']) {
     await page.goto(origin + base + lang + '/', { waitUntil: 'networkidle' });
     await expect(page.locator('h1')).toHaveText(
-      lang === 'fr' ? 'Bienvenue dans Watt Wallet' : 'Welcome to Watt Wallet',
+      lang === 'fr' ? 'Bienvenue dans Walletricity' : 'Welcome to Walletricity',
     );
     await expect(page.locator('.VPSidebar')).toBeVisible();
     await page.screenshot({

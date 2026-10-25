@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 import { chmod, mkdir, mkdtemp, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createServer } from 'node:net';
-const exe = path.resolve(process.argv[2] ?? 'src-tauri/target/release/watt-wallet.exe');
+const exe = path.resolve(process.argv[2] ?? 'src-tauri/target/release/walletricity.exe');
 await mkdir('.cache', { recursive: true });
 const root = await mkdtemp(path.resolve('.cache/native-smoke-'));
 await mkdir('test-results', { recursive: true });

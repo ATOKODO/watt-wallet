@@ -2,7 +2,9 @@
 
 # Guide développeur
 
-Watt Wallet utilise Angular 22 avec composants standalone, formulaires réactifs et Signals. Three.js rend directement le diorama. Tauri 2 fournit l’application Windows et le stockage natif. Le domaine est indépendant d’Angular et du rendu ; aucun serveur métier ni télémétrie n’est utilisé.
+Walletricity utilise Angular 22 avec composants standalone, formulaires réactifs et Signals. Three.js rend directement le diorama. Tauri 2 fournit l’application Windows et le stockage natif. Le domaine est indépendant d’Angular et du rendu ; aucun serveur métier ni télémétrie n’est utilisé.
+
+Le nom public du produit est **Walletricity**. `watt-wallet` reste le nom technique du projet/dépôt, l’espace de noms du stockage navigateur et l’identifiant d’échange version 1 ; conserver ces identifiants techniques préserve les sauvegardes existantes et la compatibilité `.wattpack`.
 
 ## Prérequis et installation
 
@@ -34,7 +36,7 @@ La version web est produite dans `dist/watt-wallet/browser`. La servir avec un s
 
 La version navigateur de production enregistre immédiatement un service worker Angular. Son groupe préchargé inclut l’application, le JavaScript, le CSS, le favicon et le manifeste web. Après un premier chargement complet et l’installation, la même origine peut être rouverte hors connexion. Le mode développement et Tauri désactivent ce service worker. Les données restent séparées pour chaque origine et profil de navigateur.
 
-La commande Windows compile le frontend et crée un installateur NSIS dans `src-tauri/target/release/bundle/nsis`, actuellement nommé `Watt Wallet_0.1.0_x64-setup.exe`. L’installation est par utilisateur, en français et sans signature commerciale. WebView2 est téléchargé s’il manque ; ce parcours nécessite Internet. L’application conserve ses deux langues.
+La commande Windows compile le frontend et crée un installateur NSIS dans `src-tauri/target/release/bundle/nsis`, actuellement nommé `Walletricity_0.1.0_x64-setup.exe`. L’installation est par utilisateur, en français et sans signature commerciale. WebView2 est téléchargé s’il manque ; ce parcours nécessite Internet. L’application conserve ses deux langues.
 
 L’inlining du CSS critique Angular est désactivé car le gestionnaire `onload` de sa feuille différée est incompatible avec la CSP de scripts Tauri. Les styles chargent comme feuilles externes et la politique de scripts reste stricte. L’interception native du dépôt de fichiers dans la WebView est désactivée pour permettre le glisser-déposer HTML des appareils sous Windows ; les imports utilisent des sélecteurs dédiés.
 
@@ -131,7 +133,7 @@ Pour vérifier le binaire installé sous Windows :
 powershell -NoProfile -File scripts/installer-smoke.ps1
 ```
 
-Ce test installe le paquet NSIS dans un dossier unique `.cache/installer-smoke-*` sans raccourcis, vérifie le SHA-256 du binaire après normalisation du seul marqueur NSIS réservé par Tauri, exécute les contrôles WebView2 réels puis désinstalle le paquet temporaire. Il refuse de démarrer si Watt Wallet est déjà installé pour le compte courant.
+Ce test installe le paquet NSIS dans un dossier unique `.cache/installer-smoke-*` sans raccourcis, vérifie le SHA-256 du binaire après normalisation du seul marqueur NSIS réservé par Tauri, exécute les contrôles WebView2 réels puis désinstalle le paquet temporaire. Il refuse de démarrer si Walletricity est déjà installé pour le compte courant.
 
 Pour conserver les caches dans l’espace de travail, définir ces variables avant l’installation ou le téléchargement des dépendances concernées :
 

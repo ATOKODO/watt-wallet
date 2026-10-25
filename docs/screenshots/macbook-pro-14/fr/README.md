@@ -1,4 +1,4 @@
-# Captures Watt Wallet — MacBook Pro 14 pouces
+# Captures Walletricity — MacBook Pro 14 pouces
 
 21 captures PNG de **1512 × 982 pixels**, en français. Captures du viewport, sans cadre d’appareil ni assemblage de page entière.
 

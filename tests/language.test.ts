@@ -47,12 +47,15 @@ describe('languages', () => {
     service.setLanguage('en');
     expect(initialLanguage()).toBe('en');
     expect(root.lang).toBe('en');
+    expect(document.title).toBe('Walletricity · Your energy, made clear');
+    expect(translate('Walletricity, accueil', 'en')).toBe('Walletricity, home');
     expect(service.number(182.5, 1)).toBe('182.5');
     expect(service.money(182.5, 1)).toBe('€182.5');
     expect(service.deviceName(device)).toBe('Electric heater');
     expect(device.name).toBe('Radiateur électrique');
     expect(service.deviceName({ ...device, id: 'custom', name: 'Bibliothèque' })).toBe('Bibliothèque');
     service.setLanguage('fr');
+    expect(document.title).toBe('Walletricity · Votre énergie, en clair');
     expect(service.number(182.5, 1)).toBe('182,5');
     expect(service.deviceName(device)).toBe('Radiateur électrique');
   });

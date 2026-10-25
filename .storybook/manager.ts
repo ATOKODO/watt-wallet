@@ -3,7 +3,7 @@ import { create } from 'storybook/theming';
 addons.setConfig({
   theme: create({
     base: 'light',
-    brandTitle: 'Watt Wallet · Design system',
+    brandTitle: 'Walletricity · Design system',
     brandImage: 'brand.svg',
     brandUrl: '?path=/story/design-system--introduction',
     colorPrimary: '#315b43',

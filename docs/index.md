@@ -2,12 +2,12 @@
 layout: home
 title: Documentation
 hero:
-  name: Watt Wallet
+  name: Walletricity
   text: Your energy, made clear.
   tagline: Build a virtual home. Understand your electricity use. Compare changes before making them.
   image:
     src: /screenshots/desktop/en/01-accueil-clair.png
-    alt: Watt Wallet home and 3D board
+    alt: Walletricity home and 3D board
   actions:
     - theme: brand
       text: Read in English

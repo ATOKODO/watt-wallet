@@ -1,4 +1,4 @@
-# Watt Wallet screenshots — Desktop
+# Walletricity screenshots — Desktop
 
 21 PNG screenshots at **1920 × 1080 pixels**, in English. Viewport captures without a device frame or full-page stitching.
 

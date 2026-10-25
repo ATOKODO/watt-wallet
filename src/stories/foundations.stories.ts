@@ -8,7 +8,7 @@ import { accentPresets } from '../app/ui/palette';
   standalone: true,
   template: ` <section class="ww-showcase">
     @if (section() === 'introduction') {
-      <h1>Watt Wallet · Design system</h1>
+      <h1>Walletricity · Design system</h1>
       <p>
         A warm miniature home, calm surfaces and readable energy estimates. This catalogue renders the same
         Angular components, CSS tokens and palette functions as the application.

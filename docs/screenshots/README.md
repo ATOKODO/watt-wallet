@@ -1,4 +1,4 @@
-# Captures Watt Wallet
+# Captures Walletricity
 
 Captures de viewport PNG pour le README, avec une galerie HTML et un manifeste par série.
 

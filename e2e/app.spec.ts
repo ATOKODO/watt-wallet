@@ -1136,3 +1136,72 @@ test('devise EUR USD persistante, sans conversion, indépendante de la langue', 
   await expect(metrics.nth(1)).toContainText('€');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(402);
 });
+
+test('nom public Walletricity et sauvegardes compatibles avec le nom technique', async ({ page }) => {
+  const existingWorkspace = seedWorkspace();
+  existingWorkspace.homes[0].name = 'Logement conservé';
+  await page.route('**/__branding_setup__.html', (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<!doctype html><html></html>' }),
+  );
+  await page.goto('/__branding_setup__.html');
+  await page.evaluate(
+    async (workspace) =>
+      new Promise<void>((resolve, reject) => {
+        const request = indexedDB.open('watt-wallet', 1);
+        request.onupgradeneeded = () => {
+          request.result.createObjectStore('workspace');
+          request.result.createObjectStore('assets');
+        };
+        request.onsuccess = () => {
+          const db = request.result;
+          const tx = db.transaction('workspace', 'readwrite');
+          tx.objectStore('workspace').put(workspace, 'current');
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onerror = () => reject(tx.error);
+        };
+        request.onerror = () => reject(request.error);
+      }),
+    existingWorkspace,
+  );
+  await page.goto('/');
+  await expect(page.locator('.breadcrumb select option:checked')).toHaveText('Logement conservé');
+  await expect(page.getByRole('link', { name: 'Walletricity, accueil', exact: true })).toBeVisible();
+  await expect(page.locator('.brand')).toContainText('Walletricity');
+  await expect(page).toHaveTitle('Walletricity · Votre énergie, en clair');
+  await expect(page.locator('.workspace-footer')).toContainText('Enregistré sur cet appareil');
+  const manifest = await (await page.request.get('/manifest.webmanifest')).json();
+  expect(manifest.name).toBe('Walletricity');
+  expect(manifest.short_name).toBe('Walletricity');
+  const legacyStorage = await page.evaluate(
+    async () =>
+      new Promise<boolean>((resolve, reject) => {
+        const request = indexedDB.open('watt-wallet', 1);
+        request.onsuccess = () => {
+          const db = request.result;
+          const read = db.transaction('workspace').objectStore('workspace').get('current');
+          read.onsuccess = () => {
+            resolve(Boolean(read.result?.homes?.length));
+            db.close();
+          };
+          read.onerror = () => reject(read.error);
+        };
+        request.onerror = () => reject(request.error);
+      }),
+  );
+  expect(legacyStorage).toBe(true);
+  await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'English', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(page.getByRole('link', { name: 'Walletricity, home', exact: true })).toBeVisible();
+  await expect(page).toHaveTitle('Walletricity · Your energy, made clear');
+  const downloadEvent = page.waitForEvent('download');
+  await page.locator('.library-panel').getByRole('button', { name: 'Export', exact: true }).click();
+  const download = await downloadEvent;
+  expect(download.suggestedFilename()).toBe('bibliotheque-walletricity.wattpack');
+  const pack = decodePack(new Uint8Array(await readFile((await download.path())!)));
+  expect(pack.manifest.format).toBe('watt-wallet');
+  expect(await page.locator('body').innerText()).not.toMatch(/watt[ -]?wallet/i);
+});

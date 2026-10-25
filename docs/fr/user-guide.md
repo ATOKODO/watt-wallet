@@ -2,7 +2,7 @@
 
 # Guide utilisateur
 
-Watt Wallet estime la consommation électrique à partir des équipements et usages que vous renseignez. Aucun compteur, compte fournisseur ou catalogue en ligne n’est nécessaire. Les fiches de démonstration sont des points de départ : adaptez-les à votre équipement et indiquez la source de vos chiffres dans les notes.
+Walletricity estime la consommation électrique à partir des équipements et usages que vous renseignez. Aucun compteur, compte fournisseur ou catalogue en ligne n’est nécessaire. Les fiches de démonstration sont des points de départ : adaptez-les à votre équipement et indiquez la source de vos chiffres dans les notes.
 
 Pour les formules, consulter [Calculs et estimations](calculations.md). Pour l’installation en développement, consulter le [guide développeur](development.md).
 
@@ -12,7 +12,7 @@ Au premier lancement, un logement de démonstration et 14 fiches génériques so
 
 Utiliser le sélecteur de logement pour passer entre les logements sauvegardés, ou le bouton plus voisin pour en créer un vide. Le crayon permet de renommer le logement de référence. Chaque logement possède ses équipements, son tarif et ses scénarios ; la bibliothèque est partagée dans l’espace de travail local.
 
-Si vous disposez déjà de l’installateur Windows, l’exécuter, suivre ses étapes en français puis lancer Watt Wallet. WebView2 est téléchargé uniquement s’il manque ; le rapport de vérification précise la signature et la couverture de ce parcours.
+Si vous disposez déjà de l’installateur Windows, l’exécuter, suivre ses étapes en français puis lancer Walletricity. WebView2 est téléchargé uniquement s’il manque ; le rapport de vérification précise la signature et la couverture de ce parcours.
 
 Commencer par quelques appareils dont vous connaissez la consommation. Régler leurs usages, puis utiliser **Ajuster mon tarif** pour saisir votre prix par kWh et votre abonnement annuel. Les cartes principales affichent l’énergie annuelle, le budget électrique annuel total et sa moyenne mensuelle. Il s’agit d’estimations, pas d’une facture fournisseur.
 
@@ -75,7 +75,7 @@ Utiliser **Ajuster mon tarif** pour la référence ou le scénario actif. Tous l
 - **Heures pleines / creuses :** deux prix distincts. Régler **Consommation en heures creuses** sur chaque appareil entre 0 et 100 % ; la valeur initiale est 0 %.
 - **Abonnement annuel :** facultatif en pratique ; saisir zéro pour l’exclure.
 
-La part en heures creuses s’applique à toute l’énergie de l’appareil, veille incluse. Watt Wallet ne programme pas les cycles et ne détecte pas les heures creuses. L’abonnement entre dans le budget total mais jamais dans les parts de consommation. La carte mensuelle est le total annuel divisé par douze, pas la prévision d’une facture pour un mois précis.
+La part en heures creuses s’applique à toute l’énergie de l’appareil, veille incluse. Walletricity ne programme pas les cycles et ne détecte pas les heures creuses. L’abonnement entre dans le budget total mais jamais dans les parts de consommation. La carte mensuelle est le total annuel divisé par douze, pas la prévision d’une facture pour un mois précis.
 
 ## Comparer un scénario
 

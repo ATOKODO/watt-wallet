@@ -1,10 +1,10 @@
 [English](README.md) · [Français](README.fr.md)
 
-# Watt Wallet
+# Walletricity
 
-Build a virtual home, understand your electricity use and compare changes before buying new equipment. Watt Wallet combines an editable device library, an isometric 3D board and annual energy estimates. It runs locally in a browser or as a Windows application, without an account, a backend service or telemetry.
+Build a virtual home, understand your electricity use and compare changes before buying new equipment. Walletricity combines an editable device library, an isometric 3D board and annual energy estimates. It runs locally in a browser or as a Windows application, without an account, a backend service or telemetry.
 
-![Watt Wallet: home, annual estimate and 3D board in English](docs/screenshots/desktop/en/01-accueil-clair.png)
+![Walletricity: home, annual estimate and 3D board in English](docs/screenshots/desktop/en/01-accueil-clair.png)
 
 ## What you can do
 

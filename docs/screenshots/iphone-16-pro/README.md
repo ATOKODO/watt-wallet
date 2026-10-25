@@ -1,4 +1,4 @@
-# Captures Watt Wallet — iPhone 16 Pro
+# Captures Walletricity — iPhone 16 Pro
 
 21 captures PNG de **402 × 874 pixels**, en français. Captures du viewport, sans cadre d’appareil ni assemblage de page entière.
 
