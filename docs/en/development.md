@@ -157,16 +157,17 @@ Start the application first, then run the capture commands in another terminal w
 
 ```powershell
 node scripts/screenshots-mobile.mjs
+node scripts/screenshots-mobile.mjs en
 node scripts/screenshots-devices.mjs
 node scripts/screenshots-devices.mjs ipad-pro-11 en
 ```
 
-| Series          | Viewport    | Languages                                        |
-| --------------- | ----------- | ------------------------------------------------ |
-| iPhone 16 Pro   | 402 × 874   | Legacy French journey with a final English view. |
-| iPad Pro 11″    | 834 × 1194  | Separate French and English series.              |
-| MacBook Pro 14″ | 1512 × 982  | Separate French and English series.              |
-| Desktop         | 1920 × 1080 | Separate French and English series.              |
+| Series          | Viewport    | Languages                                                          |
+| --------------- | ----------- | ------------------------------------------------------------------ |
+| iPhone 16 Pro   | 402 × 874   | French series (final view in English) and separate English series. |
+| iPad Pro 11″    | 834 × 1194  | Separate French and English series.                                |
+| MacBook Pro 14″ | 1512 × 982  | Separate French and English series.                                |
+| Desktop         | 1920 × 1080 | Separate French and English series.                                |
 
 The shared capture helper uses isolated demonstration contexts, a pixel ratio of 1 and 21 feature captures per series. Outputs are PNGs plus a gallery, README and manifest under `docs/screenshots`. Optional device identifiers are `ipad-pro-11`, `macbook-pro-14` and `desktop`; optional language is `fr` or `en`. `WATT_WALLET_URL` changes the target URL. `WATT_WALLET_SOFTWARE_GPU=1` enables the larger-series script's software WebGL option when needed.
 

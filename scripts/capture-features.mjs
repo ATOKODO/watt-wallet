@@ -344,9 +344,10 @@ async function writeGallery(output, device, language, shots, legacyEnglishFinal)
       ' × ' +
       height +
       ' pixels**, en français. Captures du viewport, sans cadre d’appareil ni assemblage de page entière.\n\nRendu Chromium à l’échelle 1, avec des données de démonstration isolées. Ces captures montrent les dispositions responsives, sans validation Safari ou appareil Apple natif.\n\n[Ouvrir la galerie](index.html)\n\n| Fichier | Fonctionnalité |\n| --- | --- |\n';
-  const command = legacyEnglishFinal
-    ? 'node scripts/screenshots-mobile.mjs'
-    : 'node scripts/screenshots-devices.mjs ' + device.id + ' ' + language;
+  const command =
+    device.id === 'iphone-16-pro'
+      ? 'node scripts/screenshots-mobile.mjs ' + language
+      : 'node scripts/screenshots-devices.mjs ' + device.id + ' ' + language;
   await writeFile(
     path.join(output, 'README.md'),
     text +

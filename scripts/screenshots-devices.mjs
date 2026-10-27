@@ -45,8 +45,9 @@ try {
   await writeFile(
     'docs/screenshots/README.md',
     '# Captures Walletricity\n\nCaptures de viewport PNG pour le README, avec une galerie HTML et un manifeste par série.\n\n| Appareil | Dimensions | Français | English |\n| --- | --- | --- | --- |\n' +
+      '| iPhone 16 Pro | 402 × 874 | [FR](iphone-16-pro/README.md) | [EN](iphone-16-pro/en/README.md) |\n' +
       rows +
-      '\n\n[Captures iPhone 16 Pro déjà réalisées](iphone-16-pro/README.md) · 402 × 874 px.\n\nChaque nouvelle série contient 21 captures. Pour régénérer les six séries, démarrer l’application puis exécuter \u0060node scripts/screenshots-devices.mjs\u0060. Les arguments facultatifs sélectionnent un appareil et une langue.\n',
+      '\n\nChaque série contient 21 captures. Démarrer l’application, puis utiliser \u0060node scripts/screenshots-mobile.mjs [fr|en]\u0060 pour l’iPhone ou \u0060node scripts/screenshots-devices.mjs\u0060 pour les autres formats. Les arguments facultatifs sélectionnent un appareil et une langue.\n',
   );
 } finally {
   await browser.close();

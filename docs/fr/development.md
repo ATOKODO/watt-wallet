@@ -157,16 +157,17 @@ Démarrer l’application, puis utiliser les commandes de capture dans un autre 
 
 ```powershell
 node scripts/screenshots-mobile.mjs
+node scripts/screenshots-mobile.mjs en
 node scripts/screenshots-devices.mjs
 node scripts/screenshots-devices.mjs ipad-pro-11 en
 ```
 
-| Série           | Viewport    | Langues                                                      |
-| --------------- | ----------- | ------------------------------------------------------------ |
-| iPhone 16 Pro   | 402 × 874   | Parcours français historique avec une dernière vue anglaise. |
-| iPad Pro 11″    | 834 × 1194  | Séries française et anglaise séparées.                       |
-| MacBook Pro 14″ | 1512 × 982  | Séries française et anglaise séparées.                       |
-| Desktop         | 1920 × 1080 | Séries française et anglaise séparées.                       |
+| Série           | Viewport    | Langues                                                              |
+| --------------- | ----------- | -------------------------------------------------------------------- |
+| iPhone 16 Pro   | 402 × 874   | Série française (dernière vue en anglais) et série anglaise séparée. |
+| iPad Pro 11″    | 834 × 1194  | Séries française et anglaise séparées.                               |
+| MacBook Pro 14″ | 1512 × 982  | Séries française et anglaise séparées.                               |
+| Desktop         | 1920 × 1080 | Séries française et anglaise séparées.                               |
 
 La fonction de capture partagée utilise des contextes de démonstration isolés, un ratio de pixels de 1 et 21 captures de fonctionnalités par série. Les PNG, galerie, README et manifeste sont écrits dans `docs/screenshots`. Les identifiants d’appareil facultatifs sont `ipad-pro-11`, `macbook-pro-14` et `desktop` ; la langue facultative est `fr` ou `en`. `WATT_WALLET_URL` change l’URL cible. `WATT_WALLET_SOFTWARE_GPU=1` active l’option WebGL logiciel du script des grands formats si nécessaire.
 

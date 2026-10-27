@@ -75,7 +75,7 @@ Open [http://127.0.0.1:5173/en/](http://127.0.0.1:5173/en/). Build the standalon
 | [`.wattpack` format](docs/en/wattpack.md)                | Version 1 contract, complete JSON examples, GLB requirements and import limits.  |
 | [Verification and known limits](docs/en/verification.md) | Historical local validation results and what has not been tested.                |
 
-The [JSON schema](docs/wattpack.schema.json) and [example packages](examples/) are included in the repository. Browse the [screenshot index](docs/screenshots/README.md) for iPhone, iPad, MacBook and desktop layouts, including French/English series for the three larger viewports. These are Chromium layout captures, not physical Apple-device or Safari certification.
+The [JSON schema](docs/wattpack.schema.json) and [example packages](examples/) are included in the repository. Browse the [screenshot index](docs/screenshots/README.md) for iPhone, iPad, MacBook and desktop layouts, including French/English series for every viewport. These are Chromium layout captures, not physical Apple-device or Safari certification.
 
 ![Dark lavender theme and 3D board in English](docs/screenshots/desktop/en/18-accueil-sombre.png)
 
