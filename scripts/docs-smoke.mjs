@@ -36,6 +36,11 @@ async function resolvePage(url) {
   throw new Error('Missing generated target: ' + pathname);
 }
 for (const [file, source] of html) {
+  if (!path.relative(root, file).startsWith('screenshots' + path.sep)) {
+    const title = source.match(/<title>(.*?)<\/title>/)?.[1] ?? '';
+    assert.ok(title.includes('Walletricity'), 'Missing public product name in title: ' + file);
+    assert.ok(!/watt[ -]?wallet/i.test(title), 'Internal project name in page title: ' + file);
+  }
   const current = new URL(base + path.relative(root, file).split(path.sep).join('/'), 'http://docs.local');
   for (const tag of source.matchAll(/<(?:a|link|script|img|source)\b[^>]*>/g)) {
     for (const attribute of tag[0].matchAll(/\b(?:href|src)="([^"]+)"/g)) {
@@ -97,10 +102,14 @@ const screenshotDir = path.join(project, '.cache/docs-review');
 await mkdir(screenshotDir, { recursive: true });
 try {
   await page.goto(origin + base, { waitUntil: 'networkidle' });
+  await expect(page).toHaveTitle(/Walletricity/);
+  await expect(page.locator('.VPNavBarTitle .title')).toHaveText('Walletricity · Docs');
   await expect(page.locator('.VPHomeHero')).toBeVisible();
   await page.screenshot({ path: path.join(screenshotDir, 'landing.png'), animations: 'disabled' });
   for (const lang of ['fr', 'en']) {
     await page.goto(origin + base + lang + '/', { waitUntil: 'networkidle' });
+    await expect(page).toHaveTitle(/Walletricity/);
+    await expect(page.locator('.VPNavBarTitle .title')).toHaveText('Walletricity · Docs');
     await expect(page.locator('h1')).toHaveText(
       lang === 'fr' ? 'Bienvenue dans Walletricity' : 'Welcome to Walletricity',
     );

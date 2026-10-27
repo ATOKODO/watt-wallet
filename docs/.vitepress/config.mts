@@ -75,7 +75,7 @@ function locale(lang: 'en' | 'fr') {
   return {
     label: fr ? 'Français' : 'English',
     lang,
-    title: 'Watt Wallet',
+    title: 'Walletricity',
     description: fr
       ? 'Composez votre logement, comprenez votre consommation et comparez des scénarios.'
       : 'Build your home, understand electricity use and compare scenarios.',
@@ -117,8 +117,8 @@ function locale(lang: 'en' | 'fr') {
 }
 
 export default defineConfig({
-  title: 'Watt Wallet',
-  description: 'Watt Wallet documentation · Documentation Watt Wallet',
+  title: 'Walletricity',
+  description: 'Walletricity documentation · Documentation Walletricity',
   base: siteBase,
   cleanUrls: false,
   srcExclude: ['.vitepress/public/**'],
@@ -126,7 +126,7 @@ export default defineConfig({
   locales: { en: locale('en'), fr: locale('fr') },
   themeConfig: {
     logo: '/favicon.svg',
-    siteTitle: 'Watt Wallet · Docs',
+    siteTitle: 'Walletricity · Docs',
     socialLinks: [{ icon: 'github', link: repository }],
     search: {
       provider: 'local',
