@@ -25,6 +25,10 @@ npm run desktop
 
 Tauri runs the configured `beforeDevCommand` itself. Opening the normal application reads its local workspace. Use the isolated automated test profiles for destructive test data rather than a personal workspace.
 
+### Dependency security
+
+Run `npm audit` to check all dependencies, or `npm audit --omit=dev` for the application dependencies. `package.json` overrides the Vite version used by `@angular/build` to match the patched direct Vite dependency: Angular Build 22.2.4 still pins an affected patch. Keep this override until the builder selects a fixed version upstream. After dependency updates, check the application build, browser journeys, Storybook and visual regression before committing the lockfile.
+
 ## Builds and offline behavior
 
 ```powershell
