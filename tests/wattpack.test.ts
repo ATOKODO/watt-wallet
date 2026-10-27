@@ -6,6 +6,7 @@ import {
   importCopies,
   createImportPlan,
   applyImportPlan,
+  packSchema,
   WattPack,
   MAX_PACK_BYTES,
 } from '../src/app/data/wattpack';
@@ -126,6 +127,14 @@ describe('wattpack autonome', () => {
     expect(() =>
       decodePack(zipSync({ 'manifest.json': strToU8(JSON.stringify({ ...library(), version: 2 })) })),
     ).toThrow());
+  it('rejette une bibliothèque surdimensionnée sans accumuler les erreurs de chaque fiche', () => {
+    const result = packSchema.safeParse({ ...library(), definitions: Array(2001).fill(null) });
+    expect(result.success).toBe(false);
+    if (!result.success)
+      expect(result.error.issues).toEqual([
+        expect.objectContaining({ code: 'too_big', path: ['definitions'], maximum: 2000 }),
+      ]);
+  });
   it('refuse une ressource manquante', () => {
     const p = library();
     if (p.kind !== 'library') return;
