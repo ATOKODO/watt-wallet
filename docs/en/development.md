@@ -129,7 +129,9 @@ npm run desktop:build
 npm run test:native
 ```
 
-The offline script serves the production build on port 4301 and checks reload, storage, English and 3D with no external requests. Native tests use a hidden window with `--smoke-test` and `WATT_WALLET_SMOKE_DIR` to isolate the workspace and WebView2 profile; this mode is inactive during normal launches.
+The offline script serves the production build on port 4301. Before disconnecting, it checks that every resource in the service worker's prefetch groups is present in Cache Storage with the hash declared in `ngsw.json`; worker activation alone does not prove the cache is ready. It then checks reload, storage, English, fonts and 3D with no external requests. Run `npm run test:offline -- --slow-prefetch` to hold back one resource until the incomplete cache has been detected, then verify that the test waits for it before disconnecting.
+
+Native tests use a hidden window with `--smoke-test` and `WATT_WALLET_SMOKE_DIR` to isolate the workspace and WebView2 profile; this mode is inactive during normal launches.
 
 For an installed-binary check on Windows:
 

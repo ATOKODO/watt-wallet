@@ -129,7 +129,9 @@ npm run desktop:build
 npm run test:native
 ```
 
-Le script hors connexion sert la production sur le port 4301 et vérifie rechargement, stockage, anglais et 3D sans requêtes externes. Les tests natifs utilisent une fenêtre masquée avec `--smoke-test` et `WATT_WALLET_SMOKE_DIR` pour isoler données et profil WebView2 ; ce mode est inactif lors d’un lancement normal.
+Le script hors connexion sert la production sur le port 4301. Avant de couper le réseau, il vérifie que chaque ressource des groupes préchargés du service worker est présente dans Cache Storage avec l’empreinte déclarée dans `ngsw.json` ; l’activation du worker ne garantit pas à elle seule que le cache est prêt. Il vérifie ensuite rechargement, stockage, anglais, polices et 3D sans requêtes externes. Exécuter `npm run test:offline -- --slow-prefetch` pour retenir une ressource jusqu’à la détection du cache incomplet, puis vérifier que le test attend sa mise en cache avant de couper le réseau.
+
+Les tests natifs utilisent une fenêtre masquée avec `--smoke-test` et `WATT_WALLET_SMOKE_DIR` pour isoler données et profil WebView2 ; ce mode est inactif lors d’un lancement normal.
 
 Pour vérifier le binaire installé sous Windows :
 

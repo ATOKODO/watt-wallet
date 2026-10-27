@@ -3,6 +3,49 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 const root = path.resolve('dist/watt-wallet/browser');
+const manifest = JSON.parse(await readFile(path.join(root, 'ngsw.json'), 'utf8'));
+const prefetchUrls = [
+  ...new Set(
+    manifest.assetGroups.filter((group) => group.installMode === 'prefetch').flatMap((group) => group.urls),
+  ),
+];
+expect(prefetchUrls).toContain('/index.html');
+const prefetchResources = prefetchUrls.map((url) => {
+  expect(manifest.hashTable[url], 'Missing service worker hash for ' + url).toMatch(/^[a-f0-9]{40}$/);
+  return [url, manifest.hashTable[url]];
+});
+const slowPrefetch = process.argv.includes('--slow-prefetch');
+const gatedUrl = '/manifest.webmanifest';
+let releasePrefetch;
+const prefetchGate = new Promise((resolve) => (releasePrefetch = resolve));
+let checkedIncompleteCache = false;
+if (slowPrefetch) expect(prefetchUrls).toContain(gatedUrl);
+
+async function missingPrefetchResources(page) {
+  return page.evaluate(async (resources) => {
+    // A fresh browser context has no previous app version. Check the bytes as well
+    // as the URL so a metadata entry cannot be mistaken for a cached asset.
+    const stores = await Promise.all((await caches.keys()).map((name) => caches.open(name)));
+    const missing = [];
+    for (const [url, expectedHash] of resources) {
+      let found = false;
+      for (const store of stores) {
+        const response = await store.match(new URL(url, location.origin).href);
+        if (!response?.ok) continue;
+        const digest = await crypto.subtle.digest('SHA-1', await response.arrayBuffer());
+        const hash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join(
+          '',
+        );
+        if (hash === expectedHash) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) missing.push(url);
+    }
+    return missing;
+  }, prefetchResources);
+}
 const types = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -23,6 +66,7 @@ const server = createServer(async (req, res) => {
       res.writeHead(403).end();
       return;
     }
+    if (slowPrefetch && url.pathname === gatedUrl) await prefetchGate;
     const bytes = await readFile(target);
     res.writeHead(200, {
       'Content-Type': types[path.extname(target)] ?? 'application/octet-stream',
@@ -68,6 +112,23 @@ try {
   await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'English', exact: true }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Done', exact: true }).click();
+  // An activated/controlling worker can still be fetching its prefetch group.
+  // Read Cache Storage directly: fetching resources here would hide an incomplete cache.
+  await expect
+    .poll(
+      async () => {
+        const missing = await missingPrefetchResources(page);
+        if (slowPrefetch && !checkedIncompleteCache) {
+          expect(missing).toContain(gatedUrl);
+          checkedIncompleteCache = true;
+          releasePrefetch();
+        }
+        return missing;
+      },
+      { timeout: 30000, message: 'Every prefetched resource must be fully cached before disconnecting.' },
+    )
+    .toEqual([]);
+  console.log('Service worker: all ' + prefetchResources.length + ' prefetched resources verified in cache.');
   await context.setOffline(true);
   await page.reload();
   try {
@@ -125,6 +186,7 @@ try {
     'SPA production : cache complet, rechargement hors connexion, langue anglaise persistante, persistance et absence de requêtes externes OK.',
   );
 } finally {
+  releasePrefetch();
   await browser.close();
   await new Promise((r) => server.close(r));
 }
