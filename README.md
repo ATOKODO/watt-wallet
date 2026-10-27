@@ -84,3 +84,7 @@ The [JSON schema](docs/wattpack.schema.json) and [example packages](examples/) a
 Homes, scenarios and the device library are automatically saved on this device: IndexedDB in the browser, JSON and GLB files in the Windows application data folder. Data is not synchronized between browser origins, profiles or the desktop app. Export a `.wattpack` to transfer or back up a home, and export your library separately for profiles that are not installed in that home. Theme and language preferences stay on the device.
 
 The 3D view is optional: the device list and forms remain usable without WebGL. The estimates use your stated usage, not a thermal model. The V1 does not include an online catalogue, accounts, Linky integration, live meter data, photo recognition, a geometry editor, temperature/weather simulation or calendar tariffs such as Tempo. Imported GLB resources removed from profiles may remain in local storage; there is no storage compaction command yet.
+
+## License
+
+Walletricity is available under the [MIT License](LICENSE). Third-party resources retain their own licenses, including the font licenses in [public/fonts](public/fonts/).

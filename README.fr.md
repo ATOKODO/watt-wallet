@@ -84,3 +84,7 @@ Le [schéma JSON](docs/wattpack.schema.json) et les [paquets d’exemple](exampl
 Les logements, scénarios et fiches sont sauvegardés automatiquement sur cet appareil : IndexedDB dans le navigateur, fichiers JSON et GLB dans le dossier applicatif Windows. Les données ne sont pas synchronisées entre origines web, profils ou application de bureau. Exporter un `.wattpack` pour transférer ou sauvegarder un logement, et exporter séparément la bibliothèque pour les fiches qui ne sont pas installées dans ce logement. Les préférences de thème et de langue restent sur l’appareil.
 
 La 3D est facultative : la liste et les formulaires restent utilisables sans WebGL. Les estimations utilisent les usages saisis, sans modèle thermique. La V1 n’inclut pas de catalogue en ligne, comptes, intégration Linky, données de compteur en direct, reconnaissance photo, éditeur de géométrie, simulation température/météo ou tarifs calendaires comme Tempo. Les ressources GLB importées puis retirées des fiches peuvent rester dans le stockage local ; aucune commande de compactage n’est encore proposée.
+
+## Licence
+
+Walletricity est disponible sous la [licence MIT](LICENSE). Les ressources tierces conservent leurs propres licences, notamment les polices dans [public/fonts](public/fonts/).

@@ -1,6 +1,7 @@
 [package]
 name = "watt-wallet"
 version = "0.1.0"
+license = "MIT"
 description = "Votre énergie, en clair"
 authors = ["Walletricity"]
 edition = "2021"
