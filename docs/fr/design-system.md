@@ -39,7 +39,7 @@ La page Figma contient un catalogue de présentation et une zone séparée pour 
 
 Les variants décrivent l’apparence et l’état : taille, style, survol, focus clavier, désactivation, sélection ou méthode de calcul. Les libellés, valeurs des cartes, noms d’appareils et icônes sont des propriétés d’instance ; ils ne créent pas de variants dupliqués pour chaque contenu. Les icônes utilisent des échanges d’instance ; les propriétés de visibilité masquent les icônes et indications facultatives. Le catalogue présente des instances natives dans les deux modes de variables. La scène Three.js statique est une ressource visuelle capturée ; ses données énergétiques et sa géométrie restent gérées par l’application.
 
-Les **5 821 masters importés d’origine** conservent leurs identifiants dans **99 · Import archive**, sous des noms masqués `.Legacy/`. Les dépendances des écrans et animations existants sont préservées. Utiliser les familles canoniques de 05 · Components pour les nouveaux travaux.
+Utiliser les familles de composants de **05 · Components** pour les nouveaux designs.
 
 | Stories                                   | Référence Figma                                                                                  |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -80,7 +80,7 @@ Conserver les identifiants canoniques lors d’une évolution du design. Si un c
 
 L’application et Storybook partagent les composants et styles. Éviter une seconde implémentation visuelle dans le catalogue. `ButtonDirective` conserve les comportements natifs de clic, clavier, désactivation et formulaire. `MetricComponent` reçoit des données déjà formatées/traduites sans calcul ni sauvegarde. Une carte reste un `article` pour préserver la disposition et la sémantique.
 
-Storybook 10.6.1 utilise `@storybook/angular-vite` avec le rendu sans Zone.js d’Angular 22. Ce framework est actuellement en preview ; les versions sont fixées et doivent être mises à jour ensemble, avec vérifications de compilation, types et navigateur. Consulter la [documentation officielle du framework](https://storybook.js.org/docs/get-started/frameworks/angular-vite).
+Storybook utilise `@storybook/angular-vite` avec le rendu sans Zone.js d’Angular 22. Les versions sont fixées dans `package.json` ; les mettre à jour ensemble et vérifier la compilation, les types et les interactions dans le navigateur. Consulter la [documentation officielle du framework](https://storybook.js.org/docs/get-started/frameworks/angular-vite).
 
 ## Typographie partagée
 
@@ -115,6 +115,6 @@ npm run build
 npm run format:check
 ```
 
-La compilation produit `storybook-static/`, ignoré par Git. Servir le dossier entier sur HTTP/HTTPS, avec `index.json`, `iframe.html` et `assets/` ; ne pas l’ouvrir avec `file://`. Aucun workflow de publication Storybook n’est ajouté : le workflow Pages existant publie toujours uniquement le site documentaire. Télémétrie et rapports d’erreur Storybook sont désactivés.
+La compilation produit `storybook-static/`, ignoré par Git. Servir le dossier entier sur HTTP/HTTPS, avec `index.json`, `iframe.html` et `assets/` ; ne pas l’ouvrir avec `file://`. Publier Storybook séparément du site documentaire ; le workflow Pages déploie `docs/.vitepress/dist`. Télémétrie et rapports d’erreur Storybook sont désactivés.
 
 Le contrôle navigateur ouvre toutes les stories de l’index statique, attend leur succès Storybook (assertions play comprises), visite autodocs et vérifie traduction, palette, sombre, WebGL, JSON mobile et isolation du stockage. Les captures d’inspection sont écrites dans le dossier ignoré `.cache/storybook-review/`. Il utilise des processus Chromium isolés avec composition logicielle et WebGL SwiftShader pour éviter les problèmes du pilote GPU hôte ; ce ne sont pas des tests sur appareil physique ni WebView2 natif. Comme pour les autres scripts, définir `PLAYWRIGHT_BROWSERS_PATH` de façon cohérente si le runtime est installé dans un cache personnalisé.

@@ -1,12 +1,12 @@
 [English](../en/human-testing.md) · [Français](../fr/human-testing.md) · [Home](../../README.md)
 
-# Human testing
+# Manual testing
 
-Use this 20–30 minute journey to try the application before sharing feedback. The [7 October review](verification.md#review-before-human-testing-7-october-2026) records the automated checks; this guide covers interaction and platform checks that still need people.
+Use this 20–30 minute journey to check the main features, keyboard and touch interactions, and data recovery. It complements the [automated test suites](verification.md).
 
 ## Before starting
 
-Use the application URL or Windows installer supplied by the organizer. The documentation and Storybook are separate tools. Create a new empty home or use a separate browser profile. Export any existing home and library before testing, and keep one application tab open for the main journey. Removing an installed device has no undo action.
+Open the web application or the Windows application. The documentation and Storybook are separate tools. Create a new empty home or use a separate browser profile. Export any existing home and library before testing, and keep one application tab open for the main journey. Removing an installed device has no undo action.
 
 Choose French or English and EUR or USD. Currency selection changes the display without converting amounts. The examples below use EUR and invented equipment, rather than manufacturer specifications. The Windows installer is unsigned and its installation interface is in French.
 
@@ -32,7 +32,7 @@ Optionally import the [custom-model example](../../examples/modele-personnalise.
 
 ## Platform and recovery checks
 
-- **Windows:** use the actual native import/export selectors, including cancellation. Export a home, reopen it and check its scenarios and custom model. These interactive selectors still need manual validation.
+- **Windows:** use the actual native import/export selectors, including cancellation. Export a home, reopen it and check its scenarios and custom model.
 - **Mobile/tablet:** check the library immediately above the 3D card, dialogs, scrolling and touch controls. Chromium viewport screenshots do not validate physical Apple devices or Safari.
 - **Keyboard:** use Tab, Enter and Space to navigate, edit and remove devices, open dialogs and toggle snapping. Note missing focus or unreachable actions.
 - **Two tabs:** open a second tab and edit the same data. A stale tab must report a conflict instead of overwriting changes. Export its local edits before explicitly reloading if you need to keep them.

@@ -1,12 +1,12 @@
 [English](../en/human-testing.md) · [Français](../fr/human-testing.md) · [Accueil](../../README.fr.md)
 
-# Essais humains
+# Tests manuels
 
-Ce parcours de 20 à 30 minutes permet d’essayer l’application avant de transmettre vos retours. La [revue du 7 octobre](verification.md#revue-avant-les-essais-humains-7-octobre-2026) consigne les vérifications automatisées ; ce guide couvre les interactions et plateformes qui demandent encore des essais humains.
+Ce parcours de 20 à 30 minutes permet de vérifier les fonctionnalités principales, les interactions au clavier et tactiles ainsi que la récupération des données. Il complète les [suites de tests automatisés](verification.md).
 
 ## Avant de commencer
 
-Utiliser l’adresse de l’application ou l’installateur Windows fourni par l’organisateur. La documentation et Storybook sont des outils séparés. Créer un logement vide ou utiliser un profil de navigateur distinct. Exporter tout logement et toute bibliothèque existants avant les essais, puis conserver un seul onglet pour le parcours principal. Le retrait d’un appareil installé ne propose pas d’annulation.
+Ouvrir l’application web ou l’application Windows. La documentation et Storybook sont des outils séparés. Créer un logement vide ou utiliser un profil de navigateur distinct. Exporter tout logement et toute bibliothèque existants avant les essais, puis conserver un seul onglet pour le parcours principal. Le retrait d’un appareil installé ne propose pas d’annulation.
 
 Choisir le français ou l’anglais, puis EUR ou USD. Le changement de devise modifie l’affichage sans convertir les montants. Les exemples suivants utilisent EUR et des appareils fictifs, pas des caractéristiques constructeur. L’installateur Windows est non signé et son interface d’installation est en français.
 
@@ -32,7 +32,7 @@ En option, importer l’[exemple de modèle personnalisé](../../examples/modele
 
 ## Plateformes et récupération
 
-- **Windows :** manipuler les véritables sélecteurs natifs d’import/export, y compris l’annulation. Exporter un logement, le rouvrir et vérifier ses scénarios et son modèle personnalisé. Ces sélecteurs interactifs demandent encore une validation manuelle.
+- **Windows :** manipuler les véritables sélecteurs natifs d’import/export, y compris l’annulation. Exporter un logement, le rouvrir et vérifier ses scénarios et son modèle personnalisé.
 - **Mobile/tablette :** vérifier la bibliothèque juste au-dessus de la carte 3D, les fenêtres, le défilement et les commandes tactiles. Les captures de viewport Chromium ne valident pas les appareils Apple physiques ni Safari.
 - **Clavier :** naviguer avec Tab, Entrée et Espace, modifier et retirer des appareils, ouvrir les fenêtres et basculer l’accrochage. Signaler les actions inaccessibles et les focus absents.
 - **Deux onglets :** ouvrir un second onglet et modifier les mêmes données. Un onglet obsolète doit signaler le conflit sans écraser les modifications. Exporter ses changements locaux avant de recharger explicitement pour les conserver.

@@ -2,7 +2,7 @@
 
 # Régression visuelle avec Playwright
 
-Ces tests comparent le rendu de l’application et de Storybook à des références PNG relues et suivies dans `visual/baselines/`. Ils complètent les tests unitaires et les parcours fonctionnels. Les galeries historiques `docs/screenshots/` sont des images de présentation, pas les références de régression.
+Ces tests comparent le rendu de l’application et de Storybook à des références PNG relues et suivies dans `visual/baselines/`. Ils complètent les tests unitaires et les parcours fonctionnels. Les galeries `docs/screenshots/` sont des images de présentation, pas les références de régression.
 
 ## Lancer les comparaisons
 
@@ -33,10 +33,6 @@ Une référence absente ou une différence excessive de pixels fait échouer le 
 Le test d’inventaire Storybook échoue si une story est ajoutée ou retirée sans mettre à jour `visual/storybook.visual.spec.ts`. Certains tests détaillés sont volontairement ignorés aux formats intermédiaires ; les cas responsives couvrent toujours les quatre dimensions.
 
 Les captures d’accueil prennent le viewport. Les captures détaillées prennent le composant entier (qui peut dépasser la hauteur du viewport), et celles du JSON, de la palette ou du tarif incluent la vraie fenêtre modale et son arrière-plan. Le canvas WebGL est comparé, sans masque ni remplacement. Ce sont des vérifications Chromium, pas des tests sur appareils Apple physiques, Safari ou WebView2 natif.
-
-## Dernière vérification locale
-
-Le **7 octobre 2026**, `npm run test:visual` a recompilé les deux cibles et terminé sous Windows : **86 tests réussis, 17 volontairement ignorés**, avec les 138 références PNG existantes inchangées. Les 147 captures de documentation ont également été comparées à de nouvelles captures ; 24 ont été actualisées pour inclure le bouton de devise dans l’en-tête et les arrière-plans des fenêtres modales. Cette vérification locale ne valide ni le runner GitHub Actions ni WebView2 natif.
 
 ## Reproductibilité
 
@@ -77,4 +73,4 @@ Cette commande directe évite volontairement la compilation. Le script npm habit
 
 `.github/workflows/visual-regression.yml` s’exécute pour les pull requests concernées et sur lancement manuel, avec Windows 2025 et `npm ci`. Il vérifie les types, compile les deux cibles et compare les références sans les modifier. Le rapport HTML, les différences et les traces sont conservés dans l’artefact `visual-regression-report` pendant 14 jours, y compris en cas d’échec.
 
-Le workflow est fourni dans le dépôt ; un parcours local ne valide pas le runner hébergé et ne publie rien. Tout changement de navigateur, de polices ou d’image du runner demande une comparaison et une revue volontaires des références.
+Tout changement de navigateur, de polices ou d’image du runner demande une comparaison et une revue volontaires des références.

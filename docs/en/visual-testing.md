@@ -2,7 +2,7 @@
 
 # Visual regression with Playwright
 
-These tests compare the rendered application and Storybook against reviewed PNG references committed in `visual/baselines/`. They complement the unit tests and functional journeys. The older `docs/screenshots/` galleries are presentation assets, not regression references.
+These tests compare the rendered application and Storybook against reviewed PNG references committed in `visual/baselines/`. They complement the unit tests and functional journeys. The `docs/screenshots/` galleries are presentation assets, not regression references.
 
 ## Run the comparisons
 
@@ -33,10 +33,6 @@ A missing reference or an excessive pixel difference fails the run. Comparison m
 The Storybook inventory test fails when a story is added or removed without updating `visual/storybook.visual.spec.ts`. Some feature tests intentionally skip intermediate viewports; the responsive cases still run on all four.
 
 Home shots capture the viewport. Detail shots capture the whole selected component (which can be taller than the viewport), and JSON/palette/tariff shots include the real modal and backdrop. The WebGL canvas is compared, not masked or replaced. These are Chromium layout checks, not tests on physical Apple hardware, Safari or native WebView2.
-
-## Latest local verification
-
-On **7 October 2026**, `npm run test:visual` rebuilt both targets and completed on Windows: **86 passed, 17 intentionally skipped**, with the 138 existing PNG references unchanged. The 147 documentation screenshots were also checked against fresh captures; 24 were refreshed to include the currency button in the header and modal backdrops. This local check does not validate the GitHub Actions runner or native WebView2.
 
 ## Reproducibility
 
@@ -77,4 +73,4 @@ This direct command deliberately skips rebuilding. The usual npm script always b
 
 `.github/workflows/visual-regression.yml` runs on relevant pull requests and manual dispatch, using Windows 2025 and `npm ci`. It checks types, builds both targets and compares references without updating them. The HTML report, diffs and traces are uploaded as `visual-regression-report` for 14 days, including on failure.
 
-The workflow is provided in the repository; a local run does not validate the hosted runner or publish anything. Changes to browser versions, fonts or runner images require an intentional comparison and review of references.
+Changes to browser versions, fonts or runner images require an intentional comparison and review of references.

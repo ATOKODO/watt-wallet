@@ -8,9 +8,9 @@ The public product name is **Walletricity**. `watt-wallet` remains the internal 
 
 ## Prerequisites and setup
 
-Use Node **24.15+ on the 24.x branch** and npm. The recorded local validation used Node 24.20. Install the locked dependencies with `npm ci`.
+Use Node **24.15+ on the 24.x branch** and npm. Install the locked dependencies with `npm ci`.
 
-For Windows desktop work, use Rust stable with the MSVC toolchain, Visual Studio C++ Build Tools with the C++ desktop tools, Windows SDK and WebView2. Windows x64 is the validated native target. macOS/Linux installers are not part of the current delivery.
+For Windows desktop work, use Rust stable with the MSVC toolchain, Visual Studio C++ Build Tools with the C++ desktop tools, Windows SDK and WebView2. Desktop packaging targets Windows x64. macOS/Linux installers are not provided.
 
 ```powershell
 npm ci
@@ -62,7 +62,7 @@ The SPA fallback preserves existing assets and serves `index.html` for applicati
 
 `scripts/netlify-ignore-build.mjs` compares the previous deployed commit with the requested commit. Changes confined to documentation, Storybook stories/configuration, tests or Tauri do not rebuild the app. App code, public assets, shared npm dependencies, Angular/TypeScript configuration and Netlify configuration trigger a build. Keep the watched paths aligned with future build inputs. A first deployment, explicit redeployment of the same commit or unavailable Git comparison continues the build. Netlify build hooks can bypass this skip rule.
 
-After deployment, check the public URL, reload, 3D view, local saving and `.wattpack` import/export. Data belongs to each browser profile and origin; a Deploy Preview, the production domain and a new custom domain have separate storage. Export/import is required to transfer a home between them. The site has not been deployed merely by adding this configuration.
+After deployment, check the public URL, reload, 3D view, local saving and `.wattpack` import/export. Data belongs to each browser profile and origin; a Deploy Preview, the production domain and a new custom domain have separate storage. Export/import is required to transfer a home between them.
 
 See Netlify’s [file-based configuration](https://docs.netlify.com/build/configure-builds/file-based-configuration/) and [ignore-build rules](https://docs.netlify.com/build/configure-builds/ignore-builds/).
 
@@ -151,7 +151,7 @@ $env:CARGO_HOME = Join-Path (Get-Location) '.cache/cargo'
 npm exec playwright install chromium
 ```
 
-See [the historical verification report](verification.md) for recorded results, dates and native coverage limitations. It is not an assertion that tests ran again for every documentation update.
+See [test coverage and known limits](verification.md) for the scope of each suite and the checks that require manual testing.
 
 ## Examples and feature screenshots
 
@@ -170,12 +170,12 @@ node scripts/screenshots-devices.mjs
 node scripts/screenshots-devices.mjs ipad-pro-11 en
 ```
 
-| Series          | Viewport    | Languages                                                          |
-| --------------- | ----------- | ------------------------------------------------------------------ |
-| iPhone 16 Pro   | 402 × 874   | French series (final view in English) and separate English series. |
-| iPad Pro 11″    | 834 × 1194  | Separate French and English series.                                |
-| MacBook Pro 14″ | 1512 × 982  | Separate French and English series.                                |
-| Desktop         | 1920 × 1080 | Separate French and English series.                                |
+| Series          | Viewport    | Languages                           |
+| --------------- | ----------- | ----------------------------------- |
+| iPhone 16 Pro   | 402 × 874   | Separate French and English series. |
+| iPad Pro 11″    | 834 × 1194  | Separate French and English series. |
+| MacBook Pro 14″ | 1512 × 982  | Separate French and English series. |
+| Desktop         | 1920 × 1080 | Separate French and English series. |
 
 The shared capture helper uses isolated demonstration contexts, a pixel ratio of 1 and 21 feature captures per series. Outputs are PNGs plus a gallery, README and manifest under `docs/screenshots`. Optional device identifiers are `ipad-pro-11`, `macbook-pro-14` and `desktop`; optional language is `fr` or `en`. `WATT_WALLET_URL` changes the target URL. `WATT_WALLET_SOFTWARE_GPU=1` enables the larger-series script's software WebGL option when needed.
 
@@ -208,7 +208,7 @@ npx prettier --check README*.md docs/en docs/fr docs/index.md docs/.vitepress/co
 
 ### GitHub Pages
 
-The included `.github/workflows/docs-pages.yml` builds, checks links and publishes the documentation after relevant changes are pushed to `master`, or when started manually from Actions. In the repository's **Settings → Pages → Build and deployment → Source**, select **GitHub Actions** before running it. Adding the workflow locally does not publish a site or change repository settings. See [GitHub's custom Pages workflow instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) and the [VitePress deployment guide](https://vitepress.dev/guide/deploy).
+The included `.github/workflows/docs-pages.yml` builds, checks links and publishes the documentation after relevant changes are pushed to `master`, or when started manually from Actions. In the repository's **Settings → Pages → Build and deployment → Source**, select **GitHub Actions** before running it. See [GitHub's custom Pages workflow instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) and the [VitePress deployment guide](https://vitepress.dev/guide/deploy).
 
 The workflow supplies the actual Pages base path through `DOCS_BASE_PATH`, including a repository subpath or a custom domain's root. The site uses explicit `.html` routes so direct guide links do not need an SPA fallback. To check a repository subpath locally, use the same base for build, tests and preview:
 

@@ -8,9 +8,9 @@ Le nom public du produit est **Walletricity**. `watt-wallet` reste le nom techni
 
 ## Prérequis et installation
 
-Utiliser Node **24.15+ dans la branche 24.x** et npm. La validation locale enregistrée utilisait Node 24.20. Installer les dépendances verrouillées avec `npm ci`.
+Utiliser Node **24.15+ dans la branche 24.x** et npm. Installer les dépendances verrouillées avec `npm ci`.
 
-Pour Windows, utiliser Rust stable avec la chaîne MSVC, Visual Studio C++ Build Tools avec les outils de bureau C++, Windows SDK et WebView2. Windows x64 est la cible native validée. Les installateurs macOS/Linux ne font pas partie de la livraison actuelle.
+Pour Windows, utiliser Rust stable avec la chaîne MSVC, Visual Studio C++ Build Tools avec les outils de bureau C++, Windows SDK et WebView2. La version de bureau cible Windows x64. Aucun installateur macOS ou Linux n’est fourni.
 
 ```powershell
 npm ci
@@ -62,7 +62,7 @@ Le repli SPA conserve les ressources existantes et sert `index.html` pour les ad
 
 `scripts/netlify-ignore-build.mjs` compare le commit précédemment déployé au commit demandé. Les changements limités à la documentation, aux stories/configurations Storybook, aux tests ou à Tauri ne recompilent pas l’application. Le code applicatif, les ressources publiques, les dépendances npm partagées, les configurations Angular/TypeScript et Netlify déclenchent une compilation. Garder les chemins surveillés conformes aux futures entrées de compilation. Un premier déploiement, un redéploiement explicite du même commit ou une comparaison Git indisponible poursuivent la compilation. Les build hooks Netlify peuvent contourner cette règle d’annulation.
 
-Après déploiement, vérifier l’adresse publique, le rechargement, la vue 3D, la sauvegarde locale et l’import/export `.wattpack`. Les données appartiennent à chaque profil et origine de navigateur ; un Deploy Preview, le domaine de production et un nouveau domaine personnalisé ont des stockages séparés. Exporter/importer pour transférer un logement entre eux. L’ajout de cette configuration ne publie pas encore le site.
+Après déploiement, vérifier l’adresse publique, le rechargement, la vue 3D, la sauvegarde locale et l’import/export `.wattpack`. Les données appartiennent à chaque profil et origine de navigateur ; un Deploy Preview, le domaine de production et un nouveau domaine personnalisé ont des stockages séparés. Exporter/importer pour transférer un logement entre eux.
 
 Voir la [configuration par fichier](https://docs.netlify.com/build/configure-builds/file-based-configuration/) et les [règles d’annulation de compilation](https://docs.netlify.com/build/configure-builds/ignore-builds/) Netlify.
 
@@ -151,7 +151,7 @@ $env:CARGO_HOME = Join-Path (Get-Location) '.cache/cargo'
 npm exec playwright install chromium
 ```
 
-Consulter le [rapport historique de vérification](verification.md) pour les résultats, dates et limites de couverture native. Il ne signifie pas que les tests ont été réexécutés à chaque modification documentaire.
+Consulter la [couverture des tests et les limites connues](verification.md) pour le périmètre de chaque suite et les contrôles nécessitant des tests manuels.
 
 ## Exemples et captures fonctionnelles
 
@@ -170,12 +170,12 @@ node scripts/screenshots-devices.mjs
 node scripts/screenshots-devices.mjs ipad-pro-11 en
 ```
 
-| Série           | Viewport    | Langues                                                              |
-| --------------- | ----------- | -------------------------------------------------------------------- |
-| iPhone 16 Pro   | 402 × 874   | Série française (dernière vue en anglais) et série anglaise séparée. |
-| iPad Pro 11″    | 834 × 1194  | Séries française et anglaise séparées.                               |
-| MacBook Pro 14″ | 1512 × 982  | Séries française et anglaise séparées.                               |
-| Desktop         | 1920 × 1080 | Séries française et anglaise séparées.                               |
+| Série           | Viewport    | Langues                                |
+| --------------- | ----------- | -------------------------------------- |
+| iPhone 16 Pro   | 402 × 874   | Séries française et anglaise séparées. |
+| iPad Pro 11″    | 834 × 1194  | Séries française et anglaise séparées. |
+| MacBook Pro 14″ | 1512 × 982  | Séries française et anglaise séparées. |
+| Desktop         | 1920 × 1080 | Séries française et anglaise séparées. |
 
 La fonction de capture partagée utilise des contextes de démonstration isolés, un ratio de pixels de 1 et 21 captures de fonctionnalités par série. Les PNG, galerie, README et manifeste sont écrits dans `docs/screenshots`. Les identifiants d’appareil facultatifs sont `ipad-pro-11`, `macbook-pro-14` et `desktop` ; la langue facultative est `fr` ou `en`. `WATT_WALLET_URL` change l’URL cible. `WATT_WALLET_SOFTWARE_GPU=1` active l’option WebGL logiciel du script des grands formats si nécessaire.
 
@@ -208,7 +208,7 @@ npx prettier --check README*.md docs/en docs/fr docs/index.md docs/.vitepress/co
 
 ### GitHub Pages
 
-Le workflow fourni `.github/workflows/docs-pages.yml` compile, vérifie les liens et publie la documentation après les changements concernés poussés sur `master`, ou sur lancement manuel depuis Actions. Dans **Settings → Pages → Build and deployment → Source** du dépôt, sélectionner **GitHub Actions** avant de l’exécuter. Ajouter le workflow localement ne publie pas de site et ne modifie pas les paramètres du dépôt. Consulter les [instructions GitHub pour un workflow Pages personnalisé](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) et le [guide de publication VitePress](https://vitepress.dev/guide/deploy).
+Le workflow fourni `.github/workflows/docs-pages.yml` compile, vérifie les liens et publie la documentation après les changements concernés poussés sur `master`, ou sur lancement manuel depuis Actions. Dans **Settings → Pages → Build and deployment → Source** du dépôt, sélectionner **GitHub Actions** avant de l’exécuter. Consulter les [instructions GitHub pour un workflow Pages personnalisé](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) et le [guide de publication VitePress](https://vitepress.dev/guide/deploy).
 
 Le workflow fournit le chemin de base réel de Pages via `DOCS_BASE_PATH`, qu’il s’agisse d’un sous-chemin de dépôt ou de la racine d’un domaine personnalisé. Le site utilise des routes explicites en `.html` : les liens directs vers les guides ne nécessitent pas de repli SPA. Pour vérifier un sous-chemin localement, garder la même base pour la compilation, les tests et l’aperçu :
 

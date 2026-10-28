@@ -39,7 +39,7 @@ The Figma page contains a review catalogue and a separate master area. It has **
 
 Variants describe appearance and state: size, style, hover, keyboard focus, disabled, selection or calculation method. Labels, metric values, device names and icons are instance properties, rather than duplicate variants for each piece of content. Icons use instance swaps; visibility properties can hide optional icons and hints. The review catalogue shows native instances in both variable modes. The static Three.js scene is a captured visual asset; its energy data and geometry are still owned by the application.
 
-The **5,821 original imported masters** retain their IDs on **99 · Import archive**, under hidden `.Legacy/` names. Existing screen and animation dependencies remain intact. Use the canonical families on 05 · Components for new work.
+Use the component families on **05 · Components** for new designs.
 
 | Stories                                   | Figma reference                                                              |
 | ----------------------------------------- | ---------------------------------------------------------------------------- |
@@ -80,7 +80,7 @@ Preserve canonical node IDs when refining a design. If a node is replaced, updat
 
 The app and Storybook share components and styles. Avoid maintaining a second visual implementation inside the catalogue. `ButtonDirective` preserves native click, keyboard, disabled and form behavior. `MetricComponent` takes already formatted/translated data and performs no calculations or persistence. A metric remains an `article` so existing layout and semantics are preserved.
 
-Storybook 10.6.1 uses `@storybook/angular-vite` with Angular 22's zoneless rendering. This framework is currently a preview; versions are pinned and should be upgraded together, with build, type and browser checks. See the [official framework documentation](https://storybook.js.org/docs/get-started/frameworks/angular-vite).
+Storybook uses `@storybook/angular-vite` with Angular 22's zoneless rendering. Versions are pinned in `package.json`; upgrade them together and check the build, types and browser interactions. See the [official framework documentation](https://storybook.js.org/docs/get-started/frameworks/angular-vite).
 
 ## Shared typography
 
@@ -115,6 +115,6 @@ npm run build
 npm run format:check
 ```
 
-The build outputs `storybook-static/`, ignored by Git. Serve the entire directory over HTTP/HTTPS, including `index.json`, `iframe.html` and `assets/`; do not open it with `file://`. No Storybook publication workflow is included: the existing Pages workflow still publishes only the documentation website. Storybook telemetry/crash reporting is disabled.
+The build outputs `storybook-static/`, ignored by Git. Serve the entire directory over HTTP/HTTPS, including `index.json`, `iframe.html` and `assets/`; do not open it with `file://`. Publish Storybook separately from the documentation site; the Pages workflow deploys `docs/.vitepress/dist`. Storybook telemetry/crash reporting is disabled.
 
 The browser check opens every story from the static index, waits for successful Storybook completion (including play assertions), visits autodocs and checks translations, palette, dark mode, WebGL, mobile JSON layout and storage isolation. Screenshots for inspection are written to the ignored `.cache/storybook-review/` directory. It uses isolated Chromium processes with software compositing and SwiftShader WebGL to avoid host GPU driver issues; this is not physical-device or native WebView2 testing. As with the other scripts, set `PLAYWRIGHT_BROWSERS_PATH` consistently if the runtime is installed in a custom cache.

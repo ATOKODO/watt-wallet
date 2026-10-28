@@ -42,4 +42,4 @@ The 14 supplied profiles and prices are editable examples, not official specific
 
 Homes and profiles are saved automatically on this device. Browser and Windows stores are separate; there is no cloud synchronization. Use `.wattpack` exports to transfer data and keep backups. The [user guide](user-guide.md#saving-and-recovery) explains storage failures and conflicts between windows.
 
-The sidebar takes you to each feature. Local search finds text in this language; the header switches languages or appearance. For downloads and more views, see [examples and screenshots](examples.md). For the code, use the [developer guide](development.md), [exchange format](wattpack.md) and [historical verification report](verification.md).
+The sidebar takes you to each feature. Local search finds text in this language; the header switches languages or appearance. For downloads and more views, see [examples and screenshots](examples.md). For the code, use the [developer guide](development.md), [exchange format](wattpack.md) and [test coverage and known limits](verification.md).

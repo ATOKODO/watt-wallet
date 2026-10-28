@@ -43,7 +43,7 @@ function sidebar(lang: 'en' | 'fr'): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'Introduction', link: prefix },
         { text: fr ? 'Guide utilisateur' : 'User guide', link: prefix + 'user-guide' },
-        { text: fr ? 'Essais humains' : 'Human testing', link: prefix + 'human-testing' },
+        { text: fr ? 'Tests manuels' : 'Manual testing', link: prefix + 'human-testing' },
         {
           text: fr ? 'Premier logement' : 'Your first home',
           link: prefix + 'user-guide#' + (fr ? 'votre-premier-logement' : 'your-first-home'),

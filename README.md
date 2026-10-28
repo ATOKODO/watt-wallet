@@ -73,7 +73,7 @@ Open [http://127.0.0.1:5173/en/](http://127.0.0.1:5173/en/). Build the standalon
 | [Design system & Storybook](docs/en/design-system.md)    | Interactive design system, components, themes and isolated fixtures.             |
 | [Visual regression](docs/en/visual-testing.md)           | Screenshot comparisons, approved references and difference reports.              |
 | [`.wattpack` format](docs/en/wattpack.md)                | Version 1 contract, complete JSON examples, GLB requirements and import limits.  |
-| [Verification and known limits](docs/en/verification.md) | Historical local validation results and what has not been tested.                |
+| [Verification and known limits](docs/en/verification.md) | Test coverage, platform requirements and application limits.                     |
 
 The [JSON schema](docs/wattpack.schema.json) and [example packages](examples/) are included in the repository. Browse the [screenshot index](docs/screenshots/README.md) for iPhone, iPad, MacBook and desktop layouts, including French/English series for every viewport. These are Chromium layout captures, not physical Apple-device or Safari certification.
 

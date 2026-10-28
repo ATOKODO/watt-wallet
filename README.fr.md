@@ -73,7 +73,7 @@ Ouvrir [http://127.0.0.1:5173/fr/](http://127.0.0.1:5173/fr/). Compiler le site 
 | [Design system & Storybook](docs/fr/design-system.md)       | Design system interactif, composants, thèmes et données isolées.                              |
 | [Régression visuelle](docs/fr/visual-testing.md)            | Comparaisons de captures, références approuvées et rapports de différences.                   |
 | [Format `.wattpack`](docs/fr/wattpack.md)                   | Contrat version 1, exemples JSON complets, exigences GLB et limites d’import.                 |
-| [Vérifications et limites connues](docs/fr/verification.md) | Résultats historiques des validations locales et parcours non testés.                         |
+| [Vérifications et limites connues](docs/fr/verification.md) | Couverture des tests, prérequis des plateformes et limites de l’application.                  |
 
 Le [schéma JSON](docs/wattpack.schema.json) et les [paquets d’exemple](examples/) sont inclus dans le dépôt. L’[index des captures](docs/screenshots/README.md) présente les dispositions iPhone, iPad, MacBook et desktop, avec des séries françaises et anglaises pour chaque format. Ces captures Chromium ne constituent pas une certification sur appareils Apple physiques ou Safari.
 

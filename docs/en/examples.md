@@ -18,12 +18,12 @@ The [manifest JSON schema](../wattpack.schema.json) and [format guide](wattpack.
 
 Each gallery contains 21 viewport PNGs, including annual estimates, 3D, profiles/JSON, scenarios, power, tariffs, sharing and themes.
 
-| Layout          | Dimensions  | English                                             | French                                                             |
-| --------------- | ----------- | --------------------------------------------------- | ------------------------------------------------------------------ |
-| iPad Pro 11″    | 834 × 1194  | [Open](../screenshots/ipad-pro-11/en/index.html)    | [Open](../screenshots/ipad-pro-11/fr/index.html)                   |
-| MacBook Pro 14″ | 1512 × 982  | [Open](../screenshots/macbook-pro-14/en/index.html) | [Open](../screenshots/macbook-pro-14/fr/index.html)                |
-| Desktop         | 1920 × 1080 | [Open](../screenshots/desktop/en/index.html)        | [Open](../screenshots/desktop/fr/index.html)                       |
-| iPhone 16 Pro   | 402 × 874   | [Open](../screenshots/iphone-16-pro/en/index.html)  | [Open the legacy gallery](../screenshots/iphone-16-pro/index.html) |
+| Layout          | Dimensions  | English                                             | French                                              |
+| --------------- | ----------- | --------------------------------------------------- | --------------------------------------------------- |
+| iPad Pro 11″    | 834 × 1194  | [Open](../screenshots/ipad-pro-11/en/index.html)    | [Open](../screenshots/ipad-pro-11/fr/index.html)    |
+| MacBook Pro 14″ | 1512 × 982  | [Open](../screenshots/macbook-pro-14/en/index.html) | [Open](../screenshots/macbook-pro-14/fr/index.html) |
+| Desktop         | 1920 × 1080 | [Open](../screenshots/desktop/en/index.html)        | [Open](../screenshots/desktop/fr/index.html)        |
+| iPhone 16 Pro   | 402 × 874   | [Open](../screenshots/iphone-16-pro/en/index.html)  | [Open](../screenshots/iphone-16-pro/index.html)     |
 
 These captures use Chromium and isolated demonstration data at pixel ratio 1. They show responsive layouts, not validation on physical Apple devices or Safari. [Regenerate the series](development.md#examples-and-feature-screenshots).
 
