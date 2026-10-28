@@ -447,5 +447,14 @@
   "Heures creuses ({0}/kWh)": "Off-peak hours ({0}/kWh)",
   "Abonnement annuel TTC ({0})": "Annual standing charge including tax ({0})",
   "Wallet": "Wallet",
-  "ricity": "ricity"
+  "ricity": "ricity",
+  "Licences": "Licenses",
+  "Walletricity est sous licence MIT. Les bibliothèques et les polices conservent leurs propres licences.": "Walletricity is licensed under MIT. Libraries and fonts retain their own licenses.",
+  "Les licences n’ont pas pu être chargées.": "The licenses could not be loaded.",
+  "Walletricity — MIT": "Walletricity — MIT",
+  "Bibliothèques tierces": "Third-party libraries",
+  "Texte de licence : {0}": "License text: {0}",
+  "Inter — SIL Open Font License": "Inter — SIL Open Font License",
+  "Lora — SIL Open Font License": "Lora — SIL Open Font License",
+  "Roboto Mono — SIL Open Font License": "Roboto Mono — SIL Open Font License"
 }

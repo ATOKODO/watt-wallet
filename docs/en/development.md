@@ -38,6 +38,8 @@ npm run desktop:build
 
 The web build is produced in `dist/watt-wallet/browser`. Serve it with a static HTTP server on localhost or HTTPS, with an SPA fallback to `index.html` if the hosting setup needs one. Do not open it with `file://`.
 
+Use `npm run build` so its `postbuild` step also runs. `scripts/prepare-licenses.mjs` copies the project MIT license as `LICENSE.txt` and Angular's extracted dependency notices as `3rdpartylicenses.txt` into the browser output. It then regenerates the service worker manifest with Angular's configuration CLI to include both files in the offline cache. The **Licenses** button in the workspace footer is available in both development and production; the dialog also includes the bundled font notices. `npm start` prepares development notices from the installed runtime packages through its `prestart` step, without requiring a production build. Keep the copied production notices in Netlify deployments and desktop bundles. Changes to `LICENSE` or the production preparation script trigger a Netlify build.
+
 The production browser app registers an Angular service worker immediately. Its prefetch group includes the app shell, JavaScript, CSS, favicon and web manifest. After a complete initial load and installation, the same origin can reopen offline. Development mode and Tauri disable the browser service worker. Workspace data remains separate for every browser origin/profile.
 
 The Windows command builds the frontend and creates an NSIS installer in `src-tauri/target/release/bundle/nsis`, currently named `Walletricity_0.1.0_x64-setup.exe`. The installer is per-user, in French, and not commercially code-signed. It downloads WebView2 when absent; that path requires internet. Application languages remain French/English.

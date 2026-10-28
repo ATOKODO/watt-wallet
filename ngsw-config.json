@@ -6,7 +6,19 @@
       "name": "application",
       "installMode": "prefetch",
       "resources": {
-        "files": ["/index.html", "/*.css", "/*.js", "/favicon.svg", "/manifest.webmanifest", "/fonts/**"]
+        "files": [
+          "/index.html",
+          "/*.css",
+          "/*.js",
+          "!/ngsw-worker.js",
+          "!/safety-worker.js",
+          "!/worker-basic.min.js",
+          "/favicon.svg",
+          "/manifest.webmanifest",
+          "/fonts/**",
+          "/LICENSE.txt",
+          "/3rdpartylicenses.txt"
+        ]
       }
     }
   ]

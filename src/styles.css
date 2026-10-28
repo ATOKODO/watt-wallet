@@ -1062,6 +1062,12 @@ h3 {
   width: 4px;
   height: 4px;
 }
+.workspace-footer .footer-licenses {
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
 .inspector-heading {
   display: flex;
   align-items: center;
@@ -1573,6 +1579,28 @@ textarea {
 }
 .modal.wide-modal {
   width: min(580px, calc(100vw - 30px));
+}
+.modal.licenses-modal {
+  width: min(680px, calc(100vw - 30px));
+}
+.license-notice {
+  border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  padding-block: 14px;
+}
+.license-notice summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+.license-notice pre {
+  max-height: 35vh;
+  margin-top: 12px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.6;
 }
 .modal-header {
   display: flex;

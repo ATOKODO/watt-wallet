@@ -31,6 +31,8 @@ const result = spawnSync(
     '.nvmrc',
     '.node-version',
     'netlify.toml',
+    'LICENSE',
+    'scripts/prepare-licenses.mjs',
     'scripts/netlify-ignore-build.mjs',
     ':(exclude)src/stories/**',
   ],

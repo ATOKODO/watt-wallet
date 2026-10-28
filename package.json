@@ -5,8 +5,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prestart": "node scripts/prepare-dev-licenses.mjs",
     "start": "ng serve --host 127.0.0.1 --port 4200",
     "build": "ng build",
+    "postbuild": "node scripts/prepare-licenses.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:offline": "node scripts/offline-smoke.mjs",

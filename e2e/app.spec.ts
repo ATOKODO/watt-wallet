@@ -5,6 +5,46 @@ import { oversizedGeometryGlb } from '../tests/fixtures';
 import { seedLibrary, seedWorkspace, makeInstance } from '../src/app/domain/seed';
 import { encodePack, decodePack } from '../src/app/data/wattpack';
 
+test('licences accessibles en développement, reprise après erreur et traduction', async ({ page }) => {
+  const notice = await page.request.get('/3rdpartylicenses.txt');
+  expect(notice.ok()).toBe(true);
+  expect(notice.headers()['content-type']).toContain('text/plain');
+  expect(await notice.text()).toContain('Package: three@');
+  const license = await page.request.get('/LICENSE.txt');
+  expect(await license.text()).toBe(await readFile('LICENSE', 'utf8'));
+
+  await page.goto('/');
+  const rows = page.locator('.device-row');
+  await expect(rows).toHaveCount(6);
+  const button = page.getByRole('button', { name: 'Licences', exact: true });
+  await button.scrollIntoViewIfNeeded();
+  await expect(button).toBeInViewport();
+  await page.route('**/3rdpartylicenses.txt', (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<!doctype html><html></html>' }),
+  );
+  await button.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('alert')).toHaveText('Les licences n’ont pas pu être chargées.');
+  await page.unroute('**/3rdpartylicenses.txt');
+  await dialog.getByRole('button', { name: 'Réessayer', exact: true }).click();
+  await expect(dialog.locator('.license-notice')).toHaveCount(5);
+  await dialog.getByText('Bibliothèques tierces', { exact: true }).click();
+  await expect(dialog.locator('pre').nth(1)).toContainText('Package: three@');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(rows).toHaveCount(6);
+
+  await page.setViewportSize({ width: 402, height: 874 });
+  await page.getByRole('button', { name: 'Choisir la langue', exact: true }).click();
+  await dialog.getByRole('button', { name: 'English', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Done', exact: true }).click();
+  await page.getByRole('button', { name: 'Enable dark mode', exact: true }).click();
+  await page.getByRole('button', { name: 'Licenses', exact: true }).click();
+  await expect(dialog.getByRole('heading', { name: 'Licenses', exact: true })).toBeVisible();
+  await expect(dialog.getByText('Third-party libraries', { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(402);
+});
+
 test('ajout, déplacement et orbite autour du plateau', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Créer un logement', exact: true }).click();

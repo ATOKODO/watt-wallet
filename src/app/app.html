@@ -650,7 +650,10 @@
           (click)="store.saveConflict() ? reloadWorkspace() : store.retrySave()"
         >
           {{ (store.saveConflict() ? 'Recharger les données' : 'Réessayer') | t }}</button
-        >}</span
+        >}
+        <button class="text-button footer-licenses" (click)="openLicenses()">
+          {{ 'Licences' | t }}
+        </button> </span
       ><span>{{ 'Des estimations pour mieux décider. À ajuster avec vos usages réels.' | t }}</span>
     </footer>
     }
@@ -675,7 +678,13 @@
 } @if(busy() && !modal()){
 <div class="busy-status" role="status">{{ 'Traitement du fichier…' | t }}</div>
 } @if(modal()) {
-<dialog #modalDialog class="modal" [class.wide-modal]="modal() === 'device'" (cancel)="cancelModal($event)">
+<dialog
+  #modalDialog
+  class="modal"
+  [class.wide-modal]="modal() === 'device'"
+  [class.licenses-modal]="modal() === 'licenses'"
+  (cancel)="cancelModal($event)"
+>
   <div class="modal-header">
     <span class="eyebrow">{{ 'WALLETRICITY' | t }}</span
     ><button
@@ -687,7 +696,23 @@
       <ww-icon name="close" />
     </button>
   </div>
-  @if(modal() === 'new-home' || modal() === 'new-scenario' || modal() === 'rename-home') {
+  @if(modal() === 'licenses') {
+  <h2>{{ 'Licences' | t }}</h2>
+  <p class="subtle">
+    {{ 'Walletricity est sous licence MIT. Les bibliothèques et les polices conservent leurs propres
+    licences.' | t }}
+  </p>
+  @if(licenseLoading()) {
+  <p role="status">{{ 'Chargement…' | t }}</p>
+  } @if(licenseError()) {
+  <p role="alert" class="inline-error">{{licenseError() | t}}</p>
+  <button wwButton="secondary" (click)="openLicenses()">{{ 'Réessayer' | t }}</button>
+  } @for(entry of licenseEntries(); track entry.name; let first = $first) {
+  <details class="license-notice" [open]="first">
+    <summary>{{entry.name | t}}</summary>
+    <pre tabindex="0" [attr.aria-label]="'Texte de licence : {0}' | t:[entry.name | t]">{{entry.text}}</pre>
+  </details>
+  } } @if(modal() === 'new-home' || modal() === 'new-scenario' || modal() === 'rename-home') {
   <h2>
     {{(modal() === 'new-home' ? 'Un nouveau chez-vous' : modal() === 'new-scenario' ? 'Imaginez une autre
     façon de vivre' : 'Le nom de votre logement') | t}}

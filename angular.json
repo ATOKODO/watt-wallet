@@ -20,6 +20,7 @@
           },
           "configurations": {
             "production": {
+              "extractLicenses": true,
               "outputHashing": "all",
               "optimization": {
                 "scripts": true,
@@ -29,7 +30,15 @@
               "serviceWorker": "ngsw-config.json",
               "budgets": [{ "type": "initial", "maximumWarning": "2MB", "maximumError": "3MB" }]
             },
-            "development": { "optimization": false, "sourceMap": true, "extractLicenses": false }
+            "development": {
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false,
+              "assets": [
+                { "glob": "**/*", "input": "public" },
+                { "glob": "*.txt", "input": ".cache/dev-licenses", "output": "/" }
+              ]
+            }
           },
           "defaultConfiguration": "production"
         },

@@ -70,6 +70,9 @@ export class AppComponent {
   @ViewChild('deviceInspector') private deviceInspector?: ElementRef<HTMLElement>;
   private readonly compactQuery = window.matchMedia('(max-width: 760px)');
   readonly compactLayout = signal(this.compactQuery.matches);
+  readonly licenseEntries = signal<{ name: string; text: string }[]>([]);
+  readonly licenseLoading = signal(false);
+  readonly licenseError = signal('');
   tab = signal<'home' | 'scenarios' | 'library'>('home');
   mode = signal<'consumption' | 'placement'>('consumption');
   search = signal('');
@@ -88,6 +91,7 @@ export class AppComponent {
     | 'palette'
     | 'language'
     | 'currency'
+    | 'licenses'
     | null
   >(null);
   editingDefinition = signal<DeviceDefinition | null>(null);
@@ -450,6 +454,34 @@ export class AppComponent {
       this.store.report(e);
     } finally {
       this.busy.set(false);
+    }
+  }
+  async openLicenses() {
+    this.modal.set('licenses');
+    if (this.licenseEntries().length || this.licenseLoading()) return;
+    this.licenseLoading.set(true);
+    this.licenseError.set('');
+    try {
+      const files = [
+        ['Walletricity — MIT', 'LICENSE.txt'],
+        ['Bibliothèques tierces', '3rdpartylicenses.txt'],
+        ['Inter — SIL Open Font License', 'fonts/inter-LICENSE.txt'],
+        ['Lora — SIL Open Font License', 'fonts/lora-LICENSE.txt'],
+        ['Roboto Mono — SIL Open Font License', 'fonts/roboto-mono-LICENSE.txt'],
+      ];
+      const entries = await Promise.all(
+        files.map(async ([name, file]) => {
+          const response = await fetch(new URL(file, document.baseURI));
+          if (!response.ok || response.headers.get('content-type')?.includes('text/html'))
+            throw Error('License unavailable');
+          return { name, text: await response.text() };
+        }),
+      );
+      this.licenseEntries.set(entries);
+    } catch {
+      this.licenseError.set('Les licences n’ont pas pu être chargées.');
+    } finally {
+      this.licenseLoading.set(false);
     }
   }
   async openImport() {

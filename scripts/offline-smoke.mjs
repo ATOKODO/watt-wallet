@@ -10,6 +10,11 @@ const prefetchUrls = [
   ),
 ];
 expect(prefetchUrls).toContain('/index.html');
+for (const file of ['LICENSE.txt', '3rdpartylicenses.txt']) expect(prefetchUrls).toContain('/' + file);
+expect(await readFile(path.join(root, 'LICENSE.txt'))).toEqual(await readFile('LICENSE'));
+expect(await readFile(path.join(root, '3rdpartylicenses.txt'))).toEqual(
+  await readFile(path.join(root, '../3rdpartylicenses.txt')),
+);
 const prefetchResources = prefetchUrls.map((url) => {
   expect(manifest.hashTable[url], 'Missing service worker hash for ' + url).toMatch(/^[a-f0-9]{40}$/);
   return [url, manifest.hashTable[url]];
@@ -54,6 +59,7 @@ const types = {
   '.svg': 'image/svg+xml',
   '.webmanifest': 'application/manifest+json',
   '.woff2': 'font/woff2',
+  '.txt': 'text/plain; charset=utf-8',
 };
 const server = createServer(async (req, res) => {
   try {
@@ -181,9 +187,37 @@ try {
   ).toBe(true);
   expect(fontStatus.ui).toContain('Inter');
   expect(fontStatus.heading).toContain('Lora');
+  // Open notices for the first time while offline, without leaving the workspace.
+  await page.setViewportSize({ width: 402, height: 874 });
+  await page.getByRole('button', { name: 'Licenses', exact: true }).click();
+  const licenses = page.getByRole('dialog');
+  await expect(licenses.getByRole('heading', { name: 'Licenses', exact: true })).toBeVisible();
+  await expect(licenses.locator('.license-notice')).toHaveCount(5);
+  expect(await licenses.locator('pre').first().textContent()).toBe(await readFile('LICENSE', 'utf8'));
+  await licenses.getByText('Third-party libraries', { exact: true }).click();
+  expect(await licenses.locator('pre').nth(1).textContent()).toBe(
+    await readFile(path.join(root, '../3rdpartylicenses.txt'), 'utf8'),
+  );
+  await licenses.getByText('Inter — SIL Open Font License', { exact: true }).click();
+  await expect(licenses.locator('pre').nth(2)).toContainText('SIL OPEN FONT LICENSE');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(402);
+  await page.screenshot({ path: 'test-results/licenses-mobile-light.png' });
+  await page.keyboard.press('Escape');
+  await expect(licenses).not.toBeVisible();
+  await page.getByRole('button', { name: 'Enable dark mode', exact: true }).click();
+  await page.getByRole('button', { name: 'Choose language', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Français', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Terminer', exact: true }).click();
+  await page.getByRole('button', { name: 'Licences', exact: true }).click();
+  await expect(licenses.getByRole('heading', { name: 'Licences', exact: true })).toBeVisible();
+  await expect(licenses.getByText('Bibliothèques tierces', { exact: true })).toBeVisible();
+  await page.screenshot({ path: 'test-results/licenses-mobile-dark.png' });
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.device-row').filter({ hasText: 'Box Internet' })).toHaveCount(1);
+  await expect(page.locator('.webgl-fallback')).not.toBeVisible();
   expect(requests).toEqual([]);
   console.log(
-    'SPA production : cache complet, rechargement hors connexion, langue anglaise persistante, persistance et absence de requêtes externes OK.',
+    'SPA production : cache complet, rechargement hors connexion, langue anglaise persistante, données, polices, licences FR/EN et absence de requêtes externes OK.',
   );
 } finally {
   releasePrefetch();
